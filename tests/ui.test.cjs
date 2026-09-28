@@ -1,0 +1,50 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
+const root=path.resolve(__dirname,'..');
+function app(seed={},failStorage=false){
+ const dom=new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'),{url:'http://localhost/Three-Plates/',runScripts:'outside-only'}),w=dom.window;
+ w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
+ for(const [key,value] of Object.entries(seed))w.localStorage.setItem(key,value);
+ if(failStorage)w.Storage.prototype.setItem=()=>{throw Error('quota');};
+ for(const file of ['recipes.js','batch-v3.js','core-v3.js','phase1.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
+ const q=selector=>w.document.querySelector(selector),click=selector=>{assert.ok(q(selector),selector);q(selector).click();},set=(selector,value)=>{assert.ok(q(selector),selector);q(selector).value=value;q(selector).dispatchEvent(new w.Event('change',{bubbles:true}));};
+ const route=name=>{w.location.hash=name;w.dispatchEvent(new w.HashChangeEvent('hashchange'));};
+ const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
+ return {w,q,click,set,route,submit,dom,state:()=>JSON.parse(w.localStorage.getItem('three-plates-v3'))};
+}
+test('refresh keeps locked card and exhausts unseen eligible recipes first',()=>{
+ const a=app();const ids=()=>Array.from(a.w.document.querySelectorAll('[data-act="keep"]'),b=>b.dataset.id);
+ const first=ids();assert.equal(first.length,3);a.click('[data-act="keep"]');a.click('[data-act="refresh"]');const next=ids();assert.ok(next.includes(first[0]));assert.equal(next.filter(x=>first.slice(1).includes(x)).length,0);a.dom.window.close();
+});
+test('trip selector preserves usual shop, survives reload, and exact search plans a batch',()=>{
+ const a=app();a.route('shop');a.set('#shop-select','Tesco');a.click('#shop-trip');a.set('#shop-select','Aldi');assert.equal(a.state().shop,'Tesco');assert.equal(a.state().tripShop,'Aldi');
+ a.route('batch');a.set('#bf-people','2');a.set('#bf-style','variety');a.q('#recipe-search').value='bolognese';a.submit('#search-form');assert.equal(a.w.document.querySelectorAll('.meal-card').length,1);a.click('[data-act="batch-add"]');assert.equal(a.q('#batch-portions').value,'6');a.submit('#batch-form');assert.equal(a.state().batches[0].servings,6);
+ const restored=app({'three-plates-v3':JSON.stringify(a.state())});restored.route('shop');assert.equal(restored.q('#shop-select').value,'Aldi');restored.click('#shop-trip');assert.equal(restored.q('#shop-select').value,'Tesco');a.dom.window.close();restored.dom.window.close();
+});
+test('v1 migration preserves original; corrupted current data blocks mutations',()=>{
+ const old=JSON.stringify({version:1,pantry:[{id:'rice',qty:750}],bought:{rice:300},prefs:{favourites:['pesto-pea-pasta']}});
+ const a=app({'three-plates-v1':old});assert.equal(a.w.localStorage.getItem('three-plates-v1'),old);assert.equal(a.state().pantry[0].qty,750);assert.equal(a.state().bought.rice,300);a.dom.window.close();
+ const b=app({'three-plates-v3':'{broken'});b.click('[data-act="plan-add"]');assert.equal(b.w.localStorage.getItem('three-plates-v3'),'{broken');assert.match(b.q('#main').textContent,/saving is paused/);b.dom.window.close();
+});
+test('storage write failures are visible and keyboard focus survives filter updates',()=>{
+ const a=app({},true);a.q('#f-servings').focus();a.set('#f-servings','3');assert.match(a.q('#main').textContent,/cannot save changes/);assert.equal(a.w.document.activeElement.id,'f-servings');a.dom.window.close();
+});
+test('untrusted custom ingredient names render as text',()=>{
+ const a=app({'three-plates-v3':JSON.stringify({version:3,custom:{'custom-x':{name:'<img src=x onerror=alert(1)>',unit:'g'}},pantry:[{id:'custom-x',qty:20}]})});a.route('pantry');assert.equal(a.q('#main img'),null);assert.match(a.q('#main').textContent,/<img/);a.dom.window.close();
+});
+test('whole batch UI records allocation and prevents a second ingredient deduction',()=>{
+ const a=app();a.route('batch');a.q('#recipe-search').value='bolognese';a.submit('#search-form');a.click('[data-act="batch-add"]');a.set('#batch-portions','4');a.submit('#batch-form');a.click('[data-act="batch-finish"]');a.set('#freezer-qty','2');a.set('#fridge-qty','2');a.q('#freezer-confirm').checked=true;a.q('#storage-confirm').checked=true;a.submit('#finish-batch-form');assert.equal(a.state().lots.length,2);assert.deepEqual(a.state().batches[0].allocation,{eat:0,fridge:2,freezer:2});a.route('batch');assert.equal(a.q('[data-act="batch-finish"]'),null);a.dom.window.close();
+});
+test('export and restore use the same validated state including purchase history',async()=>{
+ const a=app();a.route('shop');a.set('#shop-select','Aldi');a.route('you');let blob;
+ a.w.URL.createObjectURL=b=>{blob=b;return 'blob:test';};a.w.URL.revokeObjectURL=()=>{};a.w.HTMLAnchorElement.prototype.click=()=>{};
+ a.click('[data-act="export"]');const text=await new Promise(resolve=>{const r=new a.w.FileReader();r.onload=()=>resolve(r.result);r.readAsText(blob);});
+ const b=app();b.route('you');Object.defineProperty(b.q('#backup-file'),'files',{value:[{size:text.length,text:async()=>text}]});b.q('#backup-file').dispatchEvent(new b.w.Event('change',{bubbles:true}));await new Promise(r=>setImmediate(r));assert.equal(b.state().shop,'Aldi');assert.deepEqual(b.state(),JSON.parse(text));a.dom.window.close();b.dom.window.close();
+});
+test('invalid restore and cross-tab update cannot overwrite existing browser data',async()=>{
+ const a=app();a.route('shop');a.set('#shop-select','Tesco');const prior=a.w.localStorage.getItem('three-plates-v3');a.route('you');
+ Object.defineProperty(a.q('#backup-file'),'files',{value:[{size:12,text:async()=>'{not json'}]});a.q('#backup-file').dispatchEvent(new a.w.Event('change',{bubbles:true}));await new Promise(r=>setImmediate(r));assert.equal(a.w.localStorage.getItem('three-plates-v3'),prior);
+ a.w.dispatchEvent(new a.w.StorageEvent('storage',{key:'three-plates-v3',newValue:prior}));a.route('shop');a.set('#shop-select','Aldi');assert.equal(a.w.localStorage.getItem('three-plates-v3'),prior);assert.match(a.q('#main').textContent,/another tab/);a.dom.window.close();
+});
+test('shopping UI records actual whole packs and keeps them through a trip change',()=>{
+ const a=app();a.route('batch');a.q('#recipe-search').value='chilli';a.submit('#search-form');a.click('[data-act="batch-add"]');a.set('#batch-portions','6');a.submit('#batch-form');a.route('shop');a.set('#pack-mode','packs');a.click('[data-act="bought"][data-id="beef-mince"]');assert.equal(a.state().bought['beef-mince'],1000);assert.equal(a.state().purchaseHistory[0].pack.size,500);a.click('#shop-trip');a.set('#shop-select','Tesco');assert.equal(a.state().purchaseHistory[0].retailer,'none');a.click('[data-act="stock-bought"]');assert.equal(a.state().pantry.find(p=>p.id==='beef-mince').qty,1000);a.dom.window.close();
+});

@@ -1,5 +1,9 @@
 # Three Plates v3
 
+Historical notes for baseline commit `dd700a9`. See `README.md` for the current
+Phase 1 branch, current checks and explicit deployment status. Recipe-specific
+freezer suitability is now labelled unknown rather than inferred from these examples.
+
 ## Implemented
 
 Dedicated Batch Cook navigation; people x days targets; multiple editable planned batches; five clearly labelled pilot variants of the example recipes. Bases are separated from optional sides. Cooking a batch deducts ingredients once and creates fridge/freezer portion records. Schedule stored portions across consecutive days without duplicating ingredient purchases. Defrost one planned meal without thawing the whole batch. Record the actual fully-defrosted time; track deadlines and prevent repeat deductions or over-allocation.
