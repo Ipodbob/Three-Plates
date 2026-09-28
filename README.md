@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 135 checks: 31 core regressions, 17 added domain checks,
-20 catalogue checks, 37 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 140 checks: 31 core regressions, 21 added domain checks,
+20 catalogue checks, 38 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -46,10 +46,19 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.7.1 was verified live after PR #4 (merge bef323f, successful
-Pages run 36492957596 and all 16 checked public assets matched). The fallback shares 100 requests per
+frontend v3.7.2 was verified live after PR #3 (merge ee3a43b, successful
+Pages run 36494047521 and all 16 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
+
+## Reusable menus
+
+Plan → Saved menus saves seven days of meal slots, optionally one meal type.
+Copy a menu to a new week with its saved portions or a new headcount; whole bakes
+keep their yield. Preview checks occupied dates and current food preferences before
+copying anything. Stored meals copy as fresh recipes with their sides; prepared
+stock, batch records and reservations are never duplicated. Saved menus are included
+in backups, with up to 50 menus. Old backups remain supported.
 
 ## Phase 1
 
@@ -176,6 +185,6 @@ version live. The existing live baseline was inspected; Pages configuration is u
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
 - Continue deduplicated sourcing and improve ingredient equivalence and method classification. Verify licensing before hosting full publisher methods or photographs.
 - Phase 2 remaining: richer side recipes, cooking mode/timers/screen wake,
-  reusable weeks and combined prep checklists.
+  and combined prep checklists.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,
   and physical-device/WebKit testing.
