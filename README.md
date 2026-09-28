@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 154 checks: 31 core regressions, 27 added domain checks,
-23 catalogue checks, 43 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 168 checks: 31 core regressions, 33 added domain checks,
+23 catalogue checks, 51 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -46,8 +46,8 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.8.1 was verified live after PR #6 (merge 56dec3a, successful
-Pages run 36496620030 and all 18 checked public assets matched). The fallback shares 100 requests per
+frontend v3.9.0 was verified live after PR #7 (merge 760d3e6, successful
+Pages run 36498896287 and all 18 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
@@ -89,7 +89,7 @@ date order through the next three days, with an ingredient-search action that
 retains the current meal and food filters. They are personal reminders, not safety
 or expiry determinations. Scanning and purchases retain the existing reminder;
 linking products keeps the earliest date, and consuming the final stock clears it.
-Dates are included in normal backups. This feature branch is not yet deployed.
+Dates are included in normal backups and were released in v3.7.2.
 
 Planned recipe views now use the selected meal or batch's own portions. Stored
 meals separate fresh sides from already-cooked ingredients; prepared containers
@@ -124,6 +124,27 @@ usable-weight basis, entered/estimated provenance, source URL and label-check da
 Purchase history snapshots the actual pack and retailer; changing shops never
 rewrites purchases. Moving purchases to pantry adds the whole purchased amount.
 No retailer sizes, prices, availability or integrations are claimed as verified.
+
+## Cooking mode (current feature branch)
+
+Plan > Start cooking opens large ingredient and method check-offs for that meal
+or batch. Check-offs persist across reloads and backups without changing pantry
+stock. Stored meals list only their fresh side; original recipes have in-app step
+checks, while publisher recipes link to their full method and offer a method
+completion check. Ingredients, Method and Timers shortcuts reduce scrolling.
+
+Up to eight named timers per meal support pause, resume and removal. Saved finish
+times recover elapsed time after returning to the page; they are not background
+phone alarms. The UI says to use a phone alarm when leaving or locking the app.
+Screen-awake is opt-in and releases when the dialog closes. Unsupported or denied
+requests show a screen-timeout fallback. Physical-device behaviour is unverified.
+
+Changing a meal's portions or side requires an explicit checklist restart so old
+checks cannot describe different quantities. Finishing uses the existing meal or
+batch confirmation and stock transaction. The feature has 14 domain/connected UI
+checks, plus the existing regression suite. Implementation references:
+[Screen Wake Lock specification](https://www.w3.org/TR/screen-wake-lock/) and
+[MDN timer throttling](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout#reasons_for_delays_longer_than_specified).
 
 ## Saved data
 
@@ -206,7 +227,6 @@ version live. The existing live baseline was inspected; Pages configuration is u
 
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
 - Continue deduplicated sourcing and improve ingredient equivalence and method classification. Verify licensing before hosting full publisher methods or photographs.
-- Phase 2 remaining: cooking mode/timers/screen wake,
-  and combined prep checklists.
+- Phase 2 remaining: combined preparation checklist and further whole-app checks.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,
   and physical-device/WebKit testing.

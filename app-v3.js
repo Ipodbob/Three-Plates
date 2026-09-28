@@ -46,6 +46,10 @@
     `<button type="button" class="button ${cls}" data-act="${act}" data-id="${e(id)}">${label}</button>`;
   const plannedRecipeButton = (record, kind) =>
     `<button type="button" class="button secondary" data-act="recipe" data-id="${e(record.recipeId)}" data-record="${e(record.id)}" data-context="${kind}">Recipe</button>`;
+  const cookingButton = (record, kind) =>
+    globalThis.PlatesCooking && !record.cooked
+      ? `<button type="button" class="button secondary" data-act="cooking" data-id="${e(record.id)}" data-kind="${kind}">${state.cooking?.[kind + ":" + record.id] ? "Resume cooking" : "Start cooking"}</button>`
+      : "";
   const number = (n, max = 3) =>
     Number(n).toLocaleString("en-GB", { maximumFractionDigits: max });
   const counts = {
@@ -90,7 +94,8 @@
     seen = { choose: [], batch: [] },
     locked = { choose: [], batch: [] },
     toastTimer,
-    scannerCleanup;
+    scannerCleanup,
+    cookingCleanup;
   const recipe = (id) => R.find((r) => r.id === id),
     ingredients = () => ({ ...I, ...state.custom }),
     ing = (id) => I[id] || state.custom[id];
@@ -575,7 +580,7 @@
   function batchCard(b) {
     const r = recipe(b.recipeId),
       suggest = C.suggestBatchSize(state, b, R, ingredients());
-    return `<article class="plan-card"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(day(b.date))} · ${b.servings} portions</div><h3>${e(r.name)}</h3><p class="helper">${r.batch.type === "base" ? "Base only; sides are added when you plan stored portions." : "Complete meal, including its topping."}</p><div class="action-wrap">${plannedRecipeButton(b, "batch")}${btn("Edit batch", "batch-edit", b.id)}${btn("Cooked — store portions", "batch-finish", b.id, "")}</div>${suggest ? `<div class="notice"><span>${amount(suggest.id, suggest.extra)} extra from packs. ${btn("Make " + suggest.servings + " portions", "batch-round", b.id, "ghost")}<small>Optional. All ingredients will scale; other purchases may increase.</small></span></div>` : ""}<button class="text-btn" data-act="batch-remove" data-id="${b.id}">Remove planned batch</button></div></article>`;
+    return `<article class="plan-card"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(day(b.date))} · ${b.servings} portions</div><h3>${e(r.name)}</h3><p class="helper">${r.batch.type === "base" ? "Base only; sides are added when you plan stored portions." : "Complete meal, including its topping."}</p><div class="action-wrap">${plannedRecipeButton(b, "batch")}${cookingButton(b, "batch")}${btn("Edit batch", "batch-edit", b.id)}${btn("Cooked — store portions", "batch-finish", b.id, "")}</div>${suggest ? `<div class="notice"><span>${amount(suggest.id, suggest.extra)} extra from packs. ${btn("Make " + suggest.servings + " portions", "batch-round", b.id, "ghost")}<small>Optional. All ingredients will scale; other purchases may increase.</small></span></div>` : ""}<button class="text-btn" data-act="batch-remove" data-id="${b.id}">Remove planned batch</button></div></article>`;
   }
   function planCard(p) {
     const r = recipe(p.recipeId),
@@ -585,7 +590,7 @@
       conflict =
         !C.foodAllowed(r, state.prefs) ||
         !C.sideAllowed(p.side, state.prefs, R);
-    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored || p.side !== "none" ? `<p class="helper">${p.side === "none" ? "No additional side" : e(C.sideName(p.side, R)) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") + btn(p.side === "none" ? "Add side" : "Change side", "plan-side", p.id) : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
+    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored || p.side !== "none" ? `<p class="helper">${p.side === "none" ? "No additional side" : e(C.sideName(p.side, R)) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${cookingButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") + btn(p.side === "none" ? "Add side" : "Change side", "plan-side", p.id) : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
   }
   function sideMethod(side) {
     const r = C.sideRecipe(side, R);
@@ -1055,11 +1060,15 @@
     );
   }
   function close() {
+    cookingCleanup?.();
+    cookingCleanup = null;
     scannerCleanup?.();
     scannerCleanup = null;
     sheet.close();
   }
   function modal(title, body) {
+    cookingCleanup?.();
+    cookingCleanup = null;
     scannerCleanup?.();
     scannerCleanup = null;
     sheet.innerHTML = `<div class="sheet-top"><button class="icon-btn sheet-close" data-act="close" aria-label="Close">${icon("close")}</button><h2 id="sheet-title">${title}</h2></div><div class="sheet-content">${body}</div>`;
@@ -1080,6 +1089,31 @@
       run();
     };
     sheet.querySelector('[data-act="close"]')?.focus();
+  }
+  function cookingModal(kind, id) {
+    try {
+      cookingCleanup = globalThis.PlatesCooking.openUI({
+        kind,
+        id,
+        recipes: R,
+        ingredients,
+        amount,
+        modal,
+        getState: () => state,
+        commit: (fn) => change(fn),
+        numberInput: quantityInput,
+        confirmRestart: (run) =>
+          confirmAction(
+            "Update cooking checklist",
+            "Clear this meal's previous checks and timers and use its current quantities?",
+            "Start updated checklist",
+            run,
+          ),
+        reopen: () => cookingModal(kind, id),
+      });
+    } catch (err) {
+      toast(err.message);
+    }
   }
   function recipeModal(id, context = null) {
     const r = recipe(id);
@@ -1460,6 +1494,10 @@
       id = b.dataset.id,
       batch = route === "batch",
       key = batch ? "batch" : "choose";
+    if (act === "cooking") {
+      cookingModal(b.dataset.kind, id);
+      return;
+    }
     if (act === "quantity-step") {
       if (b.getAttribute("aria-disabled") === "true") return;
       const input = document.getElementById(b.dataset.target);
