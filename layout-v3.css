@@ -1069,3 +1069,24 @@
 .three-v3 .side-option .details-box { margin-top:10px; }
 .three-v3 #side-search { width:100%; min-height:46px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:white; color:var(--ink); font-size:16px; }
 .three-v3 .sheet .quantity-stepper input { border:0; border-radius:0; padding:6px 0; font-size:18px; background:transparent; }
+.cook-group { border-top: 1px solid var(--line, #deded4); padding: 20px 0; }
+.cook-group h3 { margin: 0 0 14px; }
+.cook-group h4 { margin: 16px 0 8px; }
+.cook-check { display: flex; gap: 12px; align-items: flex-start; padding: 12px 8px; min-height: 48px; border-radius: 10px; cursor: pointer; }
+.cook-check:hover { background: #f1f3ed; }
+.cook-check input { flex: 0 0 24px; width: 24px; height: 24px; margin: 1px 0 0; accent-color: #344e41; }
+.cook-check span { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.cook-check strong { display: block; font-size: .9rem; }
+.cook-check:has(input:checked) { color: #566451; background: #edf2e8; }
+.cook-step { font-size: 1.1rem; line-height: 1.65; margin: 10px 0; }
+.cook-step small { display: block; font-weight: 700; font-size: .8rem; }
+.cook-tools { display: grid; gap: 8px; margin: 16px 0; }
+.cook-progress { font-weight: 700; }
+.cook-timer { padding: 14px; border: 1px solid #d9dfd2; border-radius: 14px; margin: 12px 0; overflow-wrap: anywhere; }
+.cook-timer output { display: block; font-size: 2rem; font-variant-numeric: tabular-nums; margin: 6px 0; }
+#cooking-timer-form > label { display: block; margin: 12px 0 6px; }
+#cooking-timer-label { box-sizing: border-box; width: 100%; min-height: 46px; padding: 10px; font-size: 16px; border: 1px solid #d9dfd2; border-radius: 10px; }
+#cooking-alert:not(:empty) { padding: 12px; margin: 12px 0; background: #fff0cc; border-radius: 10px; }
+.three-v3 .sheet:has(#cooking-panel) .sheet-top { position: sticky; top: 0; z-index: 2; padding: 16px 20px; }
+.three-v3 .sheet:has(#cooking-panel) .sheet-top h2 { font-size: 24px; }
+#cooking-panel h3, #cooking-panel h4 { scroll-margin-top: 130px; }
