@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main fa3cc50 (PR #5): Pages run 36495335698 succeeded, all 17 checked public assets matched v3.8.0, and the live Plan displayed v3.8.0 with Saved menus. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 56dec3a (PR #6): Pages run 36496620030 succeeded, all 18 checked public assets matched v3.8.1, and the live Choose page displayed v3.8.1. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -19,9 +19,13 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 
 - Released v3.8.0 adds saved seven-day meal menus, optional headcount changes and atomic conflict/preferences checks. Stored slots become fresh recipes with sides, without copying reservations or changing stock. Old backups remain valid. The menu dialog was also checked on the live site.
 
-- Current branch feat/catalogue-quality adds 54 reviewed metadata corrections and progressive search display. No recipe identities, source ratings or ingredient quantities change. Two former bake classifications retain their historical portion limit so old plans and menus remain readable.
+- Released v3.8.1 adds 54 reviewed metadata corrections and progressive search display. No recipe identities, source ratings or ingredient quantities change. Two former bake classifications retain their historical portion limit so old plans and menus remain readable.
+
+- Branch feat/meal-sides adds 44 recipe sides for fresh and stored plans, preference-aware search, ingredient/method previews and touch steppers throughout recipe/allocation dialogs. Recipe side links persist through backup and menu copy. A discovered old 1,000-entry pantry truncation is removed. Sweet protein balls are classified as snacks rather than dinner sides.
 
 ## Verification evidence
+- Meal sides: full suite 154 passed, with targeted follow-up passing after the dynamic day-limit improvement. Browser: radish side survived reload and scaled to 340.2 g when a fresh meal changed from two to three portions. Six bolognese portions were split two fridge/four freezer; the two fridge portions were booked with roast potatoes. Shopping contained the 500 g potato side, not the cooked beef ingredients. Recording eaten left 500 g of a 1,000 g potato stock and four freezer portions after reload. The side picker was inspected at 320 px; its initially small search field was corrected. These were isolated port-4174 test records, not production pantry data.
+
 - Catalogue quality: 145 checks passed, including all 1,040 recipes migrating with unchanged planned quantities, preserved recipe/ingredient/source data, savoury meal categories, baking sides, corrected microwave filters, progressive search and keyboard focus. Real browser: chicken search starts at 12 of 148, Show more reveals 24 and focuses the first new heading; microwave macaroni is found under Microwave. Its recipe dialog was inspected at 320 px.
 
 - Menu suite: 140 total checks pass. Domain tests cover five stored lunches copied as fresh meals, unchanged reservations, side shopping and once-only deduction, backup validation, conflicts and baking yields. Connected UI verifies save/copy/reload/delete. At 320 px, the real browser saved a menu, rejected an occupied date, copied two portions as three into a new week and retained both after reload.
@@ -39,11 +43,11 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Scanner at 320 x 844: name, slider and save button visible without scrolling (button y=569–617). Reset confirmation and cancellation checked at 320 px without deleting data. Viewport overrides restored afterward.
 
 ## Remaining whole-goal work
-- Inspect remaining dialogs and alternate states (recipe/modal number fields still need the shared touch steppers): keyboard/focus, labels, touch targets, overflow, navigation clearance and long product names.
-- Finish real-browser ordinary fresh-meal and correction checks. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
+- Inspect remaining dialogs and alternate states (recipe/modal number fields now use the shared touch steppers; remaining states need inspection): keyboard/focus, labels, touch targets, overflow, navigation clearance and long product names.
+- Finish remaining correction-dialog checks. The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
 - Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
-- Continue the handover's Phase 2 direction: richer sides, cooking aids and prep checklists. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- Continue the handover's Phase 2 direction: cooking aids and prep checklists. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate

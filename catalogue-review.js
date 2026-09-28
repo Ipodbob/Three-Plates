@@ -2,6 +2,10 @@
 (function (root) {
   "use strict";
   const patches = {
+    "sp-lovelemons-no-bake-protein-balls": {
+      dishRole: "snack",
+      meals: ["Breakfast", "Dessert"],
+    },
     "sp-amyjacky-instant-pot-rice": {
       dishRole: "side",
       meals: ["Lunch", "Dinner"],

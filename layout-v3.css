@@ -1060,3 +1060,12 @@
 
 .search-progress { text-align:center; margin:24px 0; }
 .search-progress p { color:var(--muted); }
+
+.three-v3 .side-presets { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+.three-v3 .side-presets .button { min-height:44px; }
+.three-v3 .side-option { padding:18px 0; border-top:1px solid var(--line); overflow-wrap:anywhere; }
+.three-v3 .side-option h3 { margin:0 0 6px; }
+.three-v3 .side-option > .button { width:100%; margin-top:12px; }
+.three-v3 .side-option .details-box { margin-top:10px; }
+.three-v3 #side-search { width:100%; min-height:46px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:white; color:var(--ink); font-size:16px; }
+.three-v3 .sheet .quantity-stepper input { border:0; border-radius:0; padding:6px 0; font-size:18px; background:transparent; }

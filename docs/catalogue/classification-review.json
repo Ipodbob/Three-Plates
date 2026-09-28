@@ -637,5 +637,19 @@
     "patch": {
       "method": "microwave"
     }
+  },
+  {
+    "id": "sp-lovelemons-no-bake-protein-balls",
+    "url": "https://www.loveandlemons.com/no-bake-protein-balls/",
+    "sourceCategory": "Snack",
+    "reviewedOn": "2026-09-29",
+    "reason": "Sweet protein-ball snacks are not a savoury meal accompaniment. Keep searchable with breakfast/dessert rather than automatic mains or the side picker.",
+    "patch": {
+      "dishRole": "snack",
+      "meals": [
+        "Breakfast",
+        "Dessert"
+      ]
+    }
   }
 ]

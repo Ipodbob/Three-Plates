@@ -174,9 +174,11 @@
   const recipeTags = (r) =>
     (r.dishRole === "side"
       ? '<p class="helper">Side dish / starter · plan a main separately</p>'
-      : r.dishRole === "component"
-        ? '<p class="helper">Recipe component · use alongside another recipe</p>'
-        : "") +
+      : r.dishRole === "snack"
+        ? '<p class="helper">Snack · choose the amount you want to make</p>'
+        : r.dishRole === "component"
+          ? '<p class="helper">Recipe component · use alongside another recipe</p>'
+          : "") +
     (r.tags?.length
       ? `<p class="recipe-tags">${r.tags.map((tag) => `<span>${e(tag.replaceAll("-", " "))}</span>`).join("")}<span title="Three Plates effort estimate">${e(r.effort === "project" ? "More involved" : r.effort === "simple" ? "Simple" : "Some preparation")}</span></p>`
       : "");
@@ -208,10 +210,28 @@
     `<div class="field"><label for="${id}">${label}</label>${control}</div>`;
   const select = (id, values, value, extra = "") =>
     `<select id="${id}" ${extra}>${opts(values, value)}</select>`;
-  const numInput = (id, n, min = 1, max = 48) =>
+  const rawNumberInput = (id, n, min = 1, max = 48) =>
     `<input id="${id}" type="number" inputmode="numeric" min="${min}" max="${max}" step="1" value="${n}" required>`;
   const quantityInput = (id, n, min, max, label) =>
-    `<div class="quantity-stepper"><button type="button" id="${id}-minus" data-act="quantity-step" data-target="${id}" data-step="-1" aria-label="Decrease ${label}" aria-disabled="${n <= min}">−</button>${numInput(id, n, min, max)}<button type="button" id="${id}-plus" data-act="quantity-step" data-target="${id}" data-step="1" aria-label="Increase ${label}" aria-disabled="${n >= max}">+</button></div>`;
+    `<div class="quantity-stepper"><button type="button" id="${id}-minus" data-act="quantity-step" data-target="${id}" data-step="-1" aria-label="Decrease ${label}" aria-disabled="${n <= min}">−</button>${rawNumberInput(id, n, min, max)}<button type="button" id="${id}-plus" data-act="quantity-step" data-target="${id}" data-step="1" aria-label="Increase ${label}" aria-disabled="${n >= max}">+</button></div>`;
+  const numInput = (id, n, min = 1, max = 48) =>
+    quantityInput(
+      id,
+      n,
+      min,
+      max,
+      {
+        "menu-people": "people per meal",
+        "recipe-portions": "ingredient portions",
+        "batch-portions": "batch portions",
+        "eat-now": "portions to eat now",
+        "fridge-qty": "refrigerated portions",
+        "freezer-qty": "frozen portions",
+        "lot-days": "consecutive days",
+        "lot-servings": "portions per meal",
+        "lot-count": "recorded portions",
+      }[id] || "portions",
+    );
   function toast(t) {
     const el = document.getElementById("toast");
     el.textContent = t;
@@ -564,10 +584,134 @@
       unsafe = l && C.expired(l, R),
       conflict =
         !C.foodAllowed(r, state.prefs) ||
-        C.sideIngredients(p.side, p.servings).some((i) =>
-          state.prefs.exclusions.includes(i.id),
-        );
-    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored || p.side !== "none" ? `<p class="helper">${p.side === "none" ? "No additional side" : e(p.side) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
+        !C.sideAllowed(p.side, state.prefs, R);
+    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored || p.side !== "none" ? `<p class="helper">${p.side === "none" ? "No additional side" : e(C.sideName(p.side, R)) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") + btn(p.side === "none" ? "Add side" : "Change side", "plan-side", p.id) : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
+  }
+  function sideMethod(side) {
+    const r = C.sideRecipe(side, R);
+    return r?.source
+      ? '<p class="helper">Publisher recipe yield: ' +
+          e(r.source.yield || r.base) +
+          ". Ingredients scale; cooking time does not.</p>" +
+          recipeSource(r) +
+          '<a class="button secondary wide" href="' +
+          e(r.source.url) +
+          '" target="_blank" rel="noopener noreferrer">Read side method at ' +
+          e(r.source.publisher) +
+          " ↗</a>"
+      : r
+        ? '<ol class="method-list">' +
+          r.steps.map((step) => "<li>" + e(step) + "</li>").join("") +
+          "</ol>"
+        : "";
+  }
+  function sideModal(id) {
+    const p = state.plans.find((p) => p.id === id && !p.cooked);
+    if (!p) {
+      toast("This meal is no longer available to edit.");
+      return;
+    }
+    const choose = (side, label) =>
+      '<button type="button" class="button secondary" data-act="side-choice" data-id="' +
+      e(side) +
+      '" data-plan="' +
+      e(p.id) +
+      '" aria-pressed="' +
+      (p.side === side) +
+      '">' +
+      e(label) +
+      "</button>";
+    modal(
+      "Choose a side",
+      "<p><strong>" +
+        e(recipe(p.recipeId).name) +
+        "</strong><br>For " +
+        p.servings +
+        " portions · currently " +
+        e(C.sideName(p.side, R)) +
+        '</p><p class="helper">One fresh side for this meal. Shopping updates when you choose; stock changes only when the meal is finished.</p><div class="side-presets">' +
+        Object.keys(C.sides)
+          .filter((side) => C.sideAllowed(side, state.prefs, R))
+          .map((side) => choose(side, C.sideName(side, R)))
+          .join("") +
+        '</div><label for="side-search" class="label section-space">Find a side dish</label><input id="side-search" type="search" maxlength="100" placeholder="Try potatoes, salad or air fryer"><p class="helper">Recipe amounts scale to ' +
+        p.servings +
+        ' portions. Whole breads and bakes are planned separately in Baking.</p><div id="side-results"></div>',
+    );
+    let limit = 8;
+    const draw = () => {
+      const query = C.text(document.getElementById("side-search").value);
+      const options = R.filter(
+        (r) =>
+          r.id !== p.recipeId &&
+          r.dishRole === "side" &&
+          !r.baking &&
+          C.sideAllowed("recipe:" + r.id, state.prefs, R) &&
+          C.text(
+            [
+              r.name,
+              method(r),
+              r.cuisine,
+              ...(r.tags || []),
+              ...r.ingredients.map((i) => ing(i.id).name),
+            ].join(" "),
+          ).includes(query),
+      );
+      document.getElementById("side-results").innerHTML =
+        '<p role="status">' +
+        (options.length
+          ? "Showing " +
+            Math.min(limit, options.length) +
+            " of " +
+            options.length +
+            " side dishes"
+          : "No matching sides. Try another search; your food preferences still apply.") +
+        "</p>" +
+        options
+          .slice(0, limit)
+          .map(
+            (r) =>
+              '<section class="side-option"><h3 id="side-title-' +
+              e(r.id) +
+              '" tabindex="-1">' +
+              e(r.name) +
+              '</h3><p class="helper">' +
+              e(method(r)) +
+              " · " +
+              duration(r.total) +
+              (r.additionalTime ? " + extra time" : "") +
+              '</p><details class="details-box"><summary>Ingredients for ' +
+              p.servings +
+              " portions &amp; method</summary>" +
+              ingredientList(r, p.servings) +
+              sideMethod("recipe:" + r.id) +
+              "</details>" +
+              choose(
+                "recipe:" + r.id,
+                p.side === "recipe:" + r.id
+                  ? "Keep this side"
+                  : "Use this side",
+              ) +
+              "</section>",
+          )
+          .join("") +
+        (options.length > limit
+          ? '<button id="side-more" type="button" class="button secondary wide">Show more sides</button>'
+          : "");
+      const more = document.getElementById("side-more");
+      if (more)
+        more.onclick = () => {
+          const next = options[limit];
+          limit += 8;
+          draw();
+          document.getElementById("side-title-" + next.id)?.focus();
+        };
+    };
+    document.getElementById("side-search").oninput = () => {
+      limit = 8;
+      draw();
+    };
+    draw();
   }
   function planPage() {
     const pending = state.plans
@@ -609,7 +753,7 @@
     return entries
       .map(
         (p) =>
-          `<li><strong>${e(recipe(p.recipeId).name)}</strong><br>${e(day(p.date || C.addDays(start, p.day)))} · ${e(p.meal)} · ${p.servings} portions${p.side !== "none" ? " · with " + e(p.side) : ""}</li>`,
+          `<li><strong>${e(recipe(p.recipeId).name)}</strong><br>${e(day(p.date || C.addDays(start, p.day)))} · ${e(p.meal)} · ${p.servings} portions${p.side !== "none" ? " · with " + e(C.sideName(p.side, R)) : ""}</li>`,
       )
       .join("");
   }
@@ -955,8 +1099,8 @@
       e(r.name),
       `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} ${r.additionalTime ? "prep/cook + extra time" : "total"} (base recipe)</p>${asBatch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}${recipeTags(r)}${r.baking ? `<p class="helper">Full recipe makes ${r.base} pieces/portions. Baking starts at the full recipe yield; changing quantities may require different tins and baking times.</p>` : ""}${context ? `<p class="notice">${e(context.label)} · ${n} portions</p>` : `<label class="label" for="recipe-portions">${r.baking ? "Pieces / portions to bake" : "Ingredient portions"}</label>${numInput("recipe-portions", n, 1, portionLimit)}`}${
         context?.stored
-          ? `<h3>Fresh side for this meal</h3>${
-              C.sideIngredients(context.side, n)
+          ? `<h3>Fresh side for this meal · ${e(C.sideName(context.side, R))}</h3>${
+              C.sideIngredients(context.side, n, R)
                 .map(
                   (i) =>
                     `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
@@ -966,14 +1110,18 @@
           : `<div id="recipe-amounts">${ingredientList(r, n)}</div>`
       }${
         context && !context.stored && context.side !== "none"
-          ? `<h3>Fresh side</h3>${C.sideIngredients(context.side, n)
+          ? `<h3>Fresh side · ${e(C.sideName(context.side, R))}</h3>${C.sideIngredients(
+              context.side,
+              n,
+              R,
+            )
               .map(
                 (i) =>
                   `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
               )
               .join("")}`
           : ""
-      }${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${context ? btn("Close recipe", "close", "", "") : btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
+      }${context && context.side !== "none" ? `<section class="section-space">${sideMethod(context.side)}</section>` : ""}${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${context ? btn("Close recipe", "close", "", "") : btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
     );
     document
       .getElementById("recipe-portions")
@@ -1053,8 +1201,16 @@
           ],
           "none",
         ),
-      )}</div><p class="helper">These portions do not buy ingredients again. Only an optional side adds shopping. Fridge deadlines are checked against the selected serving time; frozen meals need time to defrost.</p><button class="button wide" type="submit">Add to meal plan</button></form>`,
+      )}</div><p class="helper">These portions do not buy ingredients again. Only an optional side adds shopping. Add a recipe side from Plan after booking. Fridge deadlines are checked against the selected serving time; frozen meals need time to defrost.</p><button class="button wide" type="submit">Add to meal plan</button></form>`,
     );
+    const portions = document.getElementById("lot-servings"),
+      days = document.getElementById("lot-days");
+    portions.addEventListener("change", () => {
+      if (!C.integer(+portions.value, 1, Math.min(12, free))) return;
+      days.max = Math.min(7, Math.floor(free / +portions.value));
+      days.value = Math.min(+days.value || 1, +days.max);
+      days.dispatchEvent(new Event("change", { bubbles: true }));
+    });
   }
   function defrostModal(id) {
     modal(
@@ -1347,6 +1503,20 @@
     }
     if (act === "lot-correct" || act === "lot-discard-some") {
       lotCorrectionModal(id, act === "lot-discard-some");
+      return;
+    }
+    if (act === "plan-side") {
+      sideModal(id);
+      return;
+    }
+    if (act === "side-choice") {
+      if (
+        change(
+          () => C.setPlanSide(state, b.dataset.plan, id, R),
+          "Side saved. Shopping updated.",
+        )
+      )
+        close();
       return;
     }
     if (act === "search-more") {
@@ -1725,6 +1895,19 @@
   document.addEventListener("change", (ev) => {
     const t = ev.target,
       id = t.id;
+    const stepper = t.closest(".quantity-stepper");
+    if (stepper && t.matches("input[type=number]")) {
+      stepper.querySelectorAll("[data-act=quantity-step]").forEach((button) => {
+        button.setAttribute(
+          "aria-disabled",
+          String(
+            Number(button.dataset.step) < 0
+              ? Number(t.value) <= Number(t.min)
+              : Number(t.value) >= Number(t.max),
+          ),
+        );
+      });
+    }
     if (id === "batch-mode") {
       route = t.checked ? "batch" : "choose";
       history.replaceState(null, "", "#" + route);
