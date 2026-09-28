@@ -1057,3 +1057,6 @@
 @media (max-width: 590px) {
   .three-v3 .pantry-item .item-name { flex-basis: 100%; }
 }
+
+.search-progress { text-align:center; margin:24px 0; }
+.search-progress p { color:var(--muted); }

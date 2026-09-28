@@ -1,0 +1,641 @@
+[
+  {
+    "id": "sp-amyjacky-instant-pot-rice",
+    "url": "https://www.pressurecookrecipes.com/instant-pot-rice/",
+    "sourceCategory": "Breakfast, Dinner, Lunch, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main. Plain rice is an accompaniment; publisher broad category list is not a breakfast recommendation.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Lunch",
+        "Dinner"
+      ]
+    }
+  },
+  {
+    "id": "sp-budgetbytes-carrot-feta-salad",
+    "url": "https://www.budgetbytes.com/carrot-feta-salad/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-budgetbytes-creamy-cucumber-salad",
+    "url": "https://www.budgetbytes.com/creamy-cucumber-salad/",
+    "sourceCategory": "Dinner, Lunch, Salad, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-gfmore-classic-potato-salad",
+    "url": "https://www.bbcgoodfood.com/recipes/classic-potato-salad",
+    "sourceCategory": "Afternoon tea, Buffet, Dinner, Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-gfmore-fried-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/fried-bread",
+    "sourceCategory": "Breakfast, Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-gfmore-red-lentil-sweet-potato-pate",
+    "url": "https://www.bbcgoodfood.com/recipes/red-lentil-sweet-potato-pate",
+    "sourceCategory": "Lunch, Side dish, Snack",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-gfmore-tomato-cucumber-coriander-salad",
+    "url": "https://www.bbcgoodfood.com/recipes/tomato-cucumber-coriander-salad",
+    "sourceCategory": "Buffet, Dinner, Lunch, Side dish, Snack, Supper",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-lovelemons-celery-salad",
+    "url": "https://www.loveandlemons.com/celery-salad/",
+    "sourceCategory": "Salad, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-lovelemons-corn-casserole",
+    "url": "https://www.loveandlemons.com/corn-casserole/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-lovelemons-roasted-cauliflower",
+    "url": "https://www.loveandlemons.com/roasted-cauliflower/",
+    "sourceCategory": "Component, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-lovelemons-roasted-delicata-squash",
+    "url": "https://www.loveandlemons.com/roasted-delicata-squash/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-lovelemons-roasted-sweet-potatoes",
+    "url": "https://www.loveandlemons.com/roasted-sweet-potatoes/",
+    "sourceCategory": "Component, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-mealprepmanual-broccoli-cheddar-rice",
+    "url": "https://mealprepmanual.com/broccoli-cheddar-rice/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-recipetineats-marinated-bbq-vegetables",
+    "url": "https://www.recipetineats.com/marinated-bbq-vegetables/",
+    "sourceCategory": "Mains, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-sally-apple-brie-phyllo-galette",
+    "url": "https://sallysbakingaddiction.com/apple-brie-phyllo-galette/",
+    "sourceCategory": "Appetizer",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-sally-bacon-wrapped-cheesy-stuffed-jalapenos",
+    "url": "https://sallysbakingaddiction.com/bacon-wrapped-cheesy-stuffed-jalapenos/",
+    "sourceCategory": "Appetizer",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-sally-baked-sweet-potato-fries",
+    "url": "https://sallysbakingaddiction.com/baked-sweet-potato-fries/",
+    "sourceCategory": "Appetizers",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-sally-cornbread-muffins-recipe",
+    "url": "https://sallysbakingaddiction.com/cornbread-muffins-recipe/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main. Savoury pastry/cornbread should not be in Dessert. Baking retains full recipe yield.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Lunch",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-cranberry-brie-puff-pastry-tarts",
+    "url": "https://sallysbakingaddiction.com/cranberry-brie-puff-pastry-tarts/",
+    "sourceCategory": "Appetizer",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main. Savoury pastry/cornbread should not be in Dessert. Baking retains full recipe yield.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Lunch",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-mushroom-puff-pastry-tarts",
+    "url": "https://sallysbakingaddiction.com/mushroom-puff-pastry-tarts/",
+    "sourceCategory": "Appetizer",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main. Savoury pastry/cornbread should not be in Dessert. Baking retains full recipe yield.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Lunch",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-my-favorite-cornbread",
+    "url": "https://sallysbakingaddiction.com/my-favorite-cornbread/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-sally-my-favorite-pepperoni-pizza-dip",
+    "url": "https://sallysbakingaddiction.com/my-favorite-pepperoni-pizza-dip/",
+    "sourceCategory": "Appetizer",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-air-fryer-radishes",
+    "url": "https://www.skinnytaste.com/air-fryer-radishes/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-grilled-green-bean-salad",
+    "url": "https://www.skinnytaste.com/grilled-green-bean-salad/",
+    "sourceCategory": "Salad, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-parmesan-asparagus-fries",
+    "url": "https://www.skinnytaste.com/parmesan-asparagus-fries/",
+    "sourceCategory": "Appetizer, Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-rainbow-potato-salad",
+    "url": "https://www.skinnytaste.com/rainbow-potato-salad/",
+    "sourceCategory": "Side Dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-skinny-buffalo-chicken-potato-skins",
+    "url": "https://www.skinnytaste.com/skinny-buffalo-chicken-potato-skins/",
+    "sourceCategory": "Appetizer",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "gf2-hot-spicy-sweet-potatoes",
+    "url": "https://www.bbcgoodfood.com/recipes/hot-spicy-sweet-potatoes",
+    "sourceCategory": "Dinner, Lunch, Side dish, Supper, Vegetable",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "gf2-greek-bouyiourdi",
+    "url": "https://www.bbcgoodfood.com/recipes/greek-bouyiourdi",
+    "sourceCategory": "Lunch, Side dish, Starter, Supper",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher side/appetizer classification and dish composition support an accompaniment rather than an automatic main.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "sp-gfmore-slow-cooker-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/slow-cooker-bread",
+    "sourceCategory": "Side dish, Snack",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-courgette-cheddar-soda-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/courgette-cheddar-soda-bread",
+    "sourceCategory": "Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-courgette-mushroom-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/courgette-mushroom-bread",
+    "sourceCategory": "Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-easy-white-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/easy-white-bread",
+    "sourceCategory": "Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-focaccia",
+    "url": "https://www.bbcgoodfood.com/recipes/focaccia",
+    "sourceCategory": "Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-irish-soda-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/irish-soda-bread",
+    "sourceCategory": "Buffet, Side dish, Snack",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-naan-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/naan-bread",
+    "sourceCategory": "Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-olive-oil-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/olive-oil-bread",
+    "sourceCategory": "Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-pitta-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/pitta-bread",
+    "sourceCategory": "Side dish, Snack, Starter",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-quick-puffy-flatbreads",
+    "url": "https://www.bbcgoodfood.com/recipes/quick-puffy-flatbreads",
+    "sourceCategory": "Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-simple-soda-bread",
+    "url": "https://www.bbcgoodfood.com/recipes/simple-soda-bread",
+    "sourceCategory": "Side dish, Snack",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-steamed-bao-buns",
+    "url": "https://www.bbcgoodfood.com/recipes/steamed-bao-buns",
+    "sourceCategory": "Buffet, Side dish, Snack, Supper",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "gf2-toasted-cumin-flatbreads",
+    "url": "https://www.bbcgoodfood.com/recipes/toasted-cumin-flatbreads",
+    "sourceCategory": "Dinner, Lunch, Side dish, Snack, Supper",
+    "reviewedOn": "2026-09-29",
+    "reason": "Plain/savoury bread belongs in Baking and can accompany a meal, rather than being an automatic lunch.",
+    "patch": {
+      "dishRole": "side",
+      "meals": [
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-apple-spice-cupcakes-with-salted-caramel-frosting",
+    "url": "https://sallysbakingaddiction.com/apple-spice-cupcakes-with-salted-caramel-frosting/",
+    "sourceCategory": "Cupcakes",
+    "reviewedOn": "2026-09-29",
+    "reason": "Complete cake/cupcake recipes were incorrectly excluded by frosting/icing keywords.",
+    "patch": {
+      "dishRole": null,
+      "meals": [
+        "Dessert",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-classic-chocolate-cupcakes-with-vanilla-frosting",
+    "url": "https://sallysbakingaddiction.com/classic-chocolate-cupcakes-with-vanilla-frosting/",
+    "sourceCategory": "Dessert",
+    "reviewedOn": "2026-09-29",
+    "reason": "Complete cake/cupcake recipes were incorrectly excluded by frosting/icing keywords.",
+    "patch": {
+      "dishRole": null,
+      "meals": [
+        "Dessert",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-dark-chocolate-cupcakes",
+    "url": "https://sallysbakingaddiction.com/dark-chocolate-cupcakes/",
+    "sourceCategory": "Cupcakes",
+    "reviewedOn": "2026-09-29",
+    "reason": "Complete cake/cupcake recipes were incorrectly excluded by frosting/icing keywords.",
+    "patch": {
+      "dishRole": null,
+      "meals": [
+        "Dessert",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-peach-bundt-cake-with-brown-butter-icing",
+    "url": "https://sallysbakingaddiction.com/peach-bundt-cake-with-brown-butter-icing/",
+    "sourceCategory": "Cake",
+    "reviewedOn": "2026-09-29",
+    "reason": "Complete cake/cupcake recipes were incorrectly excluded by frosting/icing keywords.",
+    "patch": {
+      "dishRole": null,
+      "meals": [
+        "Dessert",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-snickerdoodle-cupcakes-cinnamon-swirl-frosting",
+    "url": "https://sallysbakingaddiction.com/snickerdoodle-cupcakes-cinnamon-swirl-frosting/",
+    "sourceCategory": "Cupcakes",
+    "reviewedOn": "2026-09-29",
+    "reason": "Complete cake/cupcake recipes were incorrectly excluded by frosting/icing keywords.",
+    "patch": {
+      "dishRole": null,
+      "meals": [
+        "Dessert",
+        "Baking"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-triple-chocolate-crunch-granola",
+    "url": "https://sallysbakingaddiction.com/triple-chocolate-crunch-granola/",
+    "sourceCategory": "Snacks",
+    "reviewedOn": "2026-09-29",
+    "reason": "Granola is a breakfast option rather than a hidden snack-only side.",
+    "patch": {
+      "dishRole": null,
+      "meals": [
+        "Breakfast"
+      ]
+    }
+  },
+  {
+    "id": "sp-sally-vanilla-almond-granola",
+    "url": "https://sallysbakingaddiction.com/vanilla-almond-granola/",
+    "sourceCategory": "Snacks",
+    "reviewedOn": "2026-09-29",
+    "reason": "Granola is a breakfast option rather than a hidden snack-only side.",
+    "patch": {
+      "dishRole": null,
+      "meals": [
+        "Breakfast"
+      ]
+    }
+  },
+  {
+    "id": "sp-recipetineats-asian-slaw",
+    "url": "https://www.recipetineats.com/asian-slaw/",
+    "sourceCategory": "Noodles, Salad",
+    "reviewedOn": "2026-09-29",
+    "reason": "This recipe makes a dressed salad, not only its dressing.",
+    "patch": {
+      "dishRole": "side"
+    }
+  },
+  {
+    "id": "gf2-spicy-kimchi-pancake-kimchi-jeon",
+    "url": "https://www.bbcgoodfood.com/recipes/spicy-kimchi-pancake-kimchi-jeon",
+    "sourceCategory": "Lunch, Side dish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Savoury pancake: pan-fried lunch, not a sweet bake. Oven is only an optional keeping-warm step.",
+    "patch": {
+      "meals": [
+        "Lunch",
+        "Dinner"
+      ],
+      "baking": false,
+      "legacyMaxServings": 48,
+      "method": "hob",
+      "tags": [
+        "savoury"
+      ]
+    }
+  },
+  {
+    "id": "gf2-tteokbokki-spicy-rice-cakes",
+    "url": "https://www.bbcgoodfood.com/recipes/tteokbokki-spicy-rice-cakes",
+    "sourceCategory": "Snack",
+    "reviewedOn": "2026-09-29",
+    "reason": "Savoury Korean rice cakes are simmered on the hob, not a dessert or whole bake.",
+    "patch": {
+      "meals": [
+        "Lunch",
+        "Dinner"
+      ],
+      "baking": false,
+      "legacyMaxServings": 48,
+      "method": "hob",
+      "tags": [
+        "savoury"
+      ]
+    }
+  },
+  {
+    "id": "sp-gfmore-microwave-chilli",
+    "url": "https://www.bbcgoodfood.com/recipes/microwave-chilli",
+    "sourceCategory": "Dinner, Lunch, Main course, Supper",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher instructions use the microwave; a mention of the hob is a comparison, not the required appliance.",
+    "patch": {
+      "method": "microwave"
+    }
+  },
+  {
+    "id": "sp-gfmore-microwave-macaroni-cheese",
+    "url": "https://www.bbcgoodfood.com/recipes/microwave-macaroni-cheese",
+    "sourceCategory": "Dinner",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher instructions use the microwave; a mention of the hob is a comparison, not the required appliance.",
+    "patch": {
+      "method": "microwave"
+    }
+  }
+]

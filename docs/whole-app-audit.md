@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main ee3a43b (PR #3): Pages run 36494047521 succeeded, all 16 checked public assets matched v3.7.2, and the live Pantry displayed v3.7.2. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main fa3cc50 (PR #5): Pages run 36495335698 succeeded, all 17 checked public assets matched v3.8.0, and the live Plan displayed v3.8.0 with Saved menus. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -17,9 +17,13 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - All app changes require persistence. Failed writes roll back; restore detects intervening saved-data changes; failed reset attempts to restore removed keys.
 - Existing IDs, v3 backups, measured-unit separation, purchase history and three-choice workflow are retained.
 
-- Branch feat/reusable-menus adds saved seven-day meal menus, optional headcount changes and atomic conflict/preferences checks. Stored slots become fresh recipes with sides, without copying reservations or changing stock. Old backups remain valid. This feature is pending release verification.
+- Released v3.8.0 adds saved seven-day meal menus, optional headcount changes and atomic conflict/preferences checks. Stored slots become fresh recipes with sides, without copying reservations or changing stock. Old backups remain valid. The menu dialog was also checked on the live site.
+
+- Current branch feat/catalogue-quality adds 54 reviewed metadata corrections and progressive search display. No recipe identities, source ratings or ingredient quantities change. Two former bake classifications retain their historical portion limit so old plans and menus remain readable.
 
 ## Verification evidence
+- Catalogue quality: 145 checks passed, including all 1,040 recipes migrating with unchanged planned quantities, preserved recipe/ingredient/source data, savoury meal categories, baking sides, corrected microwave filters, progressive search and keyboard focus. Real browser: chicken search starts at 12 of 148, Show more reveals 24 and focuses the first new heading; microwave macaroni is found under Microwave. Its recipe dialog was inspected at 320 px.
+
 - Menu suite: 140 total checks pass. Domain tests cover five stored lunches copied as fresh meals, unchanged reservations, side shopping and once-only deduction, backup validation, conflicts and baking yields. Connected UI verifies save/copy/reload/delete. At 320 px, the real browser saved a menu, rejected an occupied date, copied two portions as three into a new week and retained both after reload.
 
 - Real browser: ten-portion variety planning proposed six portions of bolognese and four of dhal. Both batches were recorded cooked; bolognese split into two fridge and four freezer portions, dhal into four freezer portions. Booking two fridge portions with pasta left only 180 g pasta on Shopping after both batches were cooked.
@@ -35,10 +39,10 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Scanner at 320 x 844: name, slider and save button visible without scrolling (button y=569–617). Reset confirmation and cancellation checked at 320 px without deleting data. Viewport overrides restored afterward.
 
 ## Remaining whole-goal work
-- Inspect remaining dialogs and alternate states: keyboard/focus, labels, touch targets, overflow, navigation clearance and long product names.
+- Inspect remaining dialogs and alternate states (recipe/modal number fields still need the shared touch steppers): keyboard/focus, labels, touch targets, overflow, navigation clearance and long product names.
 - Finish real-browser ordinary fresh-meal and correction checks. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
-- Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. Browser examples needing review: Air Fryer Radishes offered as a Dinner main; Microwave macaroni cheese labelled Hob.
+- Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
 - Continue the handover's Phase 2 direction: richer sides, cooking aids and prep checklists. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
