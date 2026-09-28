@@ -1043,3 +1043,13 @@
 /* Search controls share the same visual treatment across pages. */
 .three-v3 .pref-form input[type="search"] { flex: 1; width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid #d9dfd5; border-radius: 10px; background: #fff; color: #293a2d; font-size: 16px; }
 #pantry-search-form { margin-bottom: 16px; }
+
+.three-v3 .use-soon-panel { margin: 16px 0; }
+.three-v3 .use-soon-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
+.three-v3 .use-soon-row > div { flex: 1 1 140px; min-width: 0; overflow-wrap: anywhere; }
+.three-v3 .use-soon-row small { display: block; color: var(--muted); }
+.three-v3 .use-soon-row .button { min-height: 44px; }
+.three-v3 .pantry-item .item-name { overflow-wrap: anywhere; min-width: 0; }
+@media (max-width: 590px) {
+  .three-v3 .pantry-item .item-name { flex-basis: 100%; }
+}

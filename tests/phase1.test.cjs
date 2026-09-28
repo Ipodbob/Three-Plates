@@ -3,6 +3,23 @@ const assert=require('node:assert/strict');
 require('../recipes.js');require('../batch-v3.js');require('../recipes-rated.js');require('../recipes-diverse.js');require('../recipes-expanded.js');require('../recipes-specialists.js');require('../core-v3.js');
 const C=require('../phase1.js'),R=PLATES_DATA.recipes,I=PLATES_DATA.ingredients;
 const now=Date.parse('2026-09-28T10:00:00Z'),at=new Date(now-60000).toISOString();
+test('optional pantry reminders round-trip and reject invalid or unmeasured dates',()=>{
+ const s=C.defaults();s.pantry=[{id:'pasta',qty:500,always:false,useSoon:'2026-09-29'},{id:'rice',qty:300,always:false,useSoon:'2026-02-30'},{id:'eggs',qty:0,always:false,useSoon:'2026-09-29'},{id:'milk',qty:0,always:true,useSoon:'2026-09-29'}];
+ const restored=C.migrate(C.clone(s),R,I);assert.equal(restored.pantry[0].useSoon,'2026-09-29');assert.ok(restored.pantry.slice(1).every(p=>!p.useSoon));
+ assert.deepEqual(C.migrate(C.clone(restored),R,I),restored);
+});
+test('use-soon panel orders only active reminders through three days ahead',()=>{
+ const s=C.defaults();s.pantry=[{id:'pasta',qty:500,useSoon:'2026-10-01'},{id:'rice',qty:300,useSoon:'2026-09-27'},{id:'eggs',qty:2,useSoon:'2026-10-02'},{id:'milk',qty:0,useSoon:'2026-09-28'}];
+ assert.deepEqual(C.useSoonItems(s,'2026-09-28').map(p=>p.id),['rice','pasta']);
+});
+test('linked products retain the earliest reminder through purchases and consumption',()=>{
+ const s=C.defaults();s.custom['custom-penne']={id:'custom-penne',name:'Penne',unit:'g',group:'Other'};
+ s.pantry=[{id:'custom-penne',qty:100,always:false,useSoon:'2026-09-29'},{id:'pasta',qty:200,always:false,useSoon:'2026-10-01'}];
+ C.linkPantryItem(s,'custom-penne','pasta',100,{...I,...s.custom},100);assert.equal(s.pantry[0].useSoon,'2026-09-29');
+ s.bought.pasta=500;C.transferBought(s);assert.equal(s.pantry[0].qty,800);assert.equal(s.pantry[0].useSoon,'2026-09-29');
+ C.deduct(s,[{id:'pasta',qty:400}]);assert.equal(s.pantry[0].useSoon,'2026-09-29');C.deduct(s,[{id:'pasta',qty:400}]);assert.equal(s.pantry[0].useSoon,undefined);
+ s.bought.pasta=500;C.transferBought(s);assert.equal(s.pantry[0].useSoon,undefined);
+});
 function batch(s,id,n,recipeId='prep-chilli'){s.batches.push({id,recipeId,servings:n,date:'2026-09-28',cooked:false});}
 function finish(s,id,fridge,freezer,eat=0){C.finishBatch(s,id,{eat,fridge,freezer,cookedAt:at,freezerConfirmed:true},R,now);}
 test('ten portions across complementary batches, with immediate/fridge/freezer allocation',()=>{
@@ -43,6 +60,7 @@ test('eaten food stays consumed after removing plan history and after partial de
  const p=s.plans[0],lid=C.thawPlan(s,p.id,R,now);C.changeStorage(s,lid,'defrosted',R,now+1000,new Date(now+1000).toISOString());C.finishPlan(s,p.id,R,now+1000);
  s.plans=[];assert.throws(()=>C.correctLot(s,lid,2,at));assert.equal(s.lots.reduce((n,l)=>n+l.capacity,0),6);assert.doesNotThrow(()=>C.migrate(s,R,I));
 });
+
 test('unknown freezer suitability needs explicit confirmation and preserves state on failure',()=>{
  const s=C.defaults();batch(s,'a',4);const before=C.clone(s);
  assert.throws(()=>C.finishBatch(s,'a',{eat:0,fridge:0,freezer:4,cookedAt:at},R,now),/unknown/);assert.deepEqual(s,before);

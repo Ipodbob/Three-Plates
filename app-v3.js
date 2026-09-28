@@ -44,6 +44,8 @@
     `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n] || paths.choose}"/></svg>`;
   const btn = (label, act, id = "", cls = "secondary") =>
     `<button type="button" class="button ${cls}" data-act="${act}" data-id="${e(id)}">${label}</button>`;
+  const plannedRecipeButton = (record, kind) =>
+    `<button type="button" class="button secondary" data-act="recipe" data-id="${e(record.recipeId)}" data-record="${e(record.id)}" data-context="${kind}">Recipe</button>`;
   const number = (n, max = 3) =>
     Number(n).toLocaleString("en-GB", { maximumFractionDigits: max });
   const counts = {
@@ -545,7 +547,7 @@
   function batchCard(b) {
     const r = recipe(b.recipeId),
       suggest = C.suggestBatchSize(state, b, R, ingredients());
-    return `<article class="plan-card"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(day(b.date))} · ${b.servings} portions</div><h3>${e(r.name)}</h3><p class="helper">${r.batch.type === "base" ? "Base only; sides are added when you plan stored portions." : "Complete meal, including its topping."}</p><div class="action-wrap">${btn("Recipe", "recipe", r.id)}${btn("Edit batch", "batch-edit", b.id)}${btn("Cooked — store portions", "batch-finish", b.id, "")}</div>${suggest ? `<div class="notice"><span>${amount(suggest.id, suggest.extra)} extra from packs. ${btn("Make " + suggest.servings + " portions", "batch-round", b.id, "ghost")}<small>Optional. All ingredients will scale; other purchases may increase.</small></span></div>` : ""}<button class="text-btn" data-act="batch-remove" data-id="${b.id}">Remove planned batch</button></div></article>`;
+    return `<article class="plan-card"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(day(b.date))} · ${b.servings} portions</div><h3>${e(r.name)}</h3><p class="helper">${r.batch.type === "base" ? "Base only; sides are added when you plan stored portions." : "Complete meal, including its topping."}</p><div class="action-wrap">${plannedRecipeButton(b, "batch")}${btn("Edit batch", "batch-edit", b.id)}${btn("Cooked — store portions", "batch-finish", b.id, "")}</div>${suggest ? `<div class="notice"><span>${amount(suggest.id, suggest.extra)} extra from packs. ${btn("Make " + suggest.servings + " portions", "batch-round", b.id, "ghost")}<small>Optional. All ingredients will scale; other purchases may increase.</small></span></div>` : ""}<button class="text-btn" data-act="batch-remove" data-id="${b.id}">Remove planned batch</button></div></article>`;
   }
   function planCard(p) {
     const r = recipe(p.recipeId),
@@ -557,7 +559,7 @@
         C.sideIngredients(p.side, p.servings).some((i) =>
           state.prefs.exclusions.includes(i.id),
         );
-    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored ? `<p class="helper">${p.side === "none" ? "No additional side" : e(p.side) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${btn("Recipe", "recipe", r.id)}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
+    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored ? `<p class="helper">${p.side === "none" ? "No additional side" : e(p.side) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
   }
   function planPage() {
     const pending = state.plans
@@ -731,7 +733,12 @@
       reserved = C.reserved(state, l.id),
       deadline = C.expiry(l, R),
       expired = C.expired(l, R);
-    return `<article class="panel prepared-card"><div class="prepared-heading"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div><div class="card-kicker">${e(l.location === "thawed" ? "Defrosted · fridge" : l.location === "thawing" ? "Defrosting in fridge" : l.location)}</div><h3>${e(r.name)}</h3></div><strong class="portion-count">${l.portions}<small>portions</small></strong></div><p class="helper">${free} unallocated · ${reserved} planned<br>Cooked ${e(stamp(l.cookedAt))}${l.frozenAt ? "<br>Frozen " + e(stamp(l.frozenAt)) : ""}</p>${l.thawStartedAt ? '<p class="helper">Defrosting started ' + e(stamp(l.thawStartedAt)) + (l.thawedAt ? "<br>Fully defrosted " + e(stamp(l.thawedAt)) : "") + "</p>" : ""}${deadline ? `<p class="${expired ? "storage-alert" : "deadline"}">${expired ? "Past storage limit" : "Use by"}: ${e(stamp(deadline))}</p>` : l.location === "freezer" ? '<p class="helper">Freeze in separate portions. Schedule only what you need to thaw.</p>' : '<p class="deadline">Check thawing progress. Record the actual time fully defrosted; the 24-hour limit starts then, not when you press the button.</p>'}<div class="action-wrap">${free && !expired ? btn("Plan portions", "lot-plan", l.id, "") : ""}${l.location === "fridge" && !expired ? btn("Freeze these portions", "freeze-lot", l.id) : ""}${l.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : ""}${btn("Recipe", "recipe", r.id)}${btn("Correct record", "lot-correct", l.id)}${free ? btn("Discard some", "lot-discard-some", l.id) : ""}</div><button class="text-btn" data-act="discard-lot" data-id="${l.id}">Discard remaining portions</button></article>`;
+    return `<article class="panel prepared-card"><div class="prepared-heading"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div><div class="card-kicker">${e(l.location === "thawed" ? "Defrosted · fridge" : l.location === "thawing" ? "Defrosting in fridge" : l.location)}</div><h3>${e(r.name)}</h3></div><strong class="portion-count">${l.portions}<small>portions</small></strong></div><p class="helper">${free} unallocated · ${reserved} planned<br>Cooked ${e(stamp(l.cookedAt))}${l.frozenAt ? "<br>Frozen " + e(stamp(l.frozenAt)) : ""}</p>${l.thawStartedAt ? '<p class="helper">Defrosting started ' + e(stamp(l.thawStartedAt)) + (l.thawedAt ? "<br>Fully defrosted " + e(stamp(l.thawedAt)) : "") + "</p>" : ""}${deadline ? `<p class="${expired ? "storage-alert" : "deadline"}">${expired ? "Past storage limit" : "Use by"}: ${e(stamp(deadline))}</p>` : l.location === "freezer" ? '<p class="helper">Freeze in separate portions. Schedule only what you need to thaw.</p>' : '<p class="deadline">Check thawing progress. Record the actual time fully defrosted; the 24-hour limit starts then, not when you press the button.</p>'}<div class="action-wrap">${free && !expired ? btn("Plan portions", "lot-plan", l.id, "") : ""}${l.location === "fridge" && !expired ? btn("Freeze these portions", "freeze-lot", l.id) : ""}${l.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : ""}${plannedRecipeButton(l, "lot")}${btn("Correct record", "lot-correct", l.id)}${free ? btn("Discard some", "lot-discard-some", l.id) : ""}</div><button class="text-btn" data-act="discard-lot" data-id="${l.id}">Discard remaining portions</button></article>`;
+  }
+  function useSoonPanel() {
+    const items = C.useSoonItems(state);
+    if (!items.length) return "";
+    return `<section class="panel use-soon-panel" aria-labelledby="use-soon-title"><h2 id="use-soon-title" class="section-title">Use soon</h2><p class="helper">Your reminders for the next three days and any earlier dates. Check the pack's use-by date and storage instructions. These reminders do not establish food safety.</p>${items.map((p) => `<div class="use-soon-row"><div><strong>${e(ing(p.id).name)}</strong><small>${p.useSoon < C.today() ? "Reminder passed" : p.useSoon === C.today() ? "Today" : "Reminder"} · ${e(day(p.useSoon))}</small></div>${p.id.startsWith("custom-") ? btn("Link to recipes", "pantry-link", p.id, "ghost") : btn("Find recipes", "pantry-recipes", p.id, "ghost")}</div>`).join("")}</section>`;
   }
   function pantryPage() {
     const prepared = state.lots.filter((l) => l.portions > 0),
@@ -775,7 +782,7 @@
                 .map(lotCard)
                 .join("") || "No empty records."
             }</details><details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
-          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div><form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
+          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div>${useSoonPanel()}<form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}${p.useSoon ? `<small class="reminder-date">Reminder · ${e(day(p.useSoon))}</small>` : ""}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
       }`
     );
   }
@@ -852,23 +859,38 @@
     };
     sheet.querySelector('[data-act="close"]')?.focus();
   }
-  function recipeModal(id) {
+  function recipeModal(id, context = null) {
     const r = recipe(id);
     if (!r) return;
-    const asBatch = !!r.batch && (!r.source || route === "batch");
+    const asBatch = context
+      ? context.kind === "batch"
+      : !!r.batch && (!r.source || route === "batch");
     const portionLimit = asBatch || r.baking ? 48 : 12;
-    const n = asBatch
-      ? Math.min(48, state.batchFilters.people * state.batchFilters.days)
-      : r.baking
-        ? r.base
-        : state.filters.servings;
+    const n = context
+      ? context.servings
+      : asBatch
+        ? Math.min(48, state.batchFilters.people * state.batchFilters.days)
+        : r.baking
+          ? r.base
+          : state.filters.servings;
     modal(
       e(r.name),
-      `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} ${r.additionalTime ? "prep/cook + extra time" : "total"} (base recipe)</p>${asBatch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}${recipeTags(r)}${r.baking ? `<p class="helper">Full recipe makes ${r.base} pieces/portions. Baking starts at the full recipe yield; changing quantities may require different tins and baking times.</p>` : ""}<label class="label" for="recipe-portions">${r.baking ? "Pieces / portions to bake" : "Ingredient portions"}</label>${numInput("recipe-portions", n, 1, portionLimit)}<div id="recipe-amounts">${ingredientList(r, n)}</div>${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
+      `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} ${r.additionalTime ? "prep/cook + extra time" : "total"} (base recipe)</p>${asBatch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}${recipeTags(r)}${r.baking ? `<p class="helper">Full recipe makes ${r.base} pieces/portions. Baking starts at the full recipe yield; changing quantities may require different tins and baking times.</p>` : ""}${context ? `<p class="notice">${e(context.label)} · ${n} portions</p>` : `<label class="label" for="recipe-portions">${r.baking ? "Pieces / portions to bake" : "Ingredient portions"}</label>${numInput("recipe-portions", n, 1, portionLimit)}`}${
+        context?.stored
+          ? `<h3>Fresh side for this meal</h3>${
+              C.sideIngredients(context.side, n)
+                .map(
+                  (i) =>
+                    `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
+                )
+                .join("") || `<p class="helper">No fresh side planned.</p>`
+            }<details class="details-box"><summary>Already prepared ingredients — reference only</summary><p class="helper">These ingredients were counted when the batch was cooked. Do not buy or deduct them again.</p><div id="recipe-amounts">${ingredientList(r, n)}</div></details>`
+          : `<div id="recipe-amounts">${ingredientList(r, n)}</div>`
+      }${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${context ? btn("Close recipe", "close", "", "") : btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
     );
     document
       .getElementById("recipe-portions")
-      .addEventListener("change", (ev) => {
+      ?.addEventListener("change", (ev) => {
         const n = +ev.target.value;
         if (C.integer(n, 1, portionLimit))
           document.getElementById("recipe-amounts").innerHTML = ingredientList(
@@ -1039,7 +1061,7 @@
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((i) => `<option value="${e(i.name)}"></option>`)
           .join("")}</datalist>`,
-      )}<div class="form-grid two section-space">${field("Amount available", "pantry-qty", `<input id="pantry-qty" type="number" inputmode="decimal" min="0" max="1000000" step="any" value="${p?.qty || 0}" required>`)}${field("Unit", "pantry-unit", select("pantry-unit", Object.keys(C.units), i?.unit || "g"))}</div><label class="check-label"><input type="checkbox" id="pantry-always" ${p?.always ? "checked" : ""}>Always stocked — assume enough</label><p class="helper">Pick a suggested ingredient to match recipes. Custom items can be recorded but will not match automatically. Saving replaces that item's current amount.</p><button type="submit" class="button wide">Save ingredient</button></form>`,
+      )}<div class="form-grid two section-space">${field("Amount available", "pantry-qty", `<input id="pantry-qty" type="number" inputmode="decimal" min="0" max="1000000" step="any" value="${p?.qty || 0}" required>`)}${field("Unit", "pantry-unit", select("pantry-unit", Object.keys(C.units), i?.unit || "g"))}</div><label class="check-label"><input type="checkbox" id="pantry-always" ${p?.always ? "checked" : ""}>Always stocked — assume enough</label>${field("Use soon reminder (optional)", "pantry-use-soon", `<input id="pantry-use-soon" type="date" min="2020-01-01" max="2100-12-31" value="${e(p?.useSoon || "")}" aria-describedby="use-soon-help">`)}<p id="use-soon-help" class="helper">A reminder for this ingredient, not an expiry date. Leave blank for no reminder. When combining packs, keep the earliest reminder. Not used for Always stocked items.</p><p class="helper">Pick a suggested ingredient to match recipes. Custom items can be recorded but will not match automatically. Saving replaces that item's current amount.</p><button type="submit" class="button wide">Save ingredient</button></form>`,
     );
     document.getElementById("pantry-name").addEventListener("change", (ev) => {
       const found = Object.values(ingredients()).find(
@@ -1245,7 +1267,36 @@
       return;
     }
     if (act === "recipe") {
-      recipeModal(id);
+      let context = null;
+      if (b.dataset.context) {
+        const kind = b.dataset.context;
+        const record = (
+          kind === "plan"
+            ? state.plans
+            : kind === "batch"
+              ? state.batches
+              : state.lots
+        ).find((x) => x.id === b.dataset.record && x.recipeId === id);
+        if (!record) return;
+        const originalBatch =
+          kind === "lot" && state.batches.find((x) => x.id === record.batchId);
+        context = {
+          kind,
+          servings:
+            kind === "lot"
+              ? originalBatch?.servings || recipe(id).base
+              : record.servings,
+          stored: kind === "plan" && record.kind === "stored",
+          side: record.side || "none",
+          label:
+            kind === "lot"
+              ? "Original cooked batch (reference)"
+              : kind === "batch"
+                ? "Planned batch for " + day(record.date)
+                : record.meal + " on " + day(record.date),
+        };
+      }
+      recipeModal(id, context);
       return;
     }
     if (act === "refresh") {
@@ -1286,6 +1337,19 @@
     }
     if (act === "pantry-link") {
       pantryLinkModal(id);
+      return;
+    }
+    if (act === "pantry-recipes") {
+      const item = I[id];
+      if (!item) return;
+      const ok = change(
+        () => {
+          state.filters.query = item.name;
+          clearChoices();
+        },
+        "Recipes using " + item.name + ". Your meal and filters still apply.",
+      );
+      if (ok) go("choose");
       return;
     }
     if (act === "pantry-search-clear") {
@@ -1849,7 +1913,15 @@
                 "Use Link to recipes to combine this product with another ingredient. To add a different product, use Add an ingredient.",
               );
             state.pantry = state.pantry.filter((p) => p.id !== i.id);
-            state.pantry.push({ id: i.id, qty, always });
+            const useSoon = value("pantry-use-soon");
+            if (useSoon && !C.validDate(useSoon))
+              throw Error("Choose a valid reminder date.");
+            state.pantry.push({
+              id: i.id,
+              qty,
+              always,
+              ...(useSoon && !always && qty > 0 ? { useSoon } : {}),
+            });
             break;
           }
           default:

@@ -161,7 +161,12 @@
     if (total > 1e7) throw Error("The pantry amount is too large.");
     if (!ingredients[i.id]) s.custom[i.id] = i;
     s.pantry = s.pantry.filter((x) => x.id !== i.id);
-    s.pantry.push({ id: i.id, qty: total, always: false });
+    s.pantry.push({
+      id: i.id,
+      qty: total,
+      always: false,
+      ...(old?.qty > 0 && old.useSoon ? { useSoon: old.useSoon } : {}),
+    });
     s.barcodeMatches = restoreMatches(s.barcodeMatches, {
       ...ingredients,
       [i.id]: i,

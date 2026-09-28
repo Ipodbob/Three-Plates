@@ -44,6 +44,17 @@ function app(seed={},failStorage=false){
  const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
  return {w,q,click,set,route,submit,dom,state:()=>JSON.parse(w.localStorage.getItem('three-plates-v3'))};
 }
+test('pantry reminders can be saved, used to find recipes, reloaded and cleared',()=>{
+ const a=app();a.route('pantry');a.click('[data-act="pantry-add"]');a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');
+ const today=a.w.PlatesCore.today();a.set('#pantry-use-soon',today);a.submit('#pantry-form');
+ assert.equal(a.state().pantry[0].useSoon,today);assert.match(a.q('.use-soon-panel').textContent,/Today/);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('pantry');assert.ok(b.q('.use-soon-panel'));b.click('[data-act="pantry-recipes"]');b.route('choose');assert.equal(b.state().filters.query,'Pasta');assert.ok(b.q('.meal-card'));assert.equal(b.state().pantry[0].qty,500);
+ b.route('pantry');b.click('[data-act="pantry-edit"]');b.set('#pantry-use-soon','');b.submit('#pantry-form');assert.equal(b.state().pantry[0].useSoon,undefined);assert.equal(b.q('.use-soon-panel'),null);a.dom.window.close();b.dom.window.close();
+});
+test('always-stocked pantry entries do not carry dated reminders',()=>{
+ const a=app();a.route('pantry');a.click('[data-act="pantry-add"]');a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');a.set('#pantry-use-soon',a.w.PlatesCore.today());a.q('#pantry-always').checked=true;a.submit('#pantry-form');
+ assert.equal(a.state().pantry[0].always,true);assert.equal(a.state().pantry[0].useSoon,undefined);assert.equal(a.q('.use-soon-panel'),null);a.dom.window.close();
+});
 test('refresh keeps locked card and exhausts unseen eligible recipes first',()=>{
  const a=app();const ids=()=>Array.from(a.w.document.querySelectorAll('[data-act="keep"]'),b=>b.dataset.id);
  const first=ids();assert.equal(first.length,3);a.click('[data-act="keep"]');a.click('[data-act="refresh"]');const next=ids();assert.ok(next.includes(first[0]));assert.equal(next.filter(x=>first.slice(1).includes(x)).length,0);a.dom.window.close();
@@ -106,3 +117,16 @@ test('replacement confirmation preserves the meal until explicitly confirmed',()
 test('restore confirmation refuses to overwrite data changed while reviewing the backup',async()=>{const a=app();a.route('shop');a.set('#shop-select','Tesco');a.route('you');await new Promise(r=>setImmediate(r));const backup=JSON.stringify({...a.state(),shop:'Aldi'});Object.defineProperty(a.q('#backup-file'),'files',{value:[{size:backup.length,text:async()=>backup}]});a.q('#backup-file').dispatchEvent(new a.w.Event('change',{bubbles:true}));await new Promise(r=>setImmediate(r));assert.ok(a.q('#confirm-action'));const updated=JSON.stringify({...a.state(),shop:'Waitrose'});a.w.localStorage.setItem('three-plates-v3',updated);a.q('#confirm-action').click();assert.equal(a.w.localStorage.getItem('three-plates-v3'),updated);assert.match(a.q('#toast').textContent,/Data changed/);a.dom.window.close();});
 test('failed reset restores already-removed current data and leaves old backup intact',()=>{const a=app();a.route('shop');a.set('#shop-select','Tesco');a.w.localStorage.setItem('three-plates-v1','legacy-backup');const prior=a.w.localStorage.getItem('three-plates-v3'),remove=a.w.Storage.prototype.removeItem;a.w.Storage.prototype.removeItem=function(key){if(key==='three-plates-v1')throw Error('blocked');return remove.call(this,key)};a.route('you');a.click('[data-act="reset"]');assert.equal(a.w.localStorage.getItem('three-plates-v3'),prior);assert.equal(a.w.localStorage.getItem('three-plates-v1'),'legacy-backup');assert.match(a.q('#toast').textContent,/Existing data was retained/);a.dom.window.close();});
 test('copied shopping list names the active trip shop rather than usual shop',async()=>{const a=app();a.route('shop');await new Promise(r=>setImmediate(r));a.set('#shop-select','Aldi');a.click('#shop-trip');a.set('#shop-select','Tesco');a.click('[data-act="copy-list"]');await new Promise(r=>setImmediate(r));assert.match(a.q('#copy-text').value,/THREE PLATES — Tesco/);assert.equal(a.state().shop,'Aldi');a.dom.window.close();});
+
+test('planned recipe views use their own servings and cannot accidentally add another meal',()=>{
+ const a=app();a.set('#f-servings','4');a.q('#recipe-search').value='Pesto & pea pasta';a.submit('#search-form');a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');a.set('#f-servings','1');a.route('plan');
+ a.click('[data-act="recipe"][data-context="plan"]');assert.match(a.q('#recipe-amounts').textContent,/360 g/);assert.match(a.q('.sheet .notice').textContent,/4 portions/);assert.equal(a.q('.sheet [data-act="plan-add"]'),null);assert.equal(a.q('#recipe-portions'),null);a.click('[data-act="close"]');
+ a.route('batch');a.q('#recipe-search').value='beef bolognese sauce';a.submit('#search-form');a.click('[data-act="batch-add"]');a.set('#batch-portions','6');a.submit('#batch-form');a.route('plan');a.click('[data-act="recipe"][data-context="batch"]');assert.match(a.q('.sheet .notice').textContent,/6 portions/);assert.match(a.q('#recipe-amounts').textContent,/750 g/);assert.equal(a.q('.sheet [data-act="batch-add"]'),null);a.dom.window.close();
+});
+test('stored meal recipe separates its fresh side from already-cooked ingredients',()=>{
+ const setup=app(),C=setup.w.PlatesCore,R=setup.w.PLATES_DATA.recipes,s=C.defaults(),now=Date.now();
+ s.batches.push({id:'batch-test',recipeId:'prep-chilli',servings:6,date:C.today(),cooked:false});C.finishBatch(s,'batch-test',{eat:0,fridge:0,freezer:6,cookedAt:new Date(now-60000).toISOString(),freezerConfirmed:true},R,now);
+ C.scheduleLot(s,s.lots[0].id,C.today(),'Dinner',2,1,'rice',R,now,'18:00');
+ const a=app({'three-plates-v3':JSON.stringify(s)});a.route('plan');a.click('[data-act="recipe"][data-context="plan"]');assert.match(a.q('.sheet').textContent,/Fresh side for this meal/);assert.match(a.q('.sheet').textContent,/150 g/);assert.match(a.q('.sheet').textContent,/Already prepared ingredients/);assert.match(a.q('#recipe-amounts').textContent,/250 g/);a.click('[data-act="close"]');
+ a.route('pantry');a.click('[data-act="pantry-tab"][data-id="prepared"]');a.click('[data-act="recipe"][data-context="lot"]');assert.match(a.q('.sheet .notice').textContent,/Original cooked batch.*6 portions/);assert.match(a.q('#recipe-amounts').textContent,/750 g/);assert.equal(a.state().lots[0].portions,6);setup.dom.window.close();a.dom.window.close();
+});

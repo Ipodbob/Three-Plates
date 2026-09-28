@@ -18,8 +18,16 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 125 checks: 31 core regressions, 14 added domain checks,
-20 catalogue checks, 33 existing DOM checks and 27 barcode/relay checks.
+For responsive checks, open `/preview?width=320&page=pantry` on the development
+server. It embeds the real app in a fixed-width viewport; supported widths are
+320, 390, 430 and 1280. Pages are choose, batch, plan, shop, pantry and you. This
+preview exists only in the local server. `PORT` can select an alternate local port;
+the deployed UPC relay allows the default 4173 origin, not arbitrary preview ports.
+The server serves the local vendor decoder while keeping repository metadata,
+scripts and dependencies unavailable through HTTP.
+
+`npm test` runs 135 checks: 31 core regressions, 17 added domain checks,
+20 catalogue checks, 37 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -38,12 +46,28 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.6.1 was verified live after PR #1; the scanner and consistency
-updates in PR #2 remain unreleased. The fallback shares 100 requests per
+frontend v3.7.1 was verified live after PR #4 (merge bef323f, successful
+Pages run 36492957596 and all 16 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
 ## Phase 1
+
+Pantry also supports optional Use soon reminder dates. Due reminders appear in
+date order through the next three days, with an ingredient-search action that
+retains the current meal and food filters. They are personal reminders, not safety
+or expiry determinations. Scanning and purchases retain the existing reminder;
+linking products keeps the earliest date, and consuming the final stock clears it.
+Dates are included in normal backups. This feature branch is not yet deployed.
+
+Planned recipe views now use the selected meal or batch's own portions. Stored
+meals separate fresh sides from already-cooked ingredients; prepared containers
+show their original batch quantities for reference. These views do not offer an
+accidental duplicate planning action.
+
+The released defrost fix recovers older whole-second completion timestamps within
+the same second as their millisecond start, without resetting stock or history.
+Genuinely reversed timestamps still fail validation.
 
 Choose keeps three suggestions with refresh/keep, food exclusions, favourites,
 pantry matching and individual meal headcounts. Name/ingredient search is also
@@ -151,11 +175,7 @@ version live. The existing live baseline was inspected; Pages configuration is u
 
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
 - Continue deduplicated sourcing and improve ingredient equivalence and method classification. Verify licensing before hosting full publisher methods or photographs.
-- Phase 2: use-soon dates, richer side recipes, cooking mode/timers/screen wake,
+- Phase 2 remaining: richer side recipes, cooking mode/timers/screen wake,
   reusable weeks and combined prep checklists.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,
   and physical-device/WebKit testing.
-
-## Defrost save recovery
-
-Whole-second defrost completion timestamps are clamped to the millisecond start time when needed. Valid older records rounded within the same second recover during migration without changing stock, bookings or consumed portions. Genuinely reversed timestamps still fail validation. This hotfix is pending deployment.
