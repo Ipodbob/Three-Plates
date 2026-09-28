@@ -38,7 +38,7 @@ function app(seed={},failStorage=false){
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
  for(const [key,value] of Object.entries(seed))w.localStorage.setItem(key,value);
  if(failStorage)w.Storage.prototype.setItem=()=>{throw Error('quota');};
- for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','recipes-specialists.js','core-v3.js','phase1.js','menus.js','barcode-config.js','pantry-scan.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
+ for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','recipes-specialists.js','catalogue-review.js','core-v3.js','phase1.js','menus.js','barcode-config.js','pantry-scan.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
  const q=selector=>w.document.querySelector(selector),click=selector=>{assert.ok(q(selector),selector);q(selector).click();if(q("#confirm-action"))q("#confirm-action").click();},set=(selector,value)=>{assert.ok(q(selector),selector);q(selector).value=value;q(selector).dispatchEvent(new w.Event('change',{bubbles:true}));};
  const route=name=>{w.location.hash=name;w.dispatchEvent(new w.HashChangeEvent('hashchange'));};
  const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
@@ -134,4 +134,15 @@ test('stored meal recipe separates its fresh side from already-cooked ingredient
  C.scheduleLot(s,s.lots[0].id,C.today(),'Dinner',2,1,'rice',R,now,'18:00');
  const a=app({'three-plates-v3':JSON.stringify(s)});a.route('plan');a.click('[data-act="recipe"][data-context="plan"]');assert.match(a.q('.sheet').textContent,/Fresh side for this meal/);assert.match(a.q('.sheet').textContent,/150 g/);assert.match(a.q('.sheet').textContent,/Already prepared ingredients/);assert.match(a.q('#recipe-amounts').textContent,/250 g/);a.click('[data-act="close"]');
  a.route('pantry');a.click('[data-act="pantry-tab"][data-id="prepared"]');a.click('[data-act="recipe"][data-context="lot"]');assert.match(a.q('.sheet .notice').textContent,/Original cooked batch.*6 portions/);assert.match(a.q('#recipe-amounts').textContent,/750 g/);assert.equal(a.state().lots[0].portions,6);setup.dom.window.close();a.dom.window.close();
+});
+
+test('broad recipe searches progressively reveal unique results and reset on filter changes',()=>{
+ const a=app();a.click('#f-time-any');a.q('#recipe-search').value='chicken';a.submit('#search-form');const cards=()=>Array.from(a.w.document.querySelectorAll('.meal-card'));const ids=()=>cards().map(c=>c.querySelector('[data-act="recipe"]').dataset.id);assert.equal(cards().length,12);const first=ids();a.click('#search-more');assert.equal(cards().length,24);assert.deepEqual(ids().slice(0,12),first);assert.equal(new Set(ids()).size,24);assert.equal(a.w.document.activeElement.id,'recipe-title-'+ids()[12]);
+ let clicks=0;while(a.q('#search-more')&&clicks++<100)a.click('#search-more');assert.equal(a.q('#search-more'),null);assert.match(a.q('.search-progress').textContent,new RegExp('Showing '+cards().length+' of '+cards().length));assert.equal(new Set(ids()).size,cards().length);
+ a.q('#recipe-search').value='pasta';a.submit('#search-form');assert.equal(cards().length,12);a.click('#search-more');a.click('#f-method-hob');assert.ok(cards().length<=12);a.click('[data-act="clear-search"]');assert.equal(cards().length,3);assert.equal(a.q('#search-more'),null);a.dom.window.close();
+});
+
+test('reviewed sides stay searchable without occupying automatic dinner choices',()=>{
+ const a=app();a.click('#f-time-any');a.click('#f-method-air-fryer');a.q('#recipe-search').value='radishes';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/Side dish/);assert.equal(a.q('[data-act="recipe"]').dataset.id,'sp-skinnytaste-air-fryer-radishes');a.click('[data-act="clear-search"]');for(let i=0;i<12;i++){assert.doesNotMatch(a.q('main').textContent,/Air Fryer Radishes/);a.click('[data-act="refresh"]');}
+ a.click('#f-method-microwave');a.q('#recipe-search').value='macaroni';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/Microwave macaroni cheese/);a.dom.window.close();
 });

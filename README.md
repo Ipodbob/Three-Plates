@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 140 checks: 31 core regressions, 21 added domain checks,
-20 catalogue checks, 38 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 145 checks: 31 core regressions, 21 added domain checks,
+23 catalogue checks, 40 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -50,6 +50,16 @@ frontend v3.7.2 was verified live after PR #3 (merge ee3a43b, successful
 Pages run 36494047521 and all 16 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
+
+## Catalogue review and search
+
+A reviewed metadata layer corrects 54 dish roles, meal categories and cooking
+methods; the evidence register is [classification-review.json](docs/catalogue/classification-review.json).
+Savoury pastries stay in Baking, complete cakes are no longer hidden as icing
+components, and sides stay out of automatic main-meal choices while remaining
+searchable. Bread remains available as a Baking suggestion. Broad searches start
+with 12 cards and reveal more on request, moving keyboard focus to the new results.
+Recipe IDs, ratings, ingredients and existing plan quantities remain intact.
 
 ## Reusable menus
 

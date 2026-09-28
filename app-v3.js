@@ -85,6 +85,7 @@
   let route = location.hash.slice(1) || "choose",
     pantryTab = "ingredients",
     pantryQuery = "",
+    searchWindow = { key: "", count: 12 },
     shown = { choose: [], batch: [] },
     seen = { choose: [], batch: [] },
     locked = { choose: [], batch: [] },
@@ -324,7 +325,9 @@
     return R.filter(
       (r) =>
         (batch ? !!r.batch : !r.batch || !!r.source) &&
-        (!r.dishRole || !!f.query?.trim()) &&
+        (!r.dishRole ||
+          (r.dishRole === "side" && f.meal === "Baking") ||
+          !!f.query?.trim()) &&
         C.matching(r, f, state, R, ingredients()),
     );
   }
@@ -419,13 +422,18 @@
       cv = coverage(r, r.baking ? r.base : f.servings),
       liked = state.prefs.favourites.includes(r.id),
       kept = locked[key].includes(r.id);
-    return `<article class="meal-card"><div class="card-art"><span class="food-emoji" aria-hidden="true">${r.emoji}</span><span class="pick-label">${batch ? "BATCH COOKING" : e(r.cuisine)}</span><button class="icon-btn heart-btn ${liked ? "active" : ""}" data-act="favourite" data-id="${r.id}" aria-label="${liked ? "Unsave" : "Save"} ${e(r.name)}" aria-pressed="${liked}">${icon("heart")}</button></div><div class="card-body"><div class="card-kicker">${batch ? (r.batch.type === "base" ? "Base dish · choose a side later" : r.batch.type === "uncooked" ? "Prepared ahead · still needs cooking" : "Complete meal") : e(r.vegetarianSuitable === false ? "Contains animal-rennet cheese" : r.kind === "meat" ? "Meat" : r.kind === "fish" ? "Fish" : r.kind === "vegan" ? "Plant-based" : "Vegetarian")}</div><h3>${e(r.name)}</h3><p class="description">${e(r.source ? `By ${r.source.author}` : r.description)}</p>${recipeSource(r)}${recipeTags(r)}${!batch && r.batch?.type === "base" ? '<p class="helper">Sauce / base only · plan a side separately</p>' : ""}<div class="meta-row"><span>${icon("clock")}${duration(r.total)} ${r.additionalTime ? "prep/cook + extra time" : "total"}</span><span>${prepLabel(r)}</span><span>${e(method(r))}</span></div>${batch ? `<p class="batch-tag">Freezer suitability not verified${r.source ? "" : " · example recipe"}</p>` : `<div class="pantry-match"><span><strong>${cv.yes} / ${cv.total}</strong> ingredients covered</span><span>${r.baking ? `Full bake · ${r.base} pieces/portions` : `For ${f.servings}`}</span></div>`}<div class="card-actions">${btn("View recipe", "recipe", r.id)}${btn(batch ? "Plan batch" : r.baking ? "Plan full bake" : "Add to plan", batch ? "batch-add" : "plan-add", r.id, "")}</div><div class="card-bottom"><button class="keep-btn ${kept ? "active" : ""}" data-act="keep" data-id="${r.id}" aria-pressed="${kept}">${icon("pin")}${kept ? "Kept" : "Keep this idea"}</button><button class="text-btn" data-act="hide" data-id="${r.id}">Not for me</button></div></div></article>`;
+    return `<article class="meal-card"><div class="card-art"><span class="food-emoji" aria-hidden="true">${r.emoji}</span><span class="pick-label">${batch ? "BATCH COOKING" : e(r.cuisine)}</span><button class="icon-btn heart-btn ${liked ? "active" : ""}" data-act="favourite" data-id="${r.id}" aria-label="${liked ? "Unsave" : "Save"} ${e(r.name)}" aria-pressed="${liked}">${icon("heart")}</button></div><div class="card-body"><div class="card-kicker">${batch ? (r.batch.type === "base" ? "Base dish · choose a side later" : r.batch.type === "uncooked" ? "Prepared ahead · still needs cooking" : "Complete meal") : e(r.vegetarianSuitable === false ? "Contains animal-rennet cheese" : r.kind === "meat" ? "Meat" : r.kind === "fish" ? "Fish" : r.kind === "vegan" ? "Plant-based" : "Vegetarian")}</div><h3 id="recipe-title-${e(r.id)}" tabindex="-1">${e(r.name)}</h3><p class="description">${e(r.source ? `By ${r.source.author}` : r.description)}</p>${recipeSource(r)}${recipeTags(r)}${!batch && r.batch?.type === "base" ? '<p class="helper">Sauce / base only · plan a side separately</p>' : ""}<div class="meta-row"><span>${icon("clock")}${duration(r.total)} ${r.additionalTime ? "prep/cook + extra time" : "total"}</span><span>${prepLabel(r)}</span><span>${e(method(r))}</span></div>${batch ? `<p class="batch-tag">Freezer suitability not verified${r.source ? "" : " · example recipe"}</p>` : `<div class="pantry-match"><span><strong>${cv.yes} / ${cv.total}</strong> ingredients covered</span><span>${r.baking ? `Full bake · ${r.base} pieces/portions` : `For ${f.servings}`}</span></div>`}<div class="card-actions">${btn("View recipe", "recipe", r.id)}${btn(batch ? "Plan batch" : r.baking ? "Plan full bake" : "Add to plan", batch ? "batch-add" : "plan-add", r.id, "")}</div><div class="card-bottom"><button class="keep-btn ${kept ? "active" : ""}" data-act="keep" data-id="${r.id}" aria-pressed="${kept}">${icon("pin")}${kept ? "Kept" : "Keep this idea"}</button><button class="text-btn" data-act="hide" data-id="${r.id}">Not for me</button></div></div></article>`;
   }
   function results(batch) {
     const f = currentFilters(batch),
       all = pool(batch),
-      cards = f.query ? all : suggestions(batch);
-    return `<div class="choice-heading"><div><h2>${f.query ? "Search results" : "Three ideas for you"}</h2><p>${all.length} ${batch ? "batch recipes" : "recipes"} match your preferences</p></div>${!f.query ? btn(icon("refresh") + " Refresh", "refresh", "", "secondary") : ""}</div>${cards.length ? `<div class="choice-grid">${cards.map((r) => card(r, batch)).join("")}</div>` : empty("No matching recipes", "Try another time, method or search. Your food exclusions stay in place.", btn("Reset search & time", "reset-filters"))}`;
+      searchKey = JSON.stringify([batch, f, state.prefs, all.map((r) => r.id)]);
+    if (searchWindow.key !== searchKey)
+      searchWindow = { key: searchKey, count: 12 };
+    const cards = f.query
+      ? all.slice(0, searchWindow.count)
+      : suggestions(batch);
+    return `<div class="choice-heading"><div><h2>${f.query ? "Search results" : "Three ideas for you"}</h2><p>${all.length} ${batch ? "batch " : ""}recipe${all.length === 1 ? " matches" : "s match"} your preferences</p></div>${!f.query ? btn(icon("refresh") + " Refresh", "refresh", "", "secondary") : ""}</div>${cards.length ? `<div class="choice-grid">${cards.map((r) => card(r, batch)).join("")}</div>${f.query ? `<div class="search-progress"><p role="status">Showing ${cards.length} of ${all.length} recipe${all.length === 1 ? "" : "s"}</p>${cards.length < all.length ? `<button type="button" class="button secondary" id="search-more" data-act="search-more">Show ${Math.min(12, all.length - cards.length)} more recipes</button>` : ""}</div>` : ""}` : empty("No matching recipes", "Try another time, method or search. Your food exclusions stay in place.", btn("Reset search & time", "reset-filters"))}`;
   }
   function choosePage() {
     const batch = route === "batch",
@@ -935,7 +943,7 @@
     const asBatch = context
       ? context.kind === "batch"
       : !!r.batch && (!r.source || route === "batch");
-    const portionLimit = asBatch || r.baking ? 48 : 12;
+    const portionLimit = asBatch ? 48 : C.maxServings(r);
     const n = context
       ? context.servings
       : asBatch
@@ -1160,8 +1168,8 @@
       sheet.open && document.getElementById("recipe-portions");
     if (r.baking && !selection) f.servings = r.base;
     if (modalPortions) {
-      if (!C.integer(+modalPortions.value, 1, r.baking ? 48 : 12)) {
-        toast(`Choose 1–${r.baking ? 48 : 12} whole portions.`);
+      if (!C.integer(+modalPortions.value, 1, C.maxServings(r))) {
+        toast(`Choose 1–${C.maxServings(r)} whole portions.`);
         return;
       }
       f.servings = +modalPortions.value;
@@ -1339,6 +1347,13 @@
     }
     if (act === "lot-correct" || act === "lot-discard-some") {
       lotCorrectionModal(id, act === "lot-discard-some");
+      return;
+    }
+    if (act === "search-more") {
+      const next = pool(batch)[searchWindow.count];
+      searchWindow.count += 12;
+      render();
+      if (next) document.getElementById("recipe-title-" + next.id)?.focus();
       return;
     }
     if (act === "menus") {
@@ -1550,7 +1565,7 @@
         toast("This meal cannot be edited.");
         return;
       }
-      const max = recipe(p.recipeId)?.baking ? 48 : 12;
+      const max = C.maxServings(recipe(p.recipeId));
       modal(
         "Change portions",
         `<p>${e(recipe(p.recipeId).name)}</p><form id="plan-portions-form" data-id="${e(id)}">${field("Portions to make", "plan-portions", quantityInput("plan-portions", p.servings, 1, max, "portions"))}<p class="helper">Updates the ingredients needed for this meal. Existing purchases keep their recorded quantities.</p><button class="button wide" type="submit">Save portions</button></form>`,
@@ -1975,7 +1990,7 @@
             if (
               !p ||
               p.cooked ||
-              !C.integer(qty, 1, recipe(p.recipeId)?.baking ? 48 : 12)
+              !C.integer(qty, 1, C.maxServings(recipe(p.recipeId)))
             )
               throw Error("Choose a valid portion count for an uncooked meal.");
             p.servings = qty;

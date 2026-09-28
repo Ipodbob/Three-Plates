@@ -77,6 +77,8 @@
     yoghurt: 500,
     passata: 500,
   };
+  const maxServings = (r) =>
+    r?.baking || r?.legacyMaxServings === 48 ? 48 : 12;
   const uid = () =>
     root.crypto?.randomUUID?.() ||
     "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
@@ -355,7 +357,7 @@
         integer(
           p.servings,
           1,
-          recipes.find((r) => r.id === p.recipeId)?.baking ? 48 : 12,
+          maxServings(recipes.find((r) => r.id === p.recipeId)),
         ) &&
         !slots.has(p.date + "|" + p.meal)
       ) {
@@ -841,6 +843,7 @@
     shops,
     sides,
     commonPacks,
+    maxServings,
     uid,
     today,
     validDate,

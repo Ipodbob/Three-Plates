@@ -26,7 +26,7 @@
         !r ||
         !C.integer(e.day, 0, 6) ||
         !C.meals.includes(e.meal) ||
-        !C.integer(e.servings, 1, r.baking ? 48 : 12) ||
+        !C.integer(e.servings, 1, C.maxServings(r)) ||
         !Object.hasOwn(C.sides, e.side) ||
         !/^([01]\d|2[0-3]):[0-5]\d$/.test(e.serveTime) ||
         slots.has(slot)
