@@ -2,12 +2,43 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 require('../recipes.js');require('../batch-v3.js');
 const original=JSON.stringify(PLATES_DATA);
-require('../recipes-rated.js');require('../recipes-diverse.js');require('../recipes-expanded.js');require('../core-v3.js');
+require('../recipes-rated.js');require('../recipes-diverse.js');require('../recipes-expanded.js');const previousCatalogue=JSON.parse(JSON.stringify(PLATES_DATA));require('../recipes-specialists.js');require('../core-v3.js');
 const C=require('../phase1.js'),R=PLATES_DATA.recipes,I=PLATES_DATA.ingredients,rated=R.filter(r=>r.id.startsWith("gf-"));
 const diverse=R.filter(r=>r.id.startsWith('curated-'));
 const expanded=R.filter(r=>r.id.startsWith('gf2-'));
+const specialists=R.filter(r=>r.id.startsWith('sp-'));
+test('specialist additions preserve all 383 existing recipes and ingredient definitions',()=>{
+ assert.equal(previousCatalogue.recipes.length,383);assert.deepEqual(R.slice(0,383),previousCatalogue.recipes);
+ for(const [id,value] of Object.entries(previousCatalogue.ingredients))assert.deepEqual(I[id],value,id);
+ assert.equal(specialists.length,657);assert.equal(new Set(R.map(r=>r.id)).size,R.length);
+});
+test('every specialist source meets the requested rating threshold and resolves shopping quantities',()=>{
+ const audit=require('../docs/catalogue/specialist-quantities.json');assert.equal(audit.length,specialists.length);
+ for(const r of specialists){assert.ok(r.source.rating>=4&&r.source.rating<=5,r.id);assert.ok(r.source.ratingCount>=5,r.id);assert.ok(['ratings','reviews'].includes(r.source.countLabel));assert.equal(new URL(r.source.url).protocol,'https:');assert.ok(r.source.author);assert.equal(r.source.retrievedOn,'2026-09-28');assert.deepEqual(r.steps,[]);assert.ok(r.total>0&&r.total>=r.prep);assert.ok(r.base>=1&&r.base<=48);assert.match(r.id,/^[a-zA-Z0-9_-]{1,80}$/);assert.equal(new Set(r.ingredients.map(i=>i.id)).size,r.ingredients.length);assert.ok(r.meals.every(m=>C.meals.includes(m)));assert.equal(audit.find(a=>a.id===r.id).url,r.source.url);
+  for(const i of r.ingredients){assert.ok(I[i.id],i.id);assert.ok(Number.isFinite(i.qty)&&i.qty>0,r.id+' '+i.id);assert.ok(['g','ml','tsp','each'].includes(I[i.id].unit));assert.ok((i.avoidIds||[]).every(id=>I[id]));assert.doesNotMatch(I[i.id].name,/\blbs?\.|^(?:Packed light|Whole|Button|Prepared)$/i);}
+ }
+});
+test('specialist coverage spans all meals and nine cooking methods',()=>{
+ assert.equal(new Set(specialists.map(r=>r.source.publisher)).size,10);
+ for(const [method,min] of Object.entries({'pressure-cooker':40,'slow-cooker':30,'air-fryer':25,barbecue:7,microwave:10,hob:100,oven:100,'oven-hob':150,'no-cook':30}))assert.ok(specialists.filter(r=>r.method===method).length>=min,method);
+ for(const [meal,min] of Object.entries({Breakfast:100,Lunch:300,Dinner:300,Dessert:200,Baking:250}))assert.ok(specialists.filter(r=>r.meals.includes(meal)).length>=min,meal);
+ assert.ok(specialists.filter(r=>r.batch).length>=60);
+});
+test('every specialist recipe scales and survives saved-plan migration',()=>{
+ for(const r of specialists){const s=C.defaults(),n=r.baking?r.base:Math.min(12,r.base);s.plans=[{id:'specialist-plan',recipeId:r.id,date:C.today(),meal:r.meals[0],servings:n,cooked:false}];const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.equal(restored.plans[0].recipeId,r.id);assert.equal(restored.plans[0].servings,n);const req=C.requirements(restored,R);for(const i of r.ingredients)assert.ok(Math.abs(req[i.id]-i.qty*n/r.base)<0.002,r.id+' '+i.id);}
+});
+test('specialist equipment filters persist and pressure recipes allow extra time',()=>{
+ for(const method of ['pressure-cooker','barbecue','microwave']){const s=C.defaults();s.filters.method=method;s.batchFilters.method=method;const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.equal(restored.filters.method,method);assert.equal(restored.batchFilters.method,method);}
+ for(const r of specialists.filter(r=>r.method==='pressure-cooker')){assert.equal(r.additionalTime,true,r.id);assert.match(r.timingNote,/pressure release/);const s=C.defaults();assert.equal(C.matching(r,{...s.filters,meal:r.meals[0],time:'30',method:'pressure-cooker'},s,R,I),false);}
+ for(const id of ['sp-kingarthur-almond-flour-pancakes-recipe','sp-gfmore-blt-pasta-salad','sp-sally-creamy-strawberry-feta-pasta-salad'])assert.equal(R.find(r=>r.id===id).method,'hob');
+ for(const id of ['sp-kingarthur-classic-puff-pastry-pate-feuilletee-recipe','sp-sally-homemade-honey-butter'])assert.equal(R.find(r=>r.id===id).dishRole,'component');
+});
+test('source weight ranges and measured ingredients retain usable units',()=>{
+ const r=R.find(r=>r.id==='sp-sally-creamy-strawberry-feta-pasta-salad'),strawberry=r.ingredients.find(i=>/fresh strawberries/i.test(I[i.id].name));assert.equal(I[strawberry.id].unit,'g');assert.equal(strawberry.qty,681);assert.ok(r.planningNotes.includes('upper end'));
+ const audit=require('../docs/catalogue/specialist-quantities.json');for(const r of specialists.filter(r=>r.batch)){assert.equal(r.batch.freezer,null);assert.equal(r.batch.qualityMonths,null);if(audit.find(a=>a.id===r.id).ingredients.some(s=>/\brice\b/i.test(s)))assert.equal(r.batch.fridgeHours,24);}
+});
 test('large expansion has source coverage, valid quantities and no identifier collisions',()=>{
- assert.equal(expanded.length,266);assert.equal(R.length,383);assert.equal(new Set(R.filter(r=>r.source).map(r=>r.source.url.replace(/\/$/,''))).size,338);
+ assert.equal(expanded.length,266);assert.equal(R.length,1040);assert.equal(new Set(R.filter(r=>r.source).map(r=>r.source.url.replace(/\/$/,''))).size,995);
  assert.equal(expanded.filter(r=>r.baking).length,101);assert.equal(expanded.filter(r=>r.meals.includes('Dessert')).length,86);assert.equal(expanded.filter(r=>r.batch).length,39);assert.ok(new Set(expanded.map(r=>r.cuisine)).size>=20);
  for(const r of expanded){assert.match(r.id,/^[a-zA-Z0-9_-]{1,80}$/);assert.ok(r.total>=r.prep);assert.ok(r.source.author);assert.ok(r.source.rating>=4.3&&r.source.rating<=5);assert.ok(r.source.ratingCount>=5);assert.ok(r.source.selectionReason);assert.ok(r.meals.every(m=>C.meals.includes(m)));assert.ok(r.base>0&&r.base<=48);assert.equal(new Set(r.ingredients.map(i=>i.id)).size,r.ingredients.length);for(const i of r.ingredients){assert.ok(I[i.id]);assert.match(i.id,/^[a-zA-Z0-9_-]{1,80}$/);assert.ok(Number.isFinite(i.qty)&&i.qty>0);assert.ok(['g','ml','tsp','each'].includes(I[i.id].unit));assert.ok(!/^(Water|Warm water|Long metal skewers)$/i.test(I[i.id].name));}assert.deepEqual(r.steps,[]);}
 });
@@ -29,7 +60,7 @@ test('quantity audit covers every added source and batch rice retains conservati
  const audit=require('../docs/catalogue/expansion-quantities.json');assert.equal(audit.length,expanded.length);for(const r of expanded){const a=audit.find(a=>a.id===r.id);assert.equal(a.url,r.source.url);assert.ok(a.ingredients.length);if(r.batch){assert.equal(r.batch.freezer,null);assert.equal(r.batch.qualityMonths,null);if(a.ingredients.some(s=>/\brice\b/i.test(s)))assert.equal(r.batch.fridgeHours,24);}}
 });
 test('diverse catalogue has checked provenance and coverage across publishers and baking styles',()=>{
- assert.equal(diverse.length,32);assert.equal(new Set(diverse.map(r=>r.source.publisher)).size,7);assert.equal(new Set(R.map(r=>r.id)).size,R.length);assert.equal(new Set(R.filter(r=>r.source).map(r=>r.source.url)).size,338);
+ assert.equal(diverse.length,32);assert.equal(new Set(diverse.map(r=>r.source.publisher)).size,7);assert.equal(new Set(R.map(r=>r.id)).size,R.length);assert.equal(new Set(R.filter(r=>r.source).map(r=>r.source.url)).size,995);
  for(const r of diverse){assert.ok(r.source.selectionReason);assert.ok(r.source.rating>0&&r.source.rating<=5);assert.ok(r.source.ratingCount>0);assert.ok(['simple','moderate','project'].includes(r.effort));assert.ok(r.total>0&&Number.isFinite(r.total));assert.ok(r.prep===null||r.prep<=r.total);assert.ok(r.meals.every(m=>C.meals.includes(m)));assert.ok(r.base<=48);assert.equal(new Set(r.ingredients.map(i=>i.id)).size,r.ingredients.length);for(const i of r.ingredients){assert.ok(I[i.id],i.id);assert.ok(i.qty>0);}}
  for(const tag of ['traybake','soup','pastry','cake','bread','cookies','pie','meal-prep'])assert.ok(diverse.some(r=>r.tags.includes(tag)),tag);
  assert.equal(diverse.filter(r=>r.meals.includes('Dessert')).length,11);assert.equal(diverse.filter(r=>r.baking).length,15);

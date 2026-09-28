@@ -1,12 +1,12 @@
 'use strict';
 const assert=require('node:assert/strict');
-require('../recipes.js');require('../batch-v3.js');require('../recipes-rated.js');require('../recipes-diverse.js');require('../recipes-expanded.js');require('../core-v3.js');const C=require('../phase1.js'),R=PLATES_DATA.recipes,I=PLATES_DATA.ingredients;
+require('../recipes.js');require('../batch-v3.js');require('../recipes-rated.js');require('../recipes-diverse.js');require('../recipes-expanded.js');require('../recipes-specialists.js');require('../core-v3.js');const C=require('../phase1.js'),R=PLATES_DATA.recipes,I=PLATES_DATA.ingredients;
 let count=0;function test(name,fn){fn();count++;console.log('PASS',name);}
 const now=Date.now(),today=C.dateLocal(now),cookedAt=new Date(now-60000).toISOString();
 const fresh=()=>C.defaults(),batch=(s,n=6)=>{s.batches.push({id:'batch1',recipeId:'prep-chilli',servings:n,date:today,cooked:false});return s;};
 const cooked=(n=6,fridge=0)=>{const s=batch(fresh(),n);C.finishBatch(s,'batch1',{eat:0,fridge,freezer:n-fridge,cookedAt,freezerConfirmed:true},R,now);return s;};
 const req=s=>C.requirements(s,R),row=(s,id)=>C.shopping(s,R).find(r=>r.id===id);
-test('Original examples and rated catalogue have distinct IDs',()=>{assert.equal(R.filter(r=>r.batch).length,66);assert.equal(new Set(R.map(r=>r.id)).size,383);for(const r of R)for(const i of r.ingredients)assert.ok(I[i.id]);});
+test('Original examples and rated catalogue have distinct IDs',()=>{assert.equal(R.filter(r=>r.batch).length,132);assert.equal(new Set(R.map(r=>r.id)).size,1040);for(const r of R)for(const i of r.ingredients)assert.ok(I[i.id]);});
 test('Mass, volume and spoon conversions',()=>{assert.equal(C.convert(.75,'kg','g'),750);assert.equal(C.convert(2,'tbsp','tsp'),6);assert.equal(C.convert(.5,'l','ml'),500);assert.throws(()=>C.convert(100,'g','ml'));});
 test('v1 preferences, pantry, cooked records and bought amounts migrate',()=>{const raw={version:1,filters:{date:today,meal:'Lunch',servings:3,time:'slow'},prefs:{diet:'vegan',favourites:['red-lentil-dal'],hidden:['slow-chicken'],exclusions:['beef'],cuisines:['Everyday'],slowCooker:false},pantry:[{id:'rice',qty:1000,always:false}],plans:[{id:'p1',recipeId:'red-lentil-dal',date:today,meal:'Lunch',servings:3,cooked:true}],bought:{rice:500}};const s=C.migrate(raw,R,I);assert.equal(s.version,3);assert.equal(s.pantry[0].qty,1000);assert.equal(s.plans[0].cooked,true);assert.equal(s.plans[0].serveTime,'12:00');assert.equal(s.prefs.slowCooker,false);assert.equal(s.bought.rice,500);assert.deepEqual(s.prefs.favourites,raw.prefs.favourites);});
 test('Backup rejects unsupported versions',()=>assert.throws(()=>C.migrate({version:99},R,I)));

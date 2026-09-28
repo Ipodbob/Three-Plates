@@ -17,8 +17,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 74 checks: 31 core regressions, 11 added domain checks,
-14 catalogue checks and 18 DOM interaction checks. jsdom is test-only; it does not validate rendering
+`npm test` runs 82 checks: 31 core regressions, 11 added domain checks,
+20 catalogue checks and 20 DOM interaction checks. jsdom is test-only; it does not validate rendering
 or replace real browser checks. No development dependency is loaded by the app.
 
 ## Phase 1
@@ -63,12 +63,9 @@ overwriting another tab. Export/restore is available in Settings.
 
 ## Rated recipe catalogue
 
-The expanded library now contains **338 linked recipes from seven publishers**,
-plus the 45 preserved original examples. The latest pass adds **266 recipes**, bringing the total to **383**: regional meals,
-seafood, soups, meal prep, sweet and savoury baking, and desserts. See the
-[large expansion register and quantity audit](docs/large-catalogue-expansion.md).
-Ratings are one selection signal rather than a strict admission gate; each new
-entry records its reason for inclusion. See [coverage, sources and mapping notes](docs/collection-expansion.md).
+The library now contains **995 linked recipes from ten publishers**, plus the 45 preserved original examples: **1,040 recipes total**. The latest pass adds **657 recipes**, each rated at least **4/5 from five or more ratings or reviews**, checked on 28 September 2026. Breakfast, lunch, dinner, meal prep, soups, cakes, pastries and savoury bakes all gain substantial coverage. See the [specialist source register and quantity review](docs/specialist-catalogue-expansion.md). The earlier catalogue is preserved under its original admission policy.
+
+Visible cooking-method buttons now include **Pressure cooker**, **Barbecue** and **Microwave**, alongside hob, oven, air fryer, slow cooker and no-cook choices. Recipe components stay searchable without appearing as automatic main-meal suggestions.
 
 **Dessert** and **Baking** are separate meal choices with planning and shopping
 support. Cakes, breads and pastries default to the full recipe yield; their saved
@@ -131,9 +128,7 @@ version live. The existing live baseline was inspected; Pages configuration is u
 ## Backlog
 
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
-- Original 400-recipe target: there are now 72 checked source links.
-  Continue deduplicated sourcing using the revised quality/coverage policy; expand publisher
-  coverage and verify licensing before hosting full cooking methods or photographs.
+- Continue deduplicated sourcing and improve ingredient equivalence and method classification. Verify licensing before hosting full publisher methods or photographs.
 - Phase 2: use-soon dates, richer side recipes, cooking mode/timers/screen wake,
   reusable weeks and combined prep checklists.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,

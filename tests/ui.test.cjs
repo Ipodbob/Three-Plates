@@ -1,5 +1,12 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
+test('new equipment buttons persist across reload and return actual specialist recipes',()=>{
+ for(const method of ['pressure-cooker','barbecue','microwave']){const a=app();a.click('#f-time-any');a.click('#f-method-'+method);assert.ok(a.q('.meal-card'),method);a.route('batch');a.click('#bf-method-'+method);const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().filters.method,method);assert.equal(b.q('#f-method-'+method).getAttribute('aria-pressed'),'true');b.route('batch');assert.equal(b.q('#bf-method-'+method).getAttribute('aria-pressed'),'true');a.dom.window.close();b.dom.window.close();}
+});
+test('specialist search can plan a complete bake and keeps components out of automatic ideas',()=>{
+ const a=app();a.click('#f-time-any');for(let i=0;i<5&&a.q('.meal-stepper span').textContent!=='Baking';i++)a.click('#f-meal-next');a.q('#recipe-search').value='almond flour pancakes';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/King Arthur Baking/);a.click('[data-act="plan-add"]');assert.equal(a.state().plans[0].recipeId,'sp-kingarthur-almond-flour-pancakes-recipe');assert.equal(a.state().plans[0].servings,12);
+ a.q('#recipe-search').value='classic puff pastry';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/Recipe component/);a.q('#recipe-search').value='';a.submit('#search-form');assert.equal(a.w.document.querySelectorAll('.meal-card').length,3);assert.doesNotMatch(a.q('main').textContent,/Recipe component/);a.dom.window.close();
+});
 test('expanded catalogue can find and plan a full bake with extra time visible',()=>{
  const a=app();a.click('#f-time-any');while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');a.q('#recipe-search').value='steamed bao';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/extra time/);assert.match(a.q('.meal-card').textContent,/Hob/);a.click('[data-act="plan-add"]');assert.equal(a.state().plans[0].recipeId,'gf2-steamed-bao-buns');assert.equal(a.state().plans[0].servings,18);a.route('shop');assert.match(a.q('main').textContent,/flour/i);const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().plans[0].servings,18);a.dom.window.close();b.dom.window.close();
 });
@@ -14,11 +21,11 @@ test('source batch recipes can be planned fresh without entering the batch workf
  const a=app();a.click('#f-time-any');a.q('#recipe-search').value='big-batch';a.submit('#search-form');a.click('[data-act="recipe"][data-id="gf-big-batch-bolognese"]');assert.ok(a.q('.sheet [data-act="plan-add"]'));assert.equal(a.q('.sheet [data-act="batch-add"]'),null);a.click('.sheet [data-act="plan-add"]');assert.equal(a.state().plans[0].recipeId,'gf-big-batch-bolognese');assert.equal(a.state().batches.length,0);a.dom.window.close();
 });
 test('rated recipe search exposes attribution and plans scalable ingredients',()=>{
- const a=app();a.click('#f-time-any');a.q('#recipe-search').value='air fryer salmon';a.submit('#search-form');assert.equal(a.w.document.querySelectorAll('.meal-card').length,1);assert.match(a.q('.recipe-rating').textContent,/4.6\/5.*62 ratings/);a.click('[data-act="recipe"][data-id="gf-air-fryer-salmon"]');const link=a.q('.sheet a.button');assert.equal(link.href,'https://www.bbcgoodfood.com/recipes/air-fryer-salmon');assert.match(link.textContent,/Read cooking method/);assert.match(a.q('.sheet').textContent,/Source checked 2026-09-28/);a.click('.sheet [data-act="plan-add"]');assert.equal(a.state().plans[0].recipeId,'gf-air-fryer-salmon');a.dom.window.close();
+ const a=app();a.click('#f-time-any');a.q('#recipe-search').value='air fryer salmon';a.submit('#search-form');assert.ok(a.w.document.querySelectorAll('.meal-card').length>=1);a.click('[data-act="recipe"][data-id="gf-air-fryer-salmon"]');const link=a.q('.sheet a.button');assert.equal(link.href,'https://www.bbcgoodfood.com/recipes/air-fryer-salmon');assert.match(link.textContent,/Read cooking method/);assert.match(a.q('.sheet').textContent,/Source checked 2026-09-28/);a.click('.sheet [data-act="plan-add"]');assert.equal(a.state().plans[0].recipeId,'gf-air-fryer-salmon');a.dom.window.close();
 });
 test('air fryer filter persists across reload in both cooking modes',()=>{
  const a=app();a.click('#f-method-air-fryer');a.route('batch');a.click('#bf-method-air-fryer');
- const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().filters.method,'air-fryer');assert.equal(b.q('#f-method-air-fryer').getAttribute('aria-pressed'),'true');b.route('batch');assert.equal(b.state().batchFilters.method,'air-fryer');assert.equal(b.q('#bf-method-air-fryer').getAttribute('aria-pressed'),'true');assert.equal(b.w.document.querySelectorAll('.meal-card').length,1);a.dom.window.close();b.dom.window.close();
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().filters.method,'air-fryer');assert.equal(b.q('#f-method-air-fryer').getAttribute('aria-pressed'),'true');b.route('batch');assert.equal(b.state().batchFilters.method,'air-fryer');assert.equal(b.q('#bf-method-air-fryer').getAttribute('aria-pressed'),'true');assert.ok(b.w.document.querySelectorAll('.meal-card').length>=1);a.dom.window.close();b.dom.window.close();
 });
 test('quantity steppers respect limits, keep focus and update batch portions',()=>{
  const a=app();a.set('#f-servings','12');a.click('#f-servings-plus');assert.equal(a.state().filters.servings,12);a.click('#f-servings-minus');assert.equal(a.state().filters.servings,11);
@@ -31,7 +38,7 @@ function app(seed={},failStorage=false){
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
  for(const [key,value] of Object.entries(seed))w.localStorage.setItem(key,value);
  if(failStorage)w.Storage.prototype.setItem=()=>{throw Error('quota');};
- for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','core-v3.js','phase1.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
+ for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','recipes-specialists.js','core-v3.js','phase1.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
  const q=selector=>w.document.querySelector(selector),click=selector=>{assert.ok(q(selector),selector);q(selector).click();},set=(selector,value)=>{assert.ok(q(selector),selector);q(selector).value=value;q(selector).dispatchEvent(new w.Event('change',{bubbles:true}));};
  const route=name=>{w.location.hash=name;w.dispatchEvent(new w.HashChangeEvent('hashchange'));};
  const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));

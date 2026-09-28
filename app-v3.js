@@ -137,6 +137,9 @@
     ["oven", "Oven"],
     ["air-fryer", "Air fryer"],
     ["slow-cooker", "Slow cooker"],
+    ["pressure-cooker", "Pressure cooker"],
+    ["barbecue", "Barbecue"],
+    ["microwave", "Microwave"],
     ["no-cook", "No cook"],
   ];
   const times = [
@@ -152,6 +155,9 @@
       microwave: "Microwave",
       barbecue: "Barbecue",
       packet: "Follow packet cooking method",
+      "pressure-cooker": "Pressure cooker",
+      "sous-vide": "Sous vide",
+      "waffle-iron": "Waffle iron",
       oven: "Oven",
       "oven-hob": "Oven + hob",
       "air-fryer": "Air fryer",
@@ -163,7 +169,9 @@
   const recipeTags = (r) =>
     (r.dishRole === "side"
       ? '<p class="helper">Side dish / starter · plan a main separately</p>'
-      : "") +
+      : r.dishRole === "component"
+        ? '<p class="helper">Recipe component · use alongside another recipe</p>'
+        : "") +
     (r.tags?.length
       ? `<p class="recipe-tags">${r.tags.map((tag) => `<span>${e(tag.replaceAll("-", " "))}</span>`).join("")}<span title="Three Plates effort estimate">${e(r.effort === "project" ? "More involved" : r.effort === "simple" ? "Simple" : "Some preparation")}</span></p>`
       : "");
@@ -309,7 +317,7 @@
     return R.filter(
       (r) =>
         (batch ? !!r.batch : !r.batch || !!r.source) &&
-        (r.dishRole !== "side" || !!f.query?.trim()) &&
+        (!r.dishRole || !!f.query?.trim()) &&
         C.matching(r, f, state, R, ingredients()),
     );
   }
