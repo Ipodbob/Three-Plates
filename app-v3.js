@@ -223,6 +223,7 @@
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
       storageError = "";
+      return true;
     } catch (err) {
       storageError =
         "This browser cannot save changes. Export a backup in Settings.";
@@ -230,7 +231,7 @@
     }
   }
   // All state transitions are atomic: a failed validation leaves the previous state intact.
-  function change(fn, notice = "", reset = false) {
+  function change(fn, notice = "", reset = false, requireSaved = false) {
     if (blocked) {
       toast(storageError);
       return false;
@@ -238,7 +239,8 @@
     const before = C.clone(state);
     try {
       fn();
-      persist();
+      const saved = persist();
+      if (requireSaved && !saved) throw Error(storageError);
       if (reset) clearChoices();
       render();
       if (notice) toast(notice);
@@ -1210,7 +1212,7 @@
         close,
         getState: () => state,
         ingredients,
-        commit: (fn, notice) => change(() => fn(state), notice, true),
+        commit: (fn, notice) => change(() => fn(state), notice, true, true),
       });
       return;
     }

@@ -125,7 +125,9 @@
       !Number.isInteger(packs) ||
       packs < 1 ||
       packs > 100 ||
-      ![1, 0.5, 0.25].includes(fraction)
+      !Number.isFinite(fraction) ||
+      fraction <= 0 ||
+      fraction > 1
     )
       throw Error("Check the amount and number of packs.");
     let i = ingredients[choice.ingredientId];
@@ -178,6 +180,20 @@
     } else delete s.barcodeMatches[code];
     return delta;
   }
+  // Absolute stock correction is idempotent and never repeats recipe deductions.
+  function setRemaining(s, ingredients, id, expected, remaining) {
+    const old = s.pantry.find((x) => x.id === id);
+    if (!ingredients[id] || !old || old.always)
+      throw Error("Choose a measured item already in your pantry.");
+    if (old.qty !== expected)
+      throw Error("Stock changed. Scan again before updating it.");
+    if (!Number.isFinite(remaining) || remaining < 0 || remaining > old.qty)
+      throw Error("Check the amount left.");
+    const removed = old.qty - remaining;
+    if (remaining === 0) s.pantry = s.pantry.filter((x) => x.id !== id);
+    else old.qty = remaining;
+    return removed;
+  }
   function lookupClient({
     fetcher = root.fetch?.bind(root),
     relay = "",
@@ -208,7 +224,28 @@
         signal?.removeEventListener("abort", cancel);
       }
     }
-    return async function lookup(value, matches = {}, signal) {
+    return async function lookup(
+      value,
+      matches = {},
+      signal,
+      waitForRateLimit = false,
+    ) {
+      const waitUntil = async (time) => {
+        const ms = time - now();
+        if (!waitForRateLimit || ms <= 0) return;
+        await new Promise((resolve, reject) => {
+          const cancel = () => {
+            clearTimeout(timer);
+            reject(Error("Cancelled"));
+          };
+          const timer = setTimeout(() => {
+            signal?.removeEventListener("abort", cancel);
+            resolve();
+          }, ms);
+          if (signal?.aborted) cancel();
+          else signal?.addEventListener("abort", cancel, { once: true });
+        });
+      };
       const code = barcode(value),
         saved = matches[code];
       if (saved)
@@ -221,6 +258,7 @@
           saved,
         };
       let issue = "";
+      await waitUntil(next.off);
       if (now() >= next.off) {
         next.off = now() + 4100;
         try {
@@ -237,6 +275,7 @@
         }
       } else issue = "Please wait a few seconds between new product lookups.";
       if (signal?.aborted) throw Error("Cancelled");
+      if (relay) await waitUntil(next.upc);
       if (relay && now() >= next.upc) {
         next.upc = now() + 10100;
         try {
@@ -311,8 +350,8 @@
           })[c],
       );
     modal(
-      "Scan into pantry",
-      `<div id="scan-root"><p>Scan a food barcode, then check the ingredient and amount before adding it.</p><div class="action-wrap"><button type="button" class="button" id="scan-camera">Start camera</button><button type="button" class="button secondary" id="scan-photo-open">Take / choose barcode photo</button><input id="scan-photo" type="file" accept="image/*" capture="environment" hidden aria-label="Barcode photo"></div><video id="scan-video" playsinline muted hidden aria-label="Barcode camera preview"></video><button type="button" class="button secondary" id="scan-stop" hidden>Stop camera</button><p class="helper">Keep the whole barcode in focus with good light. Photos are read on this device, not uploaded. This reads barcodes, not food photos.</p><details><summary>Enter barcode number instead</summary><form id="barcode-number-form"><label for="barcode-number">Barcode number</label><input id="barcode-number" inputmode="numeric" autocomplete="off" maxlength="24" required><button class="button" type="submit">Look up barcode</button></form></details><p id="scan-status" role="status" aria-live="polite"></p><div id="scan-result"></div><p class="helper">New barcodes are sent to Open Food Facts${root.PLATES_BARCODE_CONFIG?.upcRelay ? ", then UPCitemdb if needed" : ". UPC backup is awaiting setup"}. Confirmed matches stay in your browser and are included in backups.</p><button type="button" id="scan-forget" class="text-btn">Forget remembered barcode matches</button></div>`,
+      "Scan your pantry",
+      `<div id="scan-root"><div class="scan-modes" role="group" aria-label="Scan action"><button type="button" id="scan-add-mode" aria-pressed="true">Add stock</button><button type="button" id="scan-use-mode" aria-pressed="false">Update amount left</button></div><p id="scan-mode-help" class="helper">Scan, check, add. Keep going until your cupboard is done.</p><button type="button" class="text-btn" id="scan-plan" hidden>Open meal plan</button><p id="scan-session" role="status"></p><div id="scan-capture"><div class="scan-viewfinder"><video id="scan-video" playsinline muted hidden aria-label="Barcode camera preview"></video><div class="scan-target" aria-hidden="true"><span>▥</span></div><p>Line up the barcode</p></div><div class="scan-tools"><button type="button" class="button" id="scan-camera">Start camera</button><button type="button" class="button secondary" id="scan-photo-open">Use photo</button><input id="scan-photo" type="file" accept="image/*" capture="environment" hidden aria-label="Barcode photo"><button type="button" class="text-btn" id="scan-stop" hidden>Pause camera</button></div><details><summary>Enter barcode number instead</summary><form id="barcode-number-form"><label for="barcode-number">Barcode number</label><input id="barcode-number" inputmode="numeric" autocomplete="off" maxlength="24" required><button class="button" type="submit">Look up barcode</button></form></details></div><p id="scan-status" role="status" aria-live="polite"></p><div id="scan-result"></div><div class="scan-footer"><button type="button" class="button secondary" id="scan-done">Done</button><details><summary>About scanning</summary><p class="helper">Photos stay on this device. New barcodes are looked up with Open Food Facts and the UPC backup. Saved matches work offline.</p><button type="button" id="scan-forget" class="text-btn">Forget remembered barcode matches</button></details></div></div>`,
     );
     const el = document.getElementById("scan-root"),
       q = (s) => el.querySelector(s),
@@ -325,7 +364,13 @@
       controller = null,
       reader = null,
       current = null,
-      selected = null;
+      selected = null,
+      mode = "add",
+      savedCount = 0,
+      cameraSession = false,
+      reviewing = false,
+      previousCode = "",
+      needsClear = false;
     const status = (t) => {
       if (alive) q("#scan-status").textContent = t;
     };
@@ -343,6 +388,7 @@
     }
     function dispose() {
       alive = false;
+      dialog.classList.remove("scanner-sheet");
       controller?.abort();
       stop();
       document.removeEventListener("visibilitychange", visibility);
@@ -361,16 +407,19 @@
     dialog.addEventListener("cancel", dispose);
     document.addEventListener("visibilitychange", visibility);
     root.addEventListener("pagehide", dispose);
-    async function found(code) {
-      stop();
+    dialog.classList.add("scanner-sheet");
+    async function found(code, fromCamera = false) {
+      reviewing = true;
+      if (!fromCamera) stop();
       controller?.abort();
       controller = new AbortController();
       const token = epoch,
         signal = controller.signal;
       q("#scan-result").innerHTML = "";
+      current = null;
       status("Looking up product…");
       try {
-        const p = await lookup(code, getState().barcodeMatches, signal);
+        const p = await lookup(code, getState().barcodeMatches, signal, true);
         if (!alive || epoch !== token || signal.aborted) return;
         review(p);
       } catch (e) {
@@ -385,6 +434,8 @@
       });
     }
     q("#scan-camera").onclick = async () => {
+      cameraSession = true;
+      reviewing = false;
       stop();
       controller?.abort();
       const token = epoch;
@@ -414,10 +465,18 @@
         q("video").hidden = false;
         status("Point the rear camera at the barcode.");
         const c = await reader.decodeFromStream(stream, q("video"), (r) => {
-          if (!r || !alive || token !== epoch) return;
+          if (!alive || token !== epoch) return;
+          if (!r) {
+            needsClear = false;
+            return;
+          }
+          if (reviewing) return;
           try {
             const code = barcode(r.getText());
-            found(code);
+            if (needsClear && code === previousCode) return;
+            previousCode = code;
+            needsClear = true;
+            found(code, true);
           } catch {
             /* Keep scanning non-product/invalid codes. */
           }
@@ -436,10 +495,14 @@
       }
     };
     q("#scan-stop").onclick = () => {
+      cameraSession = false;
       stop();
-      status("Camera stopped.");
+      status("Camera paused.");
     };
-    q("#scan-photo-open").onclick = () => q("#scan-photo").click();
+    q("#scan-photo-open").onclick = () => {
+      cameraSession = false;
+      q("#scan-photo").click();
+    };
     q("#scan-photo").onchange = async (ev) => {
       stop();
       controller?.abort();
@@ -470,6 +533,7 @@
     q("#barcode-number-form").onsubmit = (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
+      cameraSession = false;
       found(q("#barcode-number").value);
     };
     q("#scan-forget").onclick = () => {
@@ -482,37 +546,143 @@
           s.barcodeMatches = {};
         }, "Barcode matches forgotten.");
     };
+    function nextScan() {
+      current = null;
+      selected = null;
+      reviewing = false;
+      needsClear = true;
+      q("#scan-result").innerHTML = "";
+      q("#scan-capture").hidden = false;
+      q("#barcode-number").value = "";
+      status("Ready for the next item.");
+      dialog.scrollTop = 0;
+      if (cameraSession && stream)
+        status("Saved. Move the item away, then scan the next barcode.");
+      else if (cameraSession) q("#scan-camera").click();
+      else q("#barcode-number").focus();
+    }
+    q("#scan-done").onclick = () => {
+      dispose();
+      close();
+    };
+    q("#scan-plan").onclick = () => {
+      dispose();
+      close();
+      root.location.hash = "plan";
+    };
+    function setMode(value) {
+      mode = value;
+      q("#scan-plan").hidden = mode !== "use";
+      q("#scan-add-mode").setAttribute("aria-pressed", mode === "add");
+      q("#scan-use-mode").setAttribute("aria-pressed", mode === "use");
+      q("#scan-mode-help").textContent =
+        mode === "add"
+          ? "Scan, check, add. Keep going until your cupboard is done."
+          : "Set the total left in your pantry. Cooked a planned meal? Mark it cooked in Plan instead: that deducts its ingredients once.";
+      if (current) review(current);
+    }
+    q("#scan-add-mode").onclick = () => setMode("add");
+    q("#scan-use-mode").onclick = () => setMode("use");
     function review(p) {
       current = p;
       selected = null;
+      q("#scan-capture").hidden = true;
       status(
-        p.name ? "Product found. Check its pantry match and amount." : p.issue,
+        p.name
+          ? "Found — confirm below to save."
+          : p.issue || "Product not found. Give it a name to add it.",
       );
-      const list = candidates(p, ingredients());
+      const all = ingredients(),
+        list =
+          mode === "use"
+            ? getState()
+                .pantry.filter((x) => !x.always)
+                .map((x) => all[x.id])
+                .filter(Boolean)
+            : candidates(p, all);
+      let expected = 0,
+        submitted = false;
       q("#scan-result").innerHTML =
-        `<form id="scan-confirm-form"><h3>${esc(p.name || "Unrecognised product")}</h3><p>${esc(p.brand || "")} ${esc(p.size || "")}</p>${p.provider ? `<p class="helper">Found via ${esc(p.provider)}${p.provider === "Open Food Facts" ? ` · <a href="https://world.openfoodfacts.org/product/${p.code}" target="_blank" rel="noopener noreferrer">Open Food Facts · ODbL</a>` : ""}</p>` : ""}<p class="helper">Barcode ${p.code}. Choose what this counts as in recipes. Do not match a ready meal or sauce to one of its individual ingredients.</p><div class="scan-matches">${list.map((i) => `<button type="button" class="button secondary" data-match="${esc(i.id)}">${esc(i.name)} (${esc(i.unit)})</button>`).join("")}</div><label for="scan-ingredient">Pantry ingredient</label><input id="scan-ingredient" list="scan-options" placeholder="Choose or search ingredients"><datalist id="scan-options">${Object.values(
-          ingredients(),
+        `<form id="scan-confirm-form" class="scan-card"><div class="scan-product"><span class="scan-product-icon" aria-hidden="true">▥</span><div><h3>${esc(p.name || "Unknown product")}</h3><p>${esc(p.brand || "")} ${esc(p.size || "")}</p></div></div><p id="scan-selection" class="helper"></p><div id="scan-amount"><label for="scan-fraction">${mode === "use" ? "Total stock left" : "How much is left in each pack?"} <output id="scan-percent">100%</output></label><input id="scan-fraction" type="range" min="${mode === "use" ? 0 : 0.05}" max="1" step="0.05" value="1"><div class="scan-presets">${(mode ===
+        "use"
+          ? [
+              [0, "Empty"],
+              [0.25, "¼"],
+              [0.5, "½"],
+              [1, "All left"],
+            ]
+          : [
+              [0.25, "¼"],
+              [0.5, "½"],
+              [0.75, "¾"],
+              [1, "Full"],
+            ]
         )
+          .map(
+            ([value, label]) =>
+              `<button type="button" data-fraction="${value}">${label}</button>`,
+          )
+          .join(
+            "",
+          )}</div><div id="scan-pack-row"><label for="scan-packs">Packs</label><div class="quantity-stepper"><button type="button" id="scan-minus" aria-label="Fewer packs">−</button><input id="scan-packs" type="number" inputmode="numeric" min="1" max="100" step="1" value="1" required><button type="button" id="scan-plus" aria-label="More packs">+</button></div></div><p id="scan-preview" class="scan-preview" aria-live="polite"></p><button type="submit" id="scan-save" class="button wide">${mode === "use" ? "Save & scan next" : "Add & scan next"}</button></div><p id="scan-error" role="alert"></p><details id="scan-edit"><summary>${mode === "use" ? "Choose pantry item / enter amount" : "Edit product / link to recipes"}</summary><label for="scan-product-name">Product name</label><input id="scan-product-name" maxlength="80" value="${esc(p.name)}" required><div class="scan-matches">${list
+          .slice(0, 8)
+          .map(
+            (i) =>
+              `<button type="button" class="button secondary" data-match="${esc(i.id)}">${esc(i.name)}</button>`,
+          )
+          .join(
+            "",
+          )}</div><label for="scan-ingredient">${mode === "use" ? "Pantry item" : "Recipe ingredient (optional)"}</label><input id="scan-ingredient" list="scan-options" placeholder="Search ingredients"><datalist id="scan-options">${Object.values(
+          all,
+        )
+          .filter(
+            (i) =>
+              mode === "add" ||
+              getState().pantry.some((x) => x.id === i.id && !x.always),
+          )
           .map(
             (i) =>
               `<option value="${esc(i.name)} [${esc(i.id)}]">${esc(i.unit)}</option>`,
           )
           .join(
             "",
-          )}</datalist><button type="button" id="scan-custom" class="text-btn">Keep as a separate product (not matched to recipes)</button><div id="scan-amount" hidden><label for="scan-product-name">Product name</label><input id="scan-product-name" maxlength="80" value="${esc(p.name)}" required><label for="scan-qty">Usable amount in one full pack</label><input id="scan-qty" type="number" inputmode="decimal" min="0.001" max="1000000" step="any" required><label for="scan-unit">Unit</label><select id="scan-unit"><option value="g">g</option><option value="ml">ml</option><option value="each">items</option><option value="tsp">tsp</option></select><p class="helper">Check the pack label. For tinned beans or fish use drained weight when the recipe ingredient expects it. Never treat grams as a number of pieces.</p><label for="scan-packs">Number of packs</label><div class="quantity-stepper"><button type="button" id="scan-minus" aria-label="Fewer packs">−</button><input id="scan-packs" type="number" inputmode="numeric" min="1" max="100" step="1" value="1" required><button type="button" id="scan-plus" aria-label="More packs">+</button></div><label for="scan-fraction">Amount left in each pack</label><select id="scan-fraction"><option value="1">Full pack</option><option value="0.5">Half pack</option><option value="0.25">Quarter pack</option></select><label class="check-label"><input type="checkbox" id="scan-remember" checked>Remember this barcode, ingredient and full pack amount</label><p class="helper" id="scan-existing"></p><button type="submit" class="button wide">Confirm and add to pantry</button></div></form>`;
+          )}</datalist>${mode === "add" ? '<button type="button" id="scan-custom" class="text-btn">Keep as a separate product</button>' : ""}<label for="scan-qty">${mode === "use" ? "Total amount left (all packs)" : "Usable amount in one full pack"}</label><input id="scan-qty" type="number" inputmode="decimal" min="${mode === "use" ? 0 : 0.001}" max="1000000" step="any" required><label for="scan-unit">Unit</label><select id="scan-unit"><option value="g">g</option><option value="ml">ml</option><option value="each">items</option><option value="tsp">tsp</option></select><p class="helper">For drained ingredients, enter usable drained weight. Link only equivalent ingredients, not a sauce or ready meal to one ingredient.</p><label class="check-label"><input type="checkbox" id="scan-remember" checked>Remember this product for next time</label><p id="scan-existing" class="helper"></p></details><button type="button" id="scan-skip" class="text-btn">Skip this item</button><p class="scan-source">${p.provider ? `Found via ${esc(p.provider)}` : "Barcode " + esc(p.code)}${p.provider === "Open Food Facts" ? ` · <a href="https://world.openfoodfacts.org/product/${p.code}" target="_blank" rel="noopener noreferrer">Open Food Facts · ODbL</a>` : ""}</p></form>`;
+      const update = () => {
+        const fraction = +q("#scan-fraction").value;
+        q("#scan-percent").textContent = Math.round(fraction * 100) + "%";
+        q("#scan-fraction").setAttribute(
+          "aria-valuetext",
+          Math.round(fraction * 100) + " percent left",
+        );
+        const amount =
+          mode === "use"
+            ? +q("#scan-qty").value
+            : +q("#scan-qty").value * +q("#scan-packs").value * fraction;
+        q("#scan-preview").textContent = selected
+          ? `${mode === "use" ? "Leave" : "Add"} ${Math.round(amount * 1000) / 1000} ${q("#scan-unit").value} ${mode === "use" ? "in" : "to"} pantry`
+          : "Choose the pantry item below.";
+        q("#scan-save").disabled = !selected;
+      };
       const choose = (id) => {
         selected = id;
-        const i = ingredients()[id];
-        q("#scan-amount").hidden = false;
-        if (!p.name && i) q("#scan-product-name").value = i.name;
+        const i = all[id],
+          old = getState().pantry.find((x) => x.id === id);
+        if (mode === "use" && (!old || old.always)) selected = null;
+        expected = old?.qty || 0;
         q("#scan-unit").disabled = !!i;
-        q("#scan-unit").value = i?.unit || p.amount?.unit || "g";
-        q("#scan-ingredient").value = i
-          ? `${i.name} [${i.id}]`
-          : "Separate product";
+        q("#scan-unit").value = i?.unit || p.amount?.unit || "each";
+        q("#scan-ingredient").value = i ? `${i.name} [${i.id}]` : "";
+        if (!p.name && i) q("#scan-product-name").value = i.name;
         q("#scan-qty").value =
-          p.amount?.unit === q("#scan-unit").value ? p.amount.qty : "";
+          mode === "use"
+            ? expected
+            : p.amount?.unit === q("#scan-unit").value
+              ? p.amount.qty
+              : id === "new" && !p.amount
+                ? 1
+                : "";
         if (
+          mode === "add" &&
           !p.saved &&
           ([
             "chickpeas",
@@ -527,36 +697,97 @@
             /drained/i.test(i?.name || ""))
         )
           q("#scan-qty").value = "";
-        const old = getState().pantry.find((x) => x.id === id);
+        q("#scan-fraction").value = 1;
+        q("#scan-pack-row").hidden = mode === "use";
+        q("#scan-packs").required = mode === "add";
+        q("#scan-product-name").required = mode === "add";
+        q("#scan-selection").textContent =
+          mode === "use"
+            ? selected
+              ? `${i.name}: ${expected} ${i.unit} currently in pantry, across all packs.`
+              : "No saved pantry match. Choose an existing item below."
+            : i
+              ? `Adds to ${i.name}.`
+              : "Saved as its own product. Link it to recipes in Edit if needed.";
         q("#scan-existing").textContent = old?.always
-          ? "Already marked always stocked. Edit that pantry entry first."
-          : `Adds to existing stock${old ? `: ${old.qty} ${i.unit}` : ""}; it does not replace it.`;
+          ? "Always-stocked item: edit it in Pantry before measuring amounts."
+          : mode === "use"
+            ? "This replaces the total left; it does not subtract the recipe again."
+            : `Full pack: ${p.size || "size unavailable — using one item"}. Confirm the amount before adding.`;
+        q("#scan-edit").open =
+          !selected || !q("#scan-qty").value || (!p.name && mode === "add");
+        update();
       };
       q("#scan-result")
         .querySelectorAll("[data-match]")
         .forEach((b) => (b.onclick = () => choose(b.dataset.match)));
-      q("#scan-custom").onclick = () => choose("new");
+      q("#scan-custom")?.addEventListener("click", () => choose("new"));
       q("#scan-ingredient").oninput = () => {
         selected = null;
-        q("#scan-amount").hidden = true;
+        update();
       };
       q("#scan-ingredient").onchange = (ev) => {
-        const i = Object.values(ingredients()).find(
+        const i = Object.values(all).find(
           (i) => `${i.name} [${i.id}]` === ev.target.value,
         );
         if (i) choose(i.id);
       };
-      q("#scan-minus").onclick = () =>
-        (q("#scan-packs").value = Math.max(1, +q("#scan-packs").value - 1));
-      q("#scan-plus").onclick = () =>
-        (q("#scan-packs").value = Math.min(100, +q("#scan-packs").value + 1));
+      q("#scan-fraction").oninput = () => {
+        if (mode === "use")
+          q("#scan-qty").value =
+            Math.round(expected * +q("#scan-fraction").value * 1000) / 1000;
+        update();
+      };
+      q("#scan-result")
+        .querySelectorAll("[data-fraction]")
+        .forEach(
+          (b) =>
+            (b.onclick = () => {
+              q("#scan-fraction").value = b.dataset.fraction;
+              q("#scan-fraction").oninput();
+            }),
+        );
+      q("#scan-minus").onclick = () => {
+        q("#scan-packs").value = Math.max(1, +q("#scan-packs").value - 1);
+        update();
+      };
+      q("#scan-plus").onclick = () => {
+        q("#scan-packs").value = Math.min(100, +q("#scan-packs").value + 1);
+        update();
+      };
+      q("#scan-packs").oninput = update;
+      q("#scan-qty").oninput = () => {
+        if (mode === "use")
+          q("#scan-fraction").value = expected
+            ? +q("#scan-qty").value / expected
+            : 0;
+        update();
+      };
       q("#scan-unit").onchange = () => {
         q("#scan-qty").value = "";
+        q("#scan-edit").open = true;
+        update();
       };
+      q("#scan-skip").onclick = nextScan;
+      q("#scan-confirm-form").addEventListener(
+        "invalid",
+        () => {
+          q("#scan-edit").open = true;
+          q("#scan-error").textContent =
+            "Check the product name and amount below.";
+        },
+        true,
+      );
       q("#scan-confirm-form").onsubmit = (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
-        if (!alive || !selected) return;
+        if (!alive || submitted || !selected || current !== p) return;
+        const name = q("#scan-product-name").value.trim();
+        if (mode === "add" && !name) {
+          q("#scan-edit").open = true;
+          q("#scan-error").textContent = "Enter a product name.";
+          return;
+        }
         const choice = {
           ingredientId: selected,
           qty: +q("#scan-qty").value,
@@ -565,19 +796,38 @@
           fraction: +q("#scan-fraction").value,
           remember: q("#scan-remember").checked,
         };
-        const p = { ...current, name: q("#scan-product-name").value };
+        submitted = true;
         const ok = commit(
-          (s) => add(s, ingredients(), p, choice),
-          "Scanned item added to pantry.",
+          (s) =>
+            mode === "use"
+              ? setRemaining(s, ingredients(), selected, expected, choice.qty)
+              : add(s, ingredients(), { ...p, name }, choice),
+          mode === "use" ? "Pantry amount updated." : "Item saved to pantry.",
         );
         if (ok) {
-          dispose();
-          close();
+          savedCount++;
+          q("#scan-session").textContent =
+            `✓ ${savedCount} saved · ${name || p.name || "Item"}`;
+          nextScan();
+        } else {
+          submitted = false;
+          q("#scan-error").textContent =
+            "Not saved. Check the amount and pantry match. If browser storage is unavailable, free space or export a backup in Settings.";
+          q("#scan-edit").open = true;
         }
       };
-      if (p.saved && ingredients()[p.saved.ingredientId])
-        choose(p.saved.ingredientId);
+      choose(
+        p.saved && all[p.saved.ingredientId]
+          ? p.saved.ingredientId
+          : all["custom-barcode-" + p.code]
+            ? "custom-barcode-" + p.code
+            : mode === "add"
+              ? "new"
+              : "",
+      );
+      dialog.scrollTop = 0;
     }
+    q("#scan-camera").click();
     return dispose;
   }
   const api = {
@@ -587,6 +837,7 @@
     candidates,
     restoreMatches,
     add,
+    setRemaining,
     lookupClient,
     openUI,
   };

@@ -18,8 +18,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 102 checks: 31 core regressions, 11 added domain checks,
-20 catalogue checks, 20 existing DOM checks and 20 barcode/relay checks.
+`npm test` runs 108 checks: 31 core regressions, 11 added domain checks,
+20 catalogue checks, 20 existing DOM checks and 26 barcode/relay checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -27,7 +27,9 @@ The pinned ZXing browser bundle is served locally and loaded only for camera/pho
 
 Pantry has live rear-camera scanning, barcode-photo capture/upload and a number
 fallback. Product lookup suggests ingredients and amounts; users confirm before
-stock is added. Full/half/quarter packs and pack counters reduce typing. Confirmed
+stock is added. A visible Add & scan next action, continuous camera, remaining-percentage slider
+and pack counter support fast cupboard setup. Update amount left corrects total
+stock or clears an item; planned meals retain their existing cooking deduction. Confirmed
 barcode matches stay on the device and are included in the existing backups.
 Camera/photo decoding stays local; only new barcode numbers are looked up online.
 
