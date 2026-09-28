@@ -837,6 +837,21 @@
     if (!sheet.open) sheet.showModal();
     sheet.scrollTop = 0;
   }
+  function confirmAction(title, message, label, run) {
+    modal(
+      title,
+      `<p>${e(message)}</p><div class="action-wrap"><button class="button" id="confirm-action" type="button">${e(label)}</button>${btn("Cancel", "close", "", "secondary")}</div>`,
+    );
+    const control = document.getElementById("confirm-action");
+    let used = false;
+    control.onclick = () => {
+      if (used || !sheet.open || !control.isConnected) return;
+      used = true;
+      close();
+      run();
+    };
+    sheet.querySelector('[data-act="close"]')?.focus();
+  }
   function recipeModal(id) {
     const r = recipe(id);
     if (!r) return;
@@ -1160,7 +1175,9 @@
   }
   document.addEventListener("click", (ev) => {
     const b = ev.target.closest("[data-act]");
-    if (!b) return;
+    if (b) handleAction(b);
+  });
+  function handleAction(b, approved = false) {
     const act = b.dataset.act,
       id = b.dataset.id,
       batch = route === "batch",
@@ -1325,52 +1342,51 @@
       return;
     }
     if (act === "plan-edit") {
-      const p = state.plans.find((p) => p.id === id),
-        max = recipe(p.recipeId)?.baking ? 48 : 12,
-        n = prompt(`Portions to make (1–${max})`, String(p.servings));
-      if (n !== null)
-        change(
-          () => {
-            if (!C.integer(+n, 1, max))
-              throw Error(`Choose 1–${max} portions.`);
-            p.servings = +n;
-          },
-          "Portions updated.",
-          true,
-        );
+      const p = state.plans.find((p) => p.id === id);
+      if (!p || p.cooked) {
+        toast("This meal cannot be edited.");
+        return;
+      }
+      const max = recipe(p.recipeId)?.baking ? 48 : 12;
+      modal(
+        "Change portions",
+        `<p>${e(recipe(p.recipeId).name)}</p><form id="plan-portions-form" data-id="${e(id)}">${field("Portions to make", "plan-portions", quantityInput("plan-portions", p.servings, 1, max, "portions"))}<p class="helper">Updates the ingredients needed for this meal. Existing purchases keep their recorded quantities.</p><button class="button wide" type="submit">Save portions</button></form>`,
+      );
       return;
     }
-    if (
-      [
-        "hide",
-        "batch-remove",
-        "plan-remove",
-        "pantry-remove",
-        "discard-lot",
-        "freeze-lot",
-        "plan-finish",
-        "thaw-plan",
-      ].includes(act) &&
-      !confirm(
-        {
-          hide: "Hide this recipe? Restore it later in Settings.",
-          "batch-remove":
-            "Remove this uncooked batch and its shopping requirements?",
-          "plan-remove":
-            "Remove this meal from the plan? Finished cooking is not reversed.",
-          "pantry-remove": "Remove this pantry ingredient?",
-          "discard-lot":
-            "Discard all remaining portions in this container and remove their future meals from the plan?",
-          "freeze-lot":
-            "Freezer suitability for this example is unknown. Have you checked freezing instructions for the recipe you cooked and safely chilled these portions? Existing cooling time is not erased.",
-          "plan-finish":
-            "Record this meal as finished? Ingredients or stored portions are deducted once. Reheat stored food only once, until steaming hot throughout.",
-          "thaw-plan":
-            "Move only the portions for this meal from the freezer into the fridge to defrost? Leave other portions frozen.",
-        }[act],
-      )
-    )
+    const confirmation = {
+      hide: "Hide this recipe? Restore it later in Settings.",
+      "batch-remove":
+        "Remove this uncooked batch and its shopping requirements?",
+      "plan-remove":
+        "Remove this meal from the plan? Finished cooking is not reversed.",
+      "pantry-remove": "Remove this pantry ingredient?",
+      "discard-lot":
+        "Discard all remaining portions in this container and remove their future meals from the plan?",
+      "freeze-lot":
+        "Freezer suitability for this example is unknown. Have you checked freezing instructions for the recipe you cooked and safely chilled these portions? Existing cooling time is not erased.",
+      "plan-finish":
+        "Record this meal as finished? Ingredients or stored portions are deducted once. Reheat stored food only once, until steaming hot throughout.",
+      "thaw-plan":
+        "Move only the portions for this meal from the freezer into the fridge to defrost? Leave other portions frozen.",
+    };
+    if (!approved && confirmation[act]) {
+      const labels = {
+        hide: "Hide recipe",
+        "batch-remove": "Remove batch",
+        "plan-remove": "Remove meal",
+        "pantry-remove": "Remove item",
+        "discard-lot": "Discard portions",
+        "freeze-lot": "Freeze portions",
+        "plan-finish": "Record as finished",
+        "thaw-plan": "Start defrosting",
+      };
+      const title = labels[act];
+      confirmAction(title, confirmation[act], title, () =>
+        handleAction(b, true),
+      );
       return;
+    }
     change(
       () => {
         switch (act) {
@@ -1475,7 +1491,7 @@
         "reset-filters",
       ].includes(act),
     );
-  });
+  }
   document.addEventListener("change", (ev) => {
     const t = ev.target,
       id = t.id;
@@ -1716,6 +1732,18 @@
             if (!Number.isFinite(q) || q < 0 || q > 1e7)
               throw Error("Enter a valid bought amount.");
             C.recordPurchase(state, id, q, ingredients(), { replace: true });
+            break;
+          }
+          case "plan-portions-form": {
+            const p = state.plans.find((p) => p.id === id),
+              qty = n("plan-portions");
+            if (
+              !p ||
+              p.cooked ||
+              !C.integer(qty, 1, recipe(p.recipeId)?.baking ? 48 : 12)
+            )
+              throw Error("Choose a valid portion count for an uncooked meal.");
+            p.servings = qty;
             break;
           }
           case "pantry-link-form": {
