@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 50cdec2 (PR #2): Pages run 36490963520 succeeded, all 16 checked public assets matched v3.7.0, and the live Pantry opened the redesigned scanner. Earlier live UPC fallback checks also passed.
+- Main bef323f (PR #4): Pages run 36492957596 succeeded, all 16 checked public assets matched v3.7.1, and the live Pantry displayed v3.7.1. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -20,7 +20,7 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 ## Verification evidence
 - Real browser: ten-portion variety planning proposed six portions of bolognese and four of dhal. Both batches were recorded cooked; bolognese split into two fridge and four freezer portions, dhal into four freezer portions. Booking two fridge portions with pasta left only 180 g pasta on Shopping after both batches were cooked.
 - Real browser: booking and partially defrosting two freezer portions left the other two frozen. Both meals were marked eaten. A 500 g pasta purchase minus the 180 g side left 320 g after reload. Temporary active test stock was removed/discarded; the original six prepared portions remained. Test history records remain locally.
-- This workflow exposed a save-reload failure: a whole-second defrost completion could precede its millisecond start within the same second. Regression and browser recovery are verified. The isolated data fix was merged as PR #4; deployment evidence is tracked separately. It does not require resetting or replacing saved data.
+- This workflow exposed a save-reload failure: a whole-second defrost completion could precede its millisecond start within the same second. Regression and browser recovery are verified. The isolated data fix was merged and verified live as PR #4. It does not require resetting or replacing saved data. Full release suite: 125 passed. Full feature-branch suite: 133 passed.
 - Reminder browser check: saved Pasta with a reminder, reloaded, and opened ingredient search with existing meal/filters retained. Desktop screenshot inspected. The viewport override returned successfully but DOM width stayed 1280; the new panel's narrow-phone rendering remains unverified. Temporary viewport overrides were reset.
 - Full regression suite recorded separately in README and PR; targeted tests cover the newest confirmation/recovery paths.
 - Connected UI test: 100 g existing pasta + 500 g purchased - 180 g cooked = 420 g remaining after reload. Finished cooking has no repeat action.

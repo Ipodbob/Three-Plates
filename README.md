@@ -38,8 +38,8 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.7.0 was verified live after PR #2 (merge 50cdec2, successful
-Pages run 36490963520 and all 16 checked public assets matched). The fallback shares 100 requests per
+frontend v3.7.1 was verified live after PR #4 (merge bef323f, successful
+Pages run 36492957596 and all 16 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
@@ -51,6 +51,15 @@ retains the current meal and food filters. They are personal reminders, not safe
 or expiry determinations. Scanning and purchases retain the existing reminder;
 linking products keeps the earliest date, and consuming the final stock clears it.
 Dates are included in normal backups. This feature branch is not yet deployed.
+
+Planned recipe views now use the selected meal or batch's own portions. Stored
+meals separate fresh sides from already-cooked ingredients; prepared containers
+show their original batch quantities for reference. These views do not offer an
+accidental duplicate planning action.
+
+The released defrost fix recovers older whole-second completion timestamps within
+the same second as their millisecond start, without resetting stock or history.
+Genuinely reversed timestamps still fail validation.
 
 Choose keeps three suggestions with refresh/keep, food exclusions, favourites,
 pantry matching and individual meal headcounts. Name/ingredient search is also
