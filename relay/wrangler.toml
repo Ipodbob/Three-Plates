@@ -1,0 +1,14 @@
+name = "three-plates-upc"
+main = "upc-worker.mjs"
+compatibility_date = "2026-09-28"
+
+[vars]
+ALLOWED_ORIGINS = "https://ipodbob.github.io,http://127.0.0.1:4173"
+
+[[durable_objects.bindings]]
+name = "QUOTA"
+class_name = "Quota"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Quota"]

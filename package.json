@@ -1,0 +1,13 @@
+{
+  "name": "three-plates",
+  "private": true,
+  "scripts": {
+    "test": "node tests/core-v3.test.cjs && node --test tests/phase1.test.cjs tests/ui.test.cjs tests/catalogue.test.cjs tests/barcode.test.cjs tests/barcode-ui.test.cjs tests/barcode-relay.test.cjs",
+    "start": "node scripts/serve.cjs"
+  },
+  "devDependencies": {
+    "@zxing/browser": "0.2.1",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.6.2"
+  }
+}
