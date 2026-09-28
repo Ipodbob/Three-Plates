@@ -44,6 +44,17 @@ function app(seed={},failStorage=false){
  const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
  return {w,q,click,set,route,submit,dom,state:()=>JSON.parse(w.localStorage.getItem('three-plates-v3'))};
 }
+test('pantry reminders can be saved, used to find recipes, reloaded and cleared',()=>{
+ const a=app();a.route('pantry');a.click('[data-act="pantry-add"]');a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');
+ const today=a.w.PlatesCore.today();a.set('#pantry-use-soon',today);a.submit('#pantry-form');
+ assert.equal(a.state().pantry[0].useSoon,today);assert.match(a.q('.use-soon-panel').textContent,/Today/);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('pantry');assert.ok(b.q('.use-soon-panel'));b.click('[data-act="pantry-recipes"]');b.route('choose');assert.equal(b.state().filters.query,'Pasta');assert.ok(b.q('.meal-card'));assert.equal(b.state().pantry[0].qty,500);
+ b.route('pantry');b.click('[data-act="pantry-edit"]');b.set('#pantry-use-soon','');b.submit('#pantry-form');assert.equal(b.state().pantry[0].useSoon,undefined);assert.equal(b.q('.use-soon-panel'),null);a.dom.window.close();b.dom.window.close();
+});
+test('always-stocked pantry entries do not carry dated reminders',()=>{
+ const a=app();a.route('pantry');a.click('[data-act="pantry-add"]');a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');a.set('#pantry-use-soon',a.w.PlatesCore.today());a.q('#pantry-always').checked=true;a.submit('#pantry-form');
+ assert.equal(a.state().pantry[0].always,true);assert.equal(a.state().pantry[0].useSoon,undefined);assert.equal(a.q('.use-soon-panel'),null);a.dom.window.close();
+});
 test('refresh keeps locked card and exhausts unseen eligible recipes first',()=>{
  const a=app();const ids=()=>Array.from(a.w.document.querySelectorAll('[data-act="keep"]'),b=>b.dataset.id);
  const first=ids();assert.equal(first.length,3);a.click('[data-act="keep"]');a.click('[data-act="refresh"]');const next=ids();assert.ok(next.includes(first[0]));assert.equal(next.filter(x=>first.slice(1).includes(x)).length,0);a.dom.window.close();

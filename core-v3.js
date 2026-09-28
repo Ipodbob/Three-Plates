@@ -274,7 +274,14 @@
         p.qty >= 0 &&
         p.qty <= 1e7
       ) {
-        s.pantry.push({ id: p.id, qty: p.qty, always: p.always === true });
+        s.pantry.push({
+          id: p.id,
+          qty: p.qty,
+          always: p.always === true,
+          ...(p.qty > 0 && !p.always && validDate(p.useSoon)
+            ? { useSoon: p.useSoon }
+            : {}),
+        });
         seen.add(p.id);
       }
     for (const [id, v] of Object.entries(raw.bought || {}))
@@ -476,7 +483,10 @@
   function deduct(s, items) {
     for (const i of items) {
       const p = s.pantry.find((p) => p.id === i.id);
-      if (p && !p.always) p.qty = round(Math.max(0, p.qty - i.qty));
+      if (p && !p.always) {
+        p.qty = round(Math.max(0, p.qty - i.qty));
+        if (!p.qty) delete p.useSoon;
+      }
     }
   }
   function reserved(s, lotId) {

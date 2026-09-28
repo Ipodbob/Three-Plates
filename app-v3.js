@@ -733,6 +733,11 @@
       expired = C.expired(l, R);
     return `<article class="panel prepared-card"><div class="prepared-heading"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div><div class="card-kicker">${e(l.location === "thawed" ? "Defrosted · fridge" : l.location === "thawing" ? "Defrosting in fridge" : l.location)}</div><h3>${e(r.name)}</h3></div><strong class="portion-count">${l.portions}<small>portions</small></strong></div><p class="helper">${free} unallocated · ${reserved} planned<br>Cooked ${e(stamp(l.cookedAt))}${l.frozenAt ? "<br>Frozen " + e(stamp(l.frozenAt)) : ""}</p>${l.thawStartedAt ? '<p class="helper">Defrosting started ' + e(stamp(l.thawStartedAt)) + (l.thawedAt ? "<br>Fully defrosted " + e(stamp(l.thawedAt)) : "") + "</p>" : ""}${deadline ? `<p class="${expired ? "storage-alert" : "deadline"}">${expired ? "Past storage limit" : "Use by"}: ${e(stamp(deadline))}</p>` : l.location === "freezer" ? '<p class="helper">Freeze in separate portions. Schedule only what you need to thaw.</p>' : '<p class="deadline">Check thawing progress. Record the actual time fully defrosted; the 24-hour limit starts then, not when you press the button.</p>'}<div class="action-wrap">${free && !expired ? btn("Plan portions", "lot-plan", l.id, "") : ""}${l.location === "fridge" && !expired ? btn("Freeze these portions", "freeze-lot", l.id) : ""}${l.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : ""}${btn("Recipe", "recipe", r.id)}${btn("Correct record", "lot-correct", l.id)}${free ? btn("Discard some", "lot-discard-some", l.id) : ""}</div><button class="text-btn" data-act="discard-lot" data-id="${l.id}">Discard remaining portions</button></article>`;
   }
+  function useSoonPanel() {
+    const items = C.useSoonItems(state);
+    if (!items.length) return "";
+    return `<section class="panel use-soon-panel" aria-labelledby="use-soon-title"><h2 id="use-soon-title" class="section-title">Use soon</h2><p class="helper">Your reminders for the next three days and any earlier dates. Check the pack's use-by date and storage instructions. These reminders do not establish food safety.</p>${items.map((p) => `<div class="use-soon-row"><div><strong>${e(ing(p.id).name)}</strong><small>${p.useSoon < C.today() ? "Reminder passed" : p.useSoon === C.today() ? "Today" : "Reminder"} · ${e(day(p.useSoon))}</small></div>${p.id.startsWith("custom-") ? btn("Link to recipes", "pantry-link", p.id, "ghost") : btn("Find recipes", "pantry-recipes", p.id, "ghost")}</div>`).join("")}</section>`;
+  }
   function pantryPage() {
     const prepared = state.lots.filter((l) => l.portions > 0),
       stock = state.pantry
@@ -775,7 +780,7 @@
                 .map(lotCard)
                 .join("") || "No empty records."
             }</details><details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
-          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div><form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
+          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div>${useSoonPanel()}<form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}${p.useSoon ? `<small class="reminder-date">Reminder · ${e(day(p.useSoon))}</small>` : ""}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
       }`
     );
   }
@@ -1039,7 +1044,7 @@
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((i) => `<option value="${e(i.name)}"></option>`)
           .join("")}</datalist>`,
-      )}<div class="form-grid two section-space">${field("Amount available", "pantry-qty", `<input id="pantry-qty" type="number" inputmode="decimal" min="0" max="1000000" step="any" value="${p?.qty || 0}" required>`)}${field("Unit", "pantry-unit", select("pantry-unit", Object.keys(C.units), i?.unit || "g"))}</div><label class="check-label"><input type="checkbox" id="pantry-always" ${p?.always ? "checked" : ""}>Always stocked — assume enough</label><p class="helper">Pick a suggested ingredient to match recipes. Custom items can be recorded but will not match automatically. Saving replaces that item's current amount.</p><button type="submit" class="button wide">Save ingredient</button></form>`,
+      )}<div class="form-grid two section-space">${field("Amount available", "pantry-qty", `<input id="pantry-qty" type="number" inputmode="decimal" min="0" max="1000000" step="any" value="${p?.qty || 0}" required>`)}${field("Unit", "pantry-unit", select("pantry-unit", Object.keys(C.units), i?.unit || "g"))}</div><label class="check-label"><input type="checkbox" id="pantry-always" ${p?.always ? "checked" : ""}>Always stocked — assume enough</label>${field("Use soon reminder (optional)", "pantry-use-soon", `<input id="pantry-use-soon" type="date" min="2020-01-01" max="2100-12-31" value="${e(p?.useSoon || "")}" aria-describedby="use-soon-help">`)}<p id="use-soon-help" class="helper">A reminder for this ingredient, not an expiry date. Leave blank for no reminder. When combining packs, keep the earliest reminder. Not used for Always stocked items.</p><p class="helper">Pick a suggested ingredient to match recipes. Custom items can be recorded but will not match automatically. Saving replaces that item's current amount.</p><button type="submit" class="button wide">Save ingredient</button></form>`,
     );
     document.getElementById("pantry-name").addEventListener("change", (ev) => {
       const found = Object.values(ingredients()).find(
@@ -1286,6 +1291,19 @@
     }
     if (act === "pantry-link") {
       pantryLinkModal(id);
+      return;
+    }
+    if (act === "pantry-recipes") {
+      const item = I[id];
+      if (!item) return;
+      const ok = change(
+        () => {
+          state.filters.query = item.name;
+          clearChoices();
+        },
+        "Recipes using " + item.name + ". Your meal and filters still apply.",
+      );
+      if (ok) go("choose");
       return;
     }
     if (act === "pantry-search-clear") {
@@ -1849,7 +1867,15 @@
                 "Use Link to recipes to combine this product with another ingredient. To add a different product, use Add an ingredient.",
               );
             state.pantry = state.pantry.filter((p) => p.id !== i.id);
-            state.pantry.push({ id: i.id, qty, always });
+            const useSoon = value("pantry-use-soon");
+            if (useSoon && !C.validDate(useSoon))
+              throw Error("Choose a valid reminder date.");
+            state.pantry.push({
+              id: i.id,
+              qty,
+              always,
+              ...(useSoon && !always && qty > 0 ? { useSoon } : {}),
+            });
             break;
           }
           default:

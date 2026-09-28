@@ -18,8 +18,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 124 checks: 31 core regressions, 13 added domain checks,
-20 catalogue checks, 33 existing DOM checks and 27 barcode/relay checks.
+`npm test` runs 130 checks: 31 core regressions, 16 added domain checks,
+20 catalogue checks, 35 DOM checks and 28 barcode/relay checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -38,12 +38,19 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.6.1 was verified live after PR #1; the scanner and consistency
-updates in PR #2 remain unreleased. The fallback shares 100 requests per
+frontend v3.7.0 was verified live after PR #2 (merge 50cdec2, successful
+Pages run 36490963520 and all 16 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
 ## Phase 1
+
+Pantry also supports optional Use soon reminder dates. Due reminders appear in
+date order through the next three days, with an ingredient-search action that
+retains the current meal and food filters. They are personal reminders, not safety
+or expiry determinations. Scanning and purchases retain the existing reminder;
+linking products keeps the earliest date, and consuming the final stock clears it.
+Dates are included in normal backups. This feature branch is not yet deployed.
 
 Choose keeps three suggestions with refresh/keep, food exclusions, favourites,
 pantry matching and individual meal headcounts. Name/ingredient search is also
@@ -151,7 +158,7 @@ version live. The existing live baseline was inspected; Pages configuration is u
 
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
 - Continue deduplicated sourcing and improve ingredient equivalence and method classification. Verify licensing before hosting full publisher methods or photographs.
-- Phase 2: use-soon dates, richer side recipes, cooking mode/timers/screen wake,
+- Phase 2 remaining: richer side recipes, cooking mode/timers/screen wake,
   reusable weeks and combined prep checklists.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,
   and physical-device/WebKit testing.

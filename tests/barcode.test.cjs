@@ -8,6 +8,12 @@ const C = require("../phase1.js"),
   I = PLATES_DATA.ingredients,
   R = PLATES_DATA.recipes,
   code = "3017620422003";
+test('barcode additions and used-stock adjustments retain optional pantry reminders',()=>{
+ const s=C.defaults();s.pantry=[{id:'pasta',qty:100,always:false,useSoon:'2026-09-29'}];
+ B.add(s,I,{code,name:'Pasta'},{ingredientId:'pasta',qty:500,unit:'g',packs:1,fraction:0.5,remember:true});
+ assert.equal(s.pantry[0].qty,350);assert.equal(s.pantry[0].useSoon,'2026-09-29');
+ B.setRemaining(s,I,'pasta',350,50);assert.equal(s.pantry[0].useSoon,'2026-09-29');B.setRemaining(s,I,'pasta',50,0);assert.equal(s.pantry.length,0);
+});
 test("GTIN validation retains leading zeros and rejects damaged codes", () => {
   assert.equal(B.barcode("036000291452"), "0036000291452");
   assert.equal(B.barcode("3017 6204 22003"), code);

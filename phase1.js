@@ -411,11 +411,35 @@
         "Check the amount: this would give an invalid full-pack size.",
       );
     s.pantry = s.pantry.filter((p) => p.id !== sourceId && p.id !== targetId);
-    s.pantry.push({ id: targetId, qty: total, always: false });
+    const useSoon = [
+      source.useSoon,
+      existing?.qty > 0 ? existing.useSoon : null,
+    ]
+      .filter(C.validDate)
+      .sort()[0];
+    s.pantry.push({
+      id: targetId,
+      qty: total,
+      always: false,
+      ...(useSoon ? { useSoon } : {}),
+    });
     for (const [code, m] of converted) s.barcodeMatches[code] = m;
     // Keep custom definitions for historical references; only active stock moves.
     return total;
   };
+  C.useSoonItems = (s, today = C.today()) =>
+    s.pantry
+      .filter(
+        (p) =>
+          !p.always &&
+          p.qty > 0 &&
+          C.validDate(p.useSoon) &&
+          p.useSoon <= C.addDays(today, 3),
+      )
+      .sort(
+        (a, b) =>
+          a.useSoon.localeCompare(b.useSoon) || a.id.localeCompare(b.id),
+      );
   C.choiceWeight = (r, s, batch, coverage = 0) => {
     let w = 1;
     if (s.prefs.favourites.includes(r.id)) w *= 2;
