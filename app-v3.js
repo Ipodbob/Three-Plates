@@ -82,6 +82,7 @@
   }
   let route = location.hash.slice(1) || "choose",
     pantryTab = "ingredients",
+    pantryQuery = "",
     shown = { choose: [], batch: [] },
     seen = { choose: [], batch: [] },
     locked = { choose: [], batch: [] },
@@ -223,6 +224,7 @@
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
       storageError = "";
+      return true;
     } catch (err) {
       storageError =
         "This browser cannot save changes. Export a backup in Settings.";
@@ -230,7 +232,7 @@
     }
   }
   // All state transitions are atomic: a failed validation leaves the previous state intact.
-  function change(fn, notice = "", reset = false) {
+  function change(fn, notice = "", reset = false, requireSaved = true) {
     if (blocked) {
       toast(storageError);
       return false;
@@ -238,13 +240,15 @@
     const before = C.clone(state);
     try {
       fn();
-      persist();
+      const saved = persist();
+      if (requireSaved && !saved) throw Error(storageError);
       if (reset) clearChoices();
       render();
       if (notice) toast(notice);
       return true;
     } catch (err) {
       state = before;
+      if (storageError) render();
       toast(err.message || "Could not save that change.");
       return false;
     }
@@ -731,9 +735,9 @@
   }
   function pantryPage() {
     const prepared = state.lots.filter((l) => l.portions > 0),
-      stock = [...state.pantry].sort((a, b) =>
-        ing(a.id).name.localeCompare(ing(b.id).name),
-      );
+      stock = state.pantry
+        .filter((p) => C.text(ing(p.id).name).includes(C.text(pantryQuery)))
+        .sort((a, b) => ing(a.id).name.localeCompare(ing(b.id).name));
     return (
       head(
         "What you already have.",
@@ -771,7 +775,7 @@
                 .map(lotCard)
                 .join("") || "No empty records."
             }</details><details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
-          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
+          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div><form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
       }`
     );
   }
@@ -788,17 +792,15 @@
     },
   };
   function preferenceSection(key, title) {
-    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label>${select(
-      "pref-" + key,
-      [
-        ["", "Choose an ingredient"],
-        ...Object.entries(groups).map(([id, g]) => [id, g.name]),
-        ...Object.values(I)
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((i) => [i.id, i.name]),
-      ],
-      "",
-    )}<button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs[key].map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(ing(id)?.name)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
+    const options = [
+      ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
+      ...Object.values(I).sort((a, b) => a.name.localeCompare(b.name)),
+    ];
+    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label><input id="pref-${key}" type="search" list="pref-options-${key}" placeholder="Search ingredients" autocomplete="off" required><datalist id="pref-options-${key}">${options.map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs[key].map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(ing(id)?.name)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
+  }
+  function cuisineSection() {
+    const choices = [...new Set(R.map((r) => r.cuisine))].sort();
+    return `<section class="panel"><h2 class="section-title">Preferred cuisines</h2><form id="cuisine-form" class="pref-form"><label class="sr-only" for="pref-cuisine">Search cuisines</label><input id="pref-cuisine" type="search" list="cuisine-options" placeholder="Search cuisines" required><datalist id="cuisine-options">${choices.map((c) => `<option value="${e(c)}"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs.cuisines.map((c) => `<button class="chip selected" data-act="cuisine" data-id="${e(c)}">${e(c)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
   }
   function settingsPage() {
     return (
@@ -820,17 +822,7 @@
           ],
           state.prefs.diet,
         ),
-      )}</div><label class="check-label"><input id="slow-cooker" type="checkbox" ${state.prefs.slowCooker ? "checked" : ""}> I have a slow cooker</label><p class="helper">Only controls the appliance, not oven or hob slow cooking. Food filters are not a validated allergy checker; check ingredients and labels.</p></section>${preferenceSection("exclusions", "Foods you avoid")}${preferenceSection("likedIngredients", "Favourite ingredients")}<section class="panel"><h2 class="section-title">Preferred cuisines</h2><div class="chip-wrap">${[
-        ...new Set(R.map((r) => r.cuisine)),
-      ]
-        .sort()
-        .map(
-          (c) =>
-            `<button class="chip-button ${state.prefs.cuisines.includes(c) ? "selected" : ""}" data-act="cuisine" data-id="${e(c)}" aria-pressed="${state.prefs.cuisines.includes(c)}">${e(c)}</button>`,
-        )
-        .join(
-          "",
-        )}</div></section></div><div class="stack"><section class="panel"><h2 class="section-title">Saved & hidden recipes</h2><details class="details-box"><summary>Favourite recipes (${state.prefs.favourites.length})</summary>${state.prefs.favourites.map((id) => `<div class="favourite-row">${btn(e(recipe(id).name), "recipe", id, "ghost")}${btn("Unsave", "favourite", id, "ghost")}</div>`).join("") || '<p class="helper">Tap a recipe heart to save it.</p>'}</details><details class="details-box"><summary>Hidden recipes (${state.prefs.hidden.length})</summary>${state.prefs.hidden.map((id) => `<div class="favourite-row"><span>${e(recipe(id).name)}</span>${btn("Restore", "unhide", id, "ghost")}</div>`).join("") || '<p class="helper">Refreshing choices never hides a recipe permanently.</p>'}</details></section><section class="panel"><h2 class="section-title">Back up your data</h2><p class="helper">Pantry, batches, portions, shopping and preferences stay in this browser. Clearing browser data removes them. Export a backup regularly; there is no account or cloud sync.</p><div class="action-wrap">${btn("Export backup", "export")}${btn("Restore backup", "import")}</div><input type="file" id="backup-file" accept="application/json,.json" hidden><p class="helper">Version 1 backups are supported. The original v1 browser data is left untouched during upgrade.</p></section><section class="panel"><h2 class="section-title">About this version</h2><p class="helper">v3 · Batch planning, portion tracking, pack estimates and recipe search. 995 linked publisher recipes cover everyday meals, meal prep, desserts and baking. Selection considers technique, variety, clear quantities and publisher evidence alongside ratings, checked 28 September 2026. Original examples remain available and are marked unrated. Publisher methods open on their website; planning estimates are labelled. Timings are estimates. Scaling portions does not scale cooking time or guarantee appliance capacity.</p><details class="details-box"><summary>Storage guidance</summary>${storageGuide()}</details><button class="text-btn" data-act="reset">Delete all local app data</button></section></div></div>`
+      )}</div><label class="check-label"><input id="slow-cooker" type="checkbox" ${state.prefs.slowCooker ? "checked" : ""}> I have a slow cooker</label><p class="helper">Only controls the appliance, not oven or hob slow cooking. Food filters are not a validated allergy checker; check ingredients and labels.</p></section>${preferenceSection("exclusions", "Foods you avoid")}${preferenceSection("likedIngredients", "Favourite ingredients")}${cuisineSection()}</div><div class="stack"><section class="panel"><h2 class="section-title">Saved & hidden recipes</h2><details class="details-box"><summary>Favourite recipes (${state.prefs.favourites.length})</summary>${state.prefs.favourites.map((id) => `<div class="favourite-row">${btn(e(recipe(id).name), "recipe", id, "ghost")}${btn("Unsave", "favourite", id, "ghost")}</div>`).join("") || '<p class="helper">Tap a recipe heart to save it.</p>'}</details><details class="details-box"><summary>Hidden recipes (${state.prefs.hidden.length})</summary>${state.prefs.hidden.map((id) => `<div class="favourite-row"><span>${e(recipe(id).name)}</span>${btn("Restore", "unhide", id, "ghost")}</div>`).join("") || '<p class="helper">Refreshing choices never hides a recipe permanently.</p>'}</details></section><section class="panel"><h2 class="section-title">Back up your data</h2><p class="helper">Pantry, batches, portions, shopping and preferences stay in this browser. Clearing browser data removes them. Export a backup regularly; there is no account or cloud sync.</p><div class="action-wrap">${btn("Export backup", "export")}${btn("Restore backup", "import")}</div><input type="file" id="backup-file" accept="application/json,.json" hidden><p class="helper">Version 1 backups are supported. The original v1 browser data is left untouched during upgrade.</p></section><section class="panel"><h2 class="section-title">About this version</h2><p class="helper">v3 · Batch planning, portion tracking, pack estimates and recipe search. 995 linked publisher recipes cover everyday meals, meal prep, desserts and baking. Selection considers technique, variety, clear quantities and publisher evidence alongside ratings, checked 28 September 2026. Original examples remain available and are marked unrated. Publisher methods open on their website; planning estimates are labelled. Timings are estimates. Scaling portions does not scale cooking time or guarantee appliance capacity.</p><details class="details-box"><summary>Storage guidance</summary>${storageGuide()}</details><button class="text-btn" data-act="reset">Delete all local app data</button></section></div></div>`
     );
   }
   function close() {
@@ -844,6 +836,21 @@
     sheet.innerHTML = `<div class="sheet-top"><button class="icon-btn sheet-close" data-act="close" aria-label="Close">${icon("close")}</button><h2 id="sheet-title">${title}</h2></div><div class="sheet-content">${body}</div>`;
     if (!sheet.open) sheet.showModal();
     sheet.scrollTop = 0;
+  }
+  function confirmAction(title, message, label, run) {
+    modal(
+      title,
+      `<p>${e(message)}</p><div class="action-wrap"><button class="button" id="confirm-action" type="button">${e(label)}</button>${btn("Cancel", "close", "", "secondary")}</div>`,
+    );
+    const control = document.getElementById("confirm-action");
+    let used = false;
+    control.onclick = () => {
+      if (used || !sheet.open || !control.isConnected) return;
+      used = true;
+      close();
+      run();
+    };
+    sheet.querySelector('[data-act="close"]')?.focus();
   }
   function recipeModal(id) {
     const r = recipe(id);
@@ -951,7 +958,7 @@
       override = state.packs[C.activeShop(state)]?.[id];
     modal(
       "Pack size or exact weight",
-      `<h3>${e(ing(id).name)}</h3><p class="helper">Saved for ${e(state.shop === "none" ? "No preference" : state.shop)}. This is your entered size, not a verified retailer listing.</p><form id="pack-form" data-id="${id}">${field("Amount in one pack (" + e(ing(id).unit) + ")", "pack-size", `<input id="pack-size" type="number" inputmode="decimal" min="0.001" max="1000000" step="any" value="${p?.size || ""}">`)}<label class="check-label"><input type="checkbox" id="pack-exact" ${override?.size === 0 ? "checked" : ""}>Buy exact weight / loose / butcher</label><p class="helper">For drained tinned foods, enter the drained usable weight on the label. Count ingredients use individual slices, cloves, eggs or wraps, not loaves, bulbs or packs.</p>${field("Product / variant (optional)", "pack-product", `<input id="pack-product" maxlength="300" value="${e(override?.product || "")}">`)}${field("Product source URL (optional)", "pack-url", `<input id="pack-url" type="url" value="${e(override?.url || "")}">`)}${field("Label checked on (optional)", "pack-verified", `<input id="pack-verified" type="date" value="${e(override?.verifiedOn || "")}">`)}<p class="helper">Match the exact ingredient variant, fresh/frozen form and usable weight; mass and count are not interchangeable. User-entered sources are not independently verified.</p><div class="action-wrap"><button class="button" type="submit">Save</button>${btn("Reset to generic estimate", "pack-reset", id)}</div></form>`,
+      `<h3>${e(ing(id).name)}</h3><p class="helper">Saved for ${e(C.activeShop(state) === "none" ? "No preference" : C.activeShop(state))}. This is your entered size, not a verified retailer listing.</p><form id="pack-form" data-id="${id}">${field("Amount in one pack (" + e(ing(id).unit) + ")", "pack-size", `<input id="pack-size" type="number" inputmode="decimal" min="0.001" max="1000000" step="any" value="${p?.size || ""}">`)}<label class="check-label"><input type="checkbox" id="pack-exact" ${override?.size === 0 ? "checked" : ""}>Buy exact weight / loose / butcher</label><p class="helper">For drained tinned foods, enter the drained usable weight on the label. Count ingredients use individual slices, cloves, eggs or wraps, not loaves, bulbs or packs.</p>${field("Product / variant (optional)", "pack-product", `<input id="pack-product" maxlength="300" value="${e(override?.product || "")}">`)}${field("Product source URL (optional)", "pack-url", `<input id="pack-url" type="url" value="${e(override?.url || "")}">`)}${field("Label checked on (optional)", "pack-verified", `<input id="pack-verified" type="date" value="${e(override?.verifiedOn || "")}">`)}<p class="helper">Match the exact ingredient variant, fresh/frozen form and usable weight; mass and count are not interchangeable. User-entered sources are not independently verified.</p><div class="action-wrap"><button class="button" type="submit">Save</button>${btn("Reset to generic estimate", "pack-reset", id)}</div></form>`,
     );
   }
   function purchaseModal(id) {
@@ -959,6 +966,64 @@
       "Amount actually bought",
       `<h3>${e(ing(id).name)}</h3><form id="purchase-form" data-id="${id}">${field("Purchased amount (" + e(ing(id).unit) + ")", "purchase-qty", `<input id="purchase-qty" type="number" inputmode="decimal" min="0" max="10000000" step="any" value="${state.bought[id] || 0}" required>`)}<p class="helper">Includes the whole pack. Set zero to remove the purchase record.</p><button class="button wide" type="submit">Save bought amount</button></form>`,
     );
+  }
+  function pantryLinkModal(id) {
+    const source = state.pantry.find((p) => p.id === id);
+    if (!source) return;
+    modal(
+      "Link product to recipes",
+      `<p><strong>${e(ing(id).name)}</strong> · ${amount(id, source.qty)} in pantry</p><form id="pantry-link-form" data-id="${e(id)}" data-expected="${source.qty}"><label for="link-target">Recipe ingredient</label><input id="link-target" class="text-input" list="link-options" placeholder="Search equivalent ingredients" required><datalist id="link-options">${Object.values(
+        I,
+      )
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`)
+        .join(
+          "",
+        )}</datalist><label for="link-qty">Usable amount of this product <span id="link-unit"></span></label><input id="link-qty" class="text-input" type="number" min="0.001" max="10000000" step="any" inputmode="decimal" required><p id="link-preview" class="helper">Choose an ingredient to see the combined stock.</p><label class="check-label"><input id="link-confirm" type="checkbox" required>This product matches the ingredient and usable amount shown.</label><p class="helper">For tins use drained weight where needed. A sauce or ready meal is not equivalent to one of its ingredients. This combines existing stock and updates remembered barcodes; it does not record a purchase.</p><button class="button wide" type="submit">Link and combine stock</button></form>`,
+    );
+    const input = document.getElementById("link-target"),
+      qty = document.getElementById("link-qty");
+    const target = () =>
+      Object.values(I).find(
+        (i) =>
+          i.id === input.value ||
+          i.name === input.value ||
+          `${i.name} [${i.id}]` === input.value,
+      );
+    const preview = () => {
+      const i = target();
+      document.getElementById("link-unit").textContent = i
+        ? "(" + i.unit + ")"
+        : "";
+      document.getElementById("link-preview").textContent = i
+        ? "Existing: " +
+          amount(i.id, state.pantry.find((p) => p.id === i.id)?.qty || 0) +
+          ". Combined after linking: " +
+          amount(
+            i.id,
+            (state.pantry.find((p) => p.id === i.id)?.qty || 0) +
+              (+qty.value || 0),
+          ) +
+          ". Remembered full-pack sizes will scale by the same ratio."
+        : "Choose an ingredient from the suggestions.";
+    };
+    input.oninput = () => {
+      qty.value = "";
+      document.getElementById("link-confirm").checked = false;
+      preview();
+    };
+    input.onchange = () => {
+      const i = target();
+      if (
+        i &&
+        ing(id).unit === i.unit &&
+        i.unit !== "each" &&
+        !/drained/i.test(i.name)
+      )
+        qty.value = source.qty;
+      preview();
+    };
+    qty.oninput = preview;
   }
   function pantryModal(id) {
     const p = state.pantry.find((p) => p.id === id),
@@ -987,12 +1052,12 @@
       }
     });
   }
-  function addPlan(id) {
+  function addPlan(id, confirmed = false, selection = null) {
     const r = recipe(id),
-      f = { ...state.filters };
+      f = selection || { ...state.filters };
     const modalPortions =
       sheet.open && document.getElementById("recipe-portions");
-    if (r.baking) f.servings = r.base;
+    if (r.baking && !selection) f.servings = r.base;
     if (modalPortions) {
       if (!C.integer(+modalPortions.value, 1, r.baking ? 48 : 12)) {
         toast(`Choose 1–${r.baking ? 48 : 12} whole portions.`);
@@ -1007,13 +1072,19 @@
     const existing = state.plans.find(
       (p) => p.date === f.date && p.meal === f.meal,
     );
-    if (
-      existing &&
-      !confirm(
-        "Replace the existing meal? This releases reserved portions but does not undo any previous cooking.",
-      )
-    )
+    if (existing && !confirmed) {
+      confirmAction(
+        "Replace planned meal",
+        "Replace " +
+          recipe(existing.recipeId).name +
+          " with " +
+          r.name +
+          "? Reserved portions are released; previous cooking is not reversed.",
+        "Replace meal",
+        () => addPlan(id, true, f),
+      );
       return;
+    }
     if (
       change(
         () => {
@@ -1052,7 +1123,7 @@
       });
     const text =
       "THREE PLATES — " +
-      (state.shop === "none" ? "SHOPPING" : state.shop) +
+      (C.activeShop(state) === "none" ? "SHOPPING" : C.activeShop(state)) +
       "\n" +
       (lines.join("\n") || "Nothing left to buy.");
     try {
@@ -1083,34 +1154,43 @@
       if (file.size > 2e6)
         throw Error("Backup is too large. Use a file below 2 MB.");
       const next = C.migrate(JSON.parse(await file.text()), R, I);
-      if (
-        !confirm(
-          "Replace this device’s data with the backup? Export the current data first to keep a copy.",
-        )
-      )
-        return;
-      const old = state;
-      try {
-        localStorage.setItem(KEY, JSON.stringify(next));
-      } catch (err) {
-        state = old;
-        throw Error(
-          "The browser could not save the restored data. Nothing was replaced.",
-        );
-      }
-      state = next;
-      blocked = false;
-      storageError = "";
-      clearChoices();
-      render();
-      toast("Backup restored.");
+      const currentSaved = localStorage.getItem(KEY);
+      confirmAction(
+        "Restore backup",
+        "Replace this device's data with the selected backup? Export your current data first to keep a copy.",
+        "Replace with backup",
+        () => {
+          try {
+            if (localStorage.getItem(KEY) !== currentSaved)
+              throw Error(
+                "Data changed after you selected the backup. Select it again to review the replacement.",
+              );
+            localStorage.setItem(KEY, JSON.stringify(next));
+            state = next;
+            blocked = false;
+            storageError = "";
+            clearChoices();
+            render();
+            toast("Backup restored.");
+          } catch (err) {
+            toast(
+              err.message ===
+                "Data changed after you selected the backup. Select it again to review the replacement."
+                ? err.message
+                : "The browser could not save the restored data. Nothing was replaced.",
+            );
+          }
+        },
+      );
     } catch (err) {
       toast(err.message || "Invalid backup. Existing data was not changed.");
     }
   }
   document.addEventListener("click", (ev) => {
     const b = ev.target.closest("[data-act]");
-    if (!b) return;
+    if (b) handleAction(b);
+  });
+  function handleAction(b, approved = false) {
     const act = b.dataset.act,
       id = b.dataset.id,
       batch = route === "batch",
@@ -1204,13 +1284,22 @@
       purchaseModal(id);
       return;
     }
+    if (act === "pantry-link") {
+      pantryLinkModal(id);
+      return;
+    }
+    if (act === "pantry-search-clear") {
+      pantryQuery = "";
+      render();
+      return;
+    }
     if (act === "pantry-scan") {
       scannerCleanup = globalThis.PlatesBarcode.openUI({
         modal,
         close,
         getState: () => state,
         ingredients,
-        commit: (fn, notice) => change(() => fn(state), notice, true),
+        commit: (fn, notice) => change(() => fn(state), notice, true, true),
       });
       return;
     }
@@ -1245,73 +1334,109 @@
       return;
     }
     if (act === "reset") {
-      if (
-        confirm(
-          "Delete all Three Plates data in this browser, including the old version backup? This cannot be undone.",
-        )
-      ) {
-        try {
-          localStorage.removeItem(KEY);
-          localStorage.removeItem(OLD);
-          blocked = false;
-          storageError = "";
-          state = C.defaults();
-          clearChoices();
-          render();
-          toast("Local data deleted.");
-        } catch (err) {
-          toast("The browser did not allow deletion.");
+      if (!approved) {
+        confirmAction(
+          "Delete local app data",
+          "Delete all Three Plates data in this browser, including the old version backup? This cannot be undone. Export a backup first if you want to keep it.",
+          "Delete local data",
+          () => handleAction(b, true),
+        );
+        return;
+      }
+      const previous = {};
+      try {
+        previous[KEY] = localStorage.getItem(KEY);
+        previous[OLD] = localStorage.getItem(OLD);
+        localStorage.removeItem(KEY);
+        localStorage.removeItem(OLD);
+        blocked = false;
+        storageError = "";
+        state = C.defaults();
+        clearChoices();
+        render();
+        toast("Local data deleted.");
+      } catch (err) {
+        let restored = true;
+        for (const key of [KEY, OLD]) {
+          try {
+            if (previous[key] !== undefined && previous[key] !== null)
+              localStorage.setItem(key, previous[key]);
+          } catch {
+            restored = false;
+          }
         }
+        toast(
+          restored
+            ? "The browser did not allow deletion. Existing data was retained."
+            : "Deletion could not finish. Export your current data in Settings before reloading.",
+        );
       }
       return;
     }
     if (act === "plan-edit") {
-      const p = state.plans.find((p) => p.id === id),
-        max = recipe(p.recipeId)?.baking ? 48 : 12,
-        n = prompt(`Portions to make (1–${max})`, String(p.servings));
-      if (n !== null)
-        change(
-          () => {
-            if (!C.integer(+n, 1, max))
-              throw Error(`Choose 1–${max} portions.`);
-            p.servings = +n;
-          },
-          "Portions updated.",
-          true,
-        );
+      const p = state.plans.find((p) => p.id === id);
+      if (!p || p.cooked) {
+        toast("This meal cannot be edited.");
+        return;
+      }
+      const max = recipe(p.recipeId)?.baking ? 48 : 12;
+      modal(
+        "Change portions",
+        `<p>${e(recipe(p.recipeId).name)}</p><form id="plan-portions-form" data-id="${e(id)}">${field("Portions to make", "plan-portions", quantityInput("plan-portions", p.servings, 1, max, "portions"))}<p class="helper">Updates the ingredients needed for this meal. Existing purchases keep their recorded quantities.</p><button class="button wide" type="submit">Save portions</button></form>`,
+      );
       return;
     }
-    if (
-      [
-        "hide",
-        "batch-remove",
-        "plan-remove",
-        "pantry-remove",
-        "discard-lot",
-        "freeze-lot",
-        "plan-finish",
-        "thaw-plan",
-      ].includes(act) &&
-      !confirm(
-        {
-          hide: "Hide this recipe? Restore it later in Settings.",
-          "batch-remove":
-            "Remove this uncooked batch and its shopping requirements?",
-          "plan-remove":
-            "Remove this meal from the plan? Finished cooking is not reversed.",
-          "pantry-remove": "Remove this pantry ingredient?",
-          "discard-lot":
-            "Discard all remaining portions in this container and remove their future meals from the plan?",
-          "freeze-lot":
-            "Freezer suitability for this example is unknown. Have you checked freezing instructions for the recipe you cooked and safely chilled these portions? Existing cooling time is not erased.",
-          "plan-finish":
-            "Record this meal as finished? Ingredients or stored portions are deducted once. Reheat stored food only once, until steaming hot throughout.",
-          "thaw-plan":
-            "Move only the portions for this meal from the freezer into the fridge to defrost? Leave other portions frozen.",
-        }[act],
-      )
-    )
+    if (act === "batch-round" && !approved) {
+      const batch = state.batches.find((x) => x.id === id),
+        suggestion =
+          batch && C.suggestBatchSize(state, batch, R, ingredients());
+      if (!suggestion) {
+        toast("No pack adjustment is currently available.");
+        return;
+      }
+      confirmAction(
+        "Adjust batch size",
+        "Make " +
+          suggestion.servings +
+          " portions? All ingredients will scale and other purchases may increase.",
+        "Adjust portions",
+        () => handleAction(b, true),
+      );
       return;
+    }
+    const confirmation = {
+      hide: "Hide this recipe? Restore it later in Settings.",
+      "batch-remove":
+        "Remove this uncooked batch and its shopping requirements?",
+      "plan-remove":
+        "Remove this meal from the plan? Finished cooking is not reversed.",
+      "pantry-remove": "Remove this pantry ingredient?",
+      "discard-lot":
+        "Discard all remaining portions in this container and remove their future meals from the plan?",
+      "freeze-lot":
+        "Freezer suitability for this example is unknown. Have you checked freezing instructions for the recipe you cooked and safely chilled these portions? Existing cooling time is not erased.",
+      "plan-finish":
+        "Record this meal as finished? Ingredients or stored portions are deducted once. Reheat stored food only once, until steaming hot throughout.",
+      "thaw-plan":
+        "Move only the portions for this meal from the freezer into the fridge to defrost? Leave other portions frozen.",
+    };
+    if (!approved && confirmation[act]) {
+      const labels = {
+        hide: "Hide recipe",
+        "batch-remove": "Remove batch",
+        "plan-remove": "Remove meal",
+        "pantry-remove": "Remove item",
+        "discard-lot": "Discard portions",
+        "freeze-lot": "Freeze portions",
+        "plan-finish": "Record as finished",
+        "thaw-plan": "Start defrosting",
+      };
+      const title = labels[act];
+      confirmAction(title, confirmation[act], title, () =>
+        handleAction(b, true),
+      );
+      return;
+    }
     change(
       () => {
         switch (act) {
@@ -1354,12 +1479,6 @@
             const batch = state.batches.find((x) => x.id === id),
               s = C.suggestBatchSize(state, batch, R, ingredients());
             if (!s) throw Error("No pack adjustment is currently available.");
-            if (
-              !confirm(
-                `Make ${s.servings} portions? Other ingredient quantities and purchases may increase.`,
-              )
-            )
-              return;
             batch.servings = s.servings;
             break;
           }
@@ -1416,7 +1535,7 @@
         "reset-filters",
       ].includes(act),
     );
-  });
+  }
   document.addEventListener("change", (ev) => {
     const t = ev.target,
       id = t.id;
@@ -1483,6 +1602,14 @@
     const form = ev.target;
     if (!form.matches("form")) return;
     ev.preventDefault();
+    if (form.id === "pantry-search-form") {
+      pantryQuery = document
+        .getElementById("pantry-search")
+        .value.trim()
+        .slice(0, 100);
+      render();
+      return;
+    }
     if (form.id === "search-form") {
       change(
         () => {
@@ -1499,9 +1626,34 @@
       );
       return;
     }
+    if (form.id === "cuisine-form") {
+      const cuisine = document.getElementById("pref-cuisine").value.trim();
+      change(
+        () => {
+          if (!R.some((r) => r.cuisine === cuisine))
+            throw Error("Choose a cuisine from the suggestions.");
+          state.prefs.cuisines = [
+            ...new Set([...state.prefs.cuisines, cuisine]),
+          ];
+        },
+        "Preference saved.",
+        true,
+      );
+      return;
+    }
     if (form.matches(".pref-form")) {
       const key = form.dataset.key,
-        id = document.getElementById("pref-" + key).value,
+        input = document.getElementById("pref-" + key).value.trim(),
+        choices = [
+          ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
+          ...Object.values(I),
+        ],
+        id = choices.find(
+          (i) =>
+            i.id === input ||
+            `${i.name} [${i.id}]` === input ||
+            C.text(i.name) === C.text(input),
+        )?.id,
         ids = groups[id]?.ids || (I[id] ? [id] : []);
       change(
         () => {
@@ -1626,6 +1778,38 @@
             C.recordPurchase(state, id, q, ingredients(), { replace: true });
             break;
           }
+          case "plan-portions-form": {
+            const p = state.plans.find((p) => p.id === id),
+              qty = n("plan-portions");
+            if (
+              !p ||
+              p.cooked ||
+              !C.integer(qty, 1, recipe(p.recipeId)?.baking ? 48 : 12)
+            )
+              throw Error("Choose a valid portion count for an uncooked meal.");
+            p.servings = qty;
+            break;
+          }
+          case "pantry-link-form": {
+            const input = value("link-target"),
+              target = Object.values(I).find(
+                (i) =>
+                  i.id === input ||
+                  i.name === input ||
+                  `${i.name} [${i.id}]` === input,
+              );
+            if (!document.getElementById("link-confirm").checked)
+              throw Error("Confirm the ingredient and usable amount.");
+            C.linkPantryItem(
+              state,
+              id,
+              target?.id,
+              n("link-qty"),
+              ingredients(),
+              +form.dataset.expected,
+            );
+            break;
+          }
           case "pantry-form": {
             const name = value("pantry-name").trim(),
               unit = value("pantry-unit"),
@@ -1661,7 +1845,9 @@
             const qty = always ? 0 : C.convert(n("pantry-qty"), unit, i.unit);
             if (qty < 0 || qty > 1e7) throw Error("Check the quantity.");
             if (id && id !== i.id)
-              state.pantry = state.pantry.filter((p) => p.id !== id);
+              throw Error(
+                "Use Link to recipes to combine this product with another ingredient. To add a different product, use Add an ingredient.",
+              );
             state.pantry = state.pantry.filter((p) => p.id !== i.id);
             state.pantry.push({ id: i.id, qty, always });
             break;

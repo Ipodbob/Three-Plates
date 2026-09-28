@@ -991,3 +991,55 @@
 .scan-matches { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .scan-matches button { white-space: normal; text-align: left; }
 #scan-status { min-height: 1.5em; }
+/* Focused scanning surface: viewfinder first, compact confirmation second. */
+.scanner-sheet { max-width: 520px; }
+.scanner-sheet .sheet-content { padding-top: 0; }
+#scan-root .scan-modes { display: flex; padding: 4px; gap: 4px; background: #edf1e9; border-radius: 14px; }
+#scan-root .scan-modes button { flex: 1; border: 0; border-radius: 10px; padding: 12px 8px; background: transparent; color: #314434; font: inherit; font-weight: 650; min-height: 44px; }
+#scan-root .scan-modes button[aria-pressed="true"] { background: #244d39; color: white; }
+.scan-viewfinder { position: relative; height: clamp(160px, 28vh, 240px); overflow: hidden; border-radius: 20px; background: #18271f; color: #fff; display: grid; place-items: center; }
+#scan-root .scan-viewfinder video { position: absolute; inset: 0; height: 100%; max-height: none; width: 100%; object-fit: cover; margin: 0; border-radius: 0; }
+.scan-target { z-index: 1; width: 76%; height: 45%; border: 3px solid #fff; border-radius: 14px; display: grid; place-items: center; box-shadow: 0 0 0 80px #0003; }
+.scan-target span { font-size: 52px; opacity: .55; }
+.scan-viewfinder p { z-index: 1; position: absolute; bottom: 6px; font-size: 13px; background: #17251cbb; padding: 4px 10px; border-radius: 20px; }
+.scan-tools { display: flex; gap: 8px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+#scan-root #scan-camera:disabled { display: none; }
+#scan-session:empty, #scan-error:empty { display: none; }
+#scan-session { background: #eaf4e8; color: #23462e; border-radius: 12px; padding: 10px 12px; }
+#scan-status { font-size: 14px; margin: 10px 0; }
+.scan-card { border: 1px solid #dde5da; border-radius: 18px; padding: 16px; background: #fff; }
+.scan-product { display: flex; align-items: center; gap: 12px; }
+.scan-product-icon { font-size: 32px; background: #f0f3e9; border-radius: 12px; padding: 8px 12px; }
+.scan-product h3 { font-size: 19px; line-height: 1.25; margin: 0; overflow-wrap: anywhere; }
+.scan-product p { margin: 4px 0 0; font-size: 13px; }
+#scan-root #scan-fraction { padding: 0; accent-color: #275a3d; border: 0; margin: 4px 0; height: 38px; min-height: 38px; background: transparent; }
+#scan-percent { float: right; font-weight: 750; color: #275a3d; }
+.scan-presets { display: flex; gap: 8px; }
+.scan-presets button { flex: 1; min-height: 40px; border: 1px solid #d9e2d4; border-radius: 10px; background: #f3f6ef; font: inherit; color: #29442f; }
+#scan-pack-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+#scan-pack-row .quantity-stepper { width: 145px; }
+#scan-root #scan-pack-row label { margin: 0; }
+.scan-preview { text-align: center; font-weight: 650; margin: 14px 0 10px; }
+#scan-error { color: #943528; }
+#scan-root #scan-edit { margin-top: 12px; }
+.scan-source { font-size: 11px; color: #62715f; margin-bottom: 0; }
+.scan-footer { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; gap: 16px; }
+.scan-footer details { max-width: 65%; font-size: 12px; }
+#scan-root button:focus-visible, #scan-root input:focus-visible { outline: 3px solid #b7a64e; outline-offset: 3px; }
+@media (max-width: 590px) {
+  .three-v3 .scanner-sheet .sheet-top { padding: 14px 16px; }
+  .three-v3 .scanner-sheet .sheet-content { padding: 0 14px 18px; }
+  .three-v3 .scanner-sheet .sheet-top h2 { font-size: 25px; }
+  #scan-root .scan-modes button { font-size: 13px; padding: 10px 5px; }
+  .scan-card { padding: 12px; }
+  #scan-mode-help { margin: 8px 0; font-size: 12px; }
+  #scan-selection { margin: 8px 0; }
+  #scan-root #scan-amount label { margin-top: 8px; font-size: 13px; }
+  .scan-product h3 { font-size: 18px; }
+  .scan-product-icon { font-size: 26px; padding: 6px 9px; }
+  .scan-preview { margin: 10px 0 6px; }
+  #scan-root #scan-save { min-height: 48px; font-size: 15px; }
+}
+/* Search controls share the same visual treatment across pages. */
+.three-v3 .pref-form input[type="search"] { flex: 1; width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid #d9dfd5; border-radius: 10px; background: #fff; color: #293a2d; font-size: 16px; }
+#pantry-search-form { margin-bottom: 16px; }
