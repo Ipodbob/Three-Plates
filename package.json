@@ -2,7 +2,7 @@
   "name": "three-plates",
   "private": true,
   "scripts": {
-    "test": "node tests/core-v3.test.cjs && node --test tests/phase1.test.cjs tests/ui.test.cjs",
+    "test": "node tests/core-v3.test.cjs && node --test tests/phase1.test.cjs tests/ui.test.cjs tests/catalogue.test.cjs",
     "start": "node scripts/serve.cjs"
   },
   "devDependencies": { "jsdom": "^26.1.0", "prettier": "^3.6.2" }

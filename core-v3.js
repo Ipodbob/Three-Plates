@@ -179,7 +179,15 @@
     for (const [key, allowed] of Object.entries({
       meal: ["Breakfast", "Lunch", "Dinner"],
       time: ["any", "15", "30", "long", "slow"],
-      method: ["any", "hob", "oven", "oven-hob", "slow-cooker", "no-cook"],
+      method: [
+        "any",
+        "hob",
+        "oven",
+        "oven-hob",
+        "air-fryer",
+        "slow-cooker",
+        "no-cook",
+      ],
       mode: ["any", "pantry", "only"],
     }))
       if (allowed.includes(f[key])) s.filters[key] = f[key];
@@ -212,7 +220,15 @@
     for (const [k, allowed] of Object.entries({
       meal: ["Breakfast", "Lunch", "Dinner"],
       time: ["any", "15", "30", "long", "slow"],
-      method: ["any", "hob", "oven", "oven-hob", "slow-cooker", "no-cook"],
+      method: [
+        "any",
+        "hob",
+        "oven",
+        "oven-hob",
+        "air-fryer",
+        "slow-cooker",
+        "no-cook",
+      ],
     }))
       if (allowed.includes(b[k])) s.batchFilters[k] = b[k];
     s.batchFilters.query =
@@ -613,7 +629,12 @@
   function foodAllowed(r, p) {
     return (
       !!r &&
-      !r.ingredients.some((i) => p.exclusions.includes(i.id)) &&
+      !r.ingredients.some(
+        (i) =>
+          p.exclusions.includes(i.id) ||
+          (i.avoidIds || []).some((id) => p.exclusions.includes(id)),
+      ) &&
+      !(p.diet === "vegetarian" && r.vegetarianSuitable === false) &&
       !(p.diet === "vegetarian" && !["vegan", "vegetarian"].includes(r.kind)) &&
       !(p.diet === "vegan" && r.kind !== "vegan") &&
       !(p.diet === "pescatarian" && r.kind === "meat")

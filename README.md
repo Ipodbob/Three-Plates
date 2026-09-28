@@ -17,16 +17,18 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 51 checks: 31 original core regressions, 11 added domain checks
-and 9 DOM interaction checks. jsdom is test-only; it does not validate rendering
+`npm test` runs 61 checks: 31 core regressions, 11 added domain checks,
+5 catalogue checks and 14 DOM interaction checks. jsdom is test-only; it does not validate rendering
 or replace real browser checks. No development dependency is loaded by the app.
 
 ## Phase 1
 
 Choose keeps three suggestions with refresh/keep, food exclusions, favourites,
 pantry matching and individual meal headcounts. Name/ingredient search is also
-available. Bottom navigation is Choose / Batch Cook / Plan / Shopping / Pantry;
-the header has a labelled Settings link.
+available. Choose is one shared screen with a visible Batch cook switch and inline
+days, people, meal pattern and portion totals. Bottom navigation is Choose / Plan /
+Shopping / Pantry; the header has a labelled Settings link. Existing `#batch` links
+still open the shared screen with batch cooking enabled.
 
 Batch Cook supports people × days, repetition or variety, meal/time/method and
 pantry filters, and multiple editable batches. Variety starts with roughly half
@@ -58,6 +60,23 @@ Invalid linked batch/portion backups are rejected before replacement. Failed
 loads pause saving and retain the original export. Failed writes report a warning;
 export the current in-memory state. Cross-tab changes pause saving to avoid
 overwriting another tab. Export/restore is available in Settings.
+
+## Rated recipe catalogue
+
+The catalogue adds 40 distinct Good Food recipes, each with a visible publisher
+rating of at least 4.5/5 from at least 50 ratings, checked on 28 September 2026.
+Four use an air fryer and 13 are available in Batch cook. These are selected
+recipes, not a claim to rank the entire web. See [the source register](docs/recipe-sources.md).
+The full method remains on the publisher's site; no publisher photographs or
+method text are republished. Reading that method requires internet access.
+
+Cards show ratings and counts. Recipe details show author, source, retrieval date,
+source yield, and quantity assumptions. Spoon weights, handfuls, count-to-weight
+conversions and unspecified tin sizes use explicitly disclosed planning estimates.
+Optional accompaniments are identified when omitted. Counted chicken pieces are
+separate ingredients from weighed chicken: the app does not silently convert a
+pantry weight into an assumed number of pieces. Saved original recipe IDs and all
+original ingredient definitions remain unchanged.
 
 ## Storage guidance and limitations
 
@@ -98,10 +117,10 @@ version live. The existing live baseline was inspected; Pages configuration is u
 
 ## Backlog
 
-- Independently verified starter recipes and recipe-specific storage provenance;
-  no large recipe import in this feature branch.
-- Original 400-recipe expansion target: define eligibility/ratings and deduplicate
-  time/method tags before sourcing. Do not invent ratings or copy protected content.
+- Recipe-specific freezing/storage provenance and independently tested quantity mappings.
+- Original 400-recipe target: this update adds 40 verified rated source links.
+  Continue deduplicated sourcing with the same rating threshold; expand publisher
+  coverage and verify licensing before hosting full cooking methods or photographs.
 - Phase 2: use-soon dates, richer side recipes, cooking mode/timers/screen wake,
   reusable weeks and combined prep checklists.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,

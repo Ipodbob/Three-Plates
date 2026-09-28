@@ -135,6 +135,7 @@
     ["any", "Any method"],
     ["hob", "Hob"],
     ["oven", "Oven"],
+    ["air-fryer", "Air fryer"],
     ["slow-cooker", "Slow cooker"],
     ["no-cook", "No cook"],
   ];
@@ -150,9 +151,25 @@
       hob: "Hob",
       oven: "Oven",
       "oven-hob": "Oven + hob",
+      "air-fryer": "Air fryer",
       "slow-cooker": "Slow cooker",
       "no-cook": "No cook",
     })[r.method] || "";
+  const prepLabel = (r) =>
+    r.prep === null ? "Prep time not listed" : `${r.prep} min prep`;
+  function recipeSource(r, full = false) {
+    if (!r.source)
+      return '<p class="recipe-rating helper">Original example · not rated</p>';
+    const s = r.source;
+    let url;
+    try {
+      url = new URL(s.url);
+    } catch {
+      return "";
+    }
+    if (url.protocol !== "https:") return "";
+    return `<div class="recipe-rating"><a href="${e(url.href)}" target="_blank" rel="noopener noreferrer">★ ${s.rating.toFixed(1)}/5 · ${s.ratingCount.toLocaleString()} ratings · ${e(s.publisher)}</a>${full ? `<p class="helper">By ${e(s.author)}. Rating checked ${e(s.retrievedOn)}; ratings can change. Publisher yield: ${e(s.yield)}.</p><p>${e(r.planningNotes)}</p><p class="helper">These are planning quantities; count-to-weight and spoon estimates are stated above. Compare with the publisher’s ingredients before shopping. Counted chicken pieces and weighed chicken are separate pantry entries.</p>` : ""}</div>`;
+  }
   const opts = (values, value) =>
     values
       .map((v) => {
@@ -166,6 +183,8 @@
     `<select id="${id}" ${extra}>${opts(values, value)}</select>`;
   const numInput = (id, n, min = 1, max = 48) =>
     `<input id="${id}" type="number" inputmode="numeric" min="${min}" max="${max}" step="1" value="${n}" required>`;
+  const quantityInput = (id, n, min, max, label) =>
+    `<div class="quantity-stepper"><button type="button" id="${id}-minus" data-act="quantity-step" data-target="${id}" data-step="-1" aria-label="Decrease ${label}" aria-disabled="${n <= min}">−</button>${numInput(id, n, min, max)}<button type="button" id="${id}-plus" data-act="quantity-step" data-target="${id}" data-step="1" aria-label="Increase ${label}" aria-disabled="${n >= max}">+</button></div>`;
   function toast(t) {
     const el = document.getElementById("toast");
     el.textContent = t;
@@ -226,16 +245,16 @@
   }
   function nav() {
     const missing = C.shopping(state, R).filter((i) => i.remaining > 0).length;
+    const activeRoute = route === "batch" ? "choose" : route;
     document.getElementById("nav").innerHTML = [
       ["choose", "Choose"],
-      ["batch", "Batch cook"],
       ["plan", "Plan"],
       ["shop", "Shopping"],
       ["pantry", "Pantry"],
     ]
       .map(
         ([id, label]) =>
-          `<a href="#${id}" class="nav-item ${route === id ? "active" : ""}" ${route === id ? 'aria-current="page"' : ""}>${icon(id)}<span>${label}</span>${id === "shop" && missing ? `<span class="nav-count">${missing}</span>` : ""}</a>`,
+          `<a href="#${id}" class="nav-item ${activeRoute === id ? "active" : ""}" ${activeRoute === id ? 'aria-current="page"' : ""}>${icon(id)}<span>${label}</span>${id === "shop" && missing ? `<span class="nav-count">${missing}</span>` : ""}</a>`,
       )
       .join("");
     document
@@ -248,7 +267,7 @@
     const focusId = document.activeElement?.id;
     const pages = {
       choose: choosePage,
-      batch: batchPage,
+      batch: choosePage,
       plan: planPage,
       shop: shopPage,
       pantry: pantryPage,
@@ -337,7 +356,7 @@
           : p.length < 3
             ? `Only ${p.length} recipes match. Your preferences have not been relaxed.`
             : repeated
-              ? "Some ideas repeat because this starter library is small."
+              ? "Some ideas repeat because the matching recipe pool is exhausted."
               : "Three fresh ideas.",
       );
     return out.map(recipe);
@@ -345,7 +364,18 @@
   function filterExtras(batch) {
     const f = currentFilters(batch),
       prefix = batch ? "bf" : "f";
-    return `<details class="filter-details"><summary>Time & cooking method <span>${e(f.time === "any" ? "Any time" : times.find((t) => t[0] === f.time)?.[1] || "Any time")}</span></summary><div class="form-grid two">${field("Total recipe time", prefix + "-time", select(prefix + "-time", times, f.time))}${field("Cooking method", prefix + "-method", select(prefix + "-method", methods, f.method))}</div><p class="helper">Prep and total time are shown separately. Larger batches can take longer; time does not scale with portions.</p></details>`;
+    const choices = (key, title, values) =>
+      `<div class="tap-filter"><span class="label" id="${prefix}-${key}-label">${title}</span><div class="filter-chips" role="group" aria-labelledby="${prefix}-${key}-label">${values.map(([value, label]) => `<button type="button" id="${prefix}-${key}-${value}" class="filter-chip" data-act="recipe-filter" data-filter="${key}" data-id="${value}" aria-pressed="${f[key] === value}">${e(label)}</button>`).join("")}</div></div>`;
+    return `<section class="tap-filters" aria-label="Recipe filters">${choices(
+      "time",
+      "Total time",
+      times.map(([value, label]) => [
+        value,
+        label
+          .replace("minutes", "min")
+          .replace("Slow-cooked / hands-off", "Slow-cooked"),
+      ]),
+    )}${choices("method", "Cooking method", methods)}<p class="helper">Prep time is shown on each recipe. Larger batches can take longer.</p></section>`;
   }
   function searchBox(batch) {
     const f = currentFilters(batch);
@@ -357,7 +387,7 @@
       cv = coverage(r, f.servings),
       liked = state.prefs.favourites.includes(r.id),
       kept = locked[key].includes(r.id);
-    return `<article class="meal-card"><div class="card-art"><span class="food-emoji" aria-hidden="true">${r.emoji}</span><span class="pick-label">${batch ? "BATCH COOKING" : e(r.cuisine)}</span><button class="icon-btn heart-btn ${liked ? "active" : ""}" data-act="favourite" data-id="${r.id}" aria-label="${liked ? "Unsave" : "Save"} ${e(r.name)}" aria-pressed="${liked}">${icon("heart")}</button></div><div class="card-body"><div class="card-kicker">${batch ? (r.batch.type === "base" ? "Base dish · choose a side later" : r.batch.type === "uncooked" ? "Prepared ahead · still needs cooking" : "Complete meal") : e(r.kind === "meat" ? "Meat" : r.kind === "fish" ? "Fish" : r.kind === "vegan" ? "Plant-based" : "Vegetarian")}</div><h3>${e(r.name)}</h3><p class="description">${e(r.description)}</p><div class="meta-row"><span>${icon("clock")}${duration(r.total)} total</span><span>${r.prep} min prep</span><span>${e(method(r))}</span></div>${batch ? '<p class="batch-tag">Freezer suitability unknown · example recipe</p>' : `<div class="pantry-match"><span><strong>${cv.yes} / ${cv.total}</strong> ingredients covered</span><span>For ${f.servings}</span></div>`}<div class="card-actions">${btn("View recipe", "recipe", r.id)}${btn(batch ? "Plan batch" : "Add to plan", batch ? "batch-add" : "plan-add", r.id, "")}</div><div class="card-bottom"><button class="keep-btn ${kept ? "active" : ""}" data-act="keep" data-id="${r.id}" aria-pressed="${kept}">${icon("pin")}${kept ? "Kept" : "Keep this idea"}</button><button class="text-btn" data-act="hide" data-id="${r.id}">Not for me</button></div></div></article>`;
+    return `<article class="meal-card"><div class="card-art"><span class="food-emoji" aria-hidden="true">${r.emoji}</span><span class="pick-label">${batch ? "BATCH COOKING" : e(r.cuisine)}</span><button class="icon-btn heart-btn ${liked ? "active" : ""}" data-act="favourite" data-id="${r.id}" aria-label="${liked ? "Unsave" : "Save"} ${e(r.name)}" aria-pressed="${liked}">${icon("heart")}</button></div><div class="card-body"><div class="card-kicker">${batch ? (r.batch.type === "base" ? "Base dish · choose a side later" : r.batch.type === "uncooked" ? "Prepared ahead · still needs cooking" : "Complete meal") : e(r.vegetarianSuitable === false ? "Contains animal-rennet cheese" : r.kind === "meat" ? "Meat" : r.kind === "fish" ? "Fish" : r.kind === "vegan" ? "Plant-based" : "Vegetarian")}</div><h3>${e(r.name)}</h3><p class="description">${e(r.source ? `By ${r.source.author}` : r.description)}</p>${recipeSource(r)}<div class="meta-row"><span>${icon("clock")}${duration(r.total)} total</span><span>${prepLabel(r)}</span><span>${e(method(r))}</span></div>${batch ? `<p class="batch-tag">Freezer suitability not verified${r.source ? "" : " · example recipe"}</p>` : `<div class="pantry-match"><span><strong>${cv.yes} / ${cv.total}</strong> ingredients covered</span><span>For ${f.servings}</span></div>`}<div class="card-actions">${btn("View recipe", "recipe", r.id)}${btn(batch ? "Plan batch" : "Add to plan", batch ? "batch-add" : "plan-add", r.id, "")}</div><div class="card-bottom"><button class="keep-btn ${kept ? "active" : ""}" data-act="keep" data-id="${r.id}" aria-pressed="${kept}">${icon("pin")}${kept ? "Kept" : "Keep this idea"}</button><button class="text-btn" data-act="hide" data-id="${r.id}">Not for me</button></div></div></article>`;
   }
   function results(batch) {
     const f = currentFilters(batch),
@@ -366,26 +396,115 @@
     return `<div class="choice-heading"><div><h2>${f.query ? "Search results" : "Three ideas for you"}</h2><p>${all.length} ${batch ? "batch recipes" : "recipes"} match your preferences</p></div>${!f.query ? btn(icon("refresh") + " Refresh", "refresh", "", "secondary") : ""}</div>${cards.length ? `<div class="choice-grid">${cards.map((r) => card(r, batch)).join("")}</div>` : empty("No matching recipes", "Try another time, method or search. Your food exclusions stay in place.", btn("Reset search & time", "reset-filters"))}`;
   }
   function choosePage() {
-    const f = state.filters;
+    const batch = route === "batch",
+      f = currentFilters(batch),
+      prefix = batch ? "bf" : "f";
     return (
       head(
-        "What sounds good?",
-        "Three meal ideas, sized for your table.",
-        "EVERYDAY MEALS",
+        "What’s cooking?",
+        "Three ideas for one meal — or a few days ahead.",
+        "YOUR KITCHEN",
       ) +
-      `<section class="panel"><div class="form-grid three">${field("Date", "f-date", `<input id="f-date" type="date" value="${f.date}" required>`)}${field("Meal", "f-meal", select("f-meal", ["Breakfast", "Lunch", "Dinner"], f.meal))}${field("People", "f-servings", numInput("f-servings", f.servings, 1, 12))}</div><div class="mode-bar">${[
+      '<section class="panel shared-controls ' +
+      (batch ? "batching" : "") +
+      '">' +
+      '<label class="batch-inline"><span><strong>Batch cook</strong><small>Make extra for the fridge or freezer</small></span><input id="batch-mode" type="checkbox" role="switch" ' +
+      (batch ? "checked" : "") +
+      ' aria-controls="batch-options"></label>' +
+      '<div class="form-grid three">' +
+      (batch
+        ? field(
+            "Days",
+            "bf-days",
+            quantityInput("bf-days", f.days, 1, 7, "days"),
+          )
+        : field(
+            "Date",
+            "f-date",
+            '<input id="f-date" type="date" value="' + f.date + '" required>',
+          )) +
+      `<div class="field meal-choice"><span class="label" id="${prefix}-meal-label">Meal</span><div class="quantity-stepper meal-stepper" role="group" aria-labelledby="${prefix}-meal-label"><button type="button" id="${prefix}-meal-prev" data-act="meal-step" data-step="-1" aria-label="Previous meal">‹</button><span aria-live="polite" aria-atomic="true">${e(f.meal)}</span><button type="button" id="${prefix}-meal-next" data-act="meal-step" data-step="1" aria-label="Next meal">›</button></div></div>` +
+      field(
+        "People",
+        batch ? "bf-people" : "f-servings",
+        quantityInput(
+          batch ? "bf-people" : "f-servings",
+          batch ? f.people : f.servings,
+          1,
+          batch ? 6 : 12,
+          "people",
+        ),
+      ) +
+      "</div>" +
+      '<div id="batch-options" ' +
+      (batch ? "" : "hidden") +
+      ">" +
+      (batch
+        ? '<div class="inline-batch-options">' +
+          field(
+            "Meal pattern",
+            "bf-style",
+            select(
+              "bf-style",
+              [
+                ["repeat", "Repeat meals"],
+                ["variety", "Add variety"],
+              ],
+              f.style,
+            ),
+          ) +
+          '<p class="portion-summary"><strong>' +
+          f.people * f.days +
+          " portions</strong><span>" +
+          f.people +
+          (f.people === 1 ? " person × " : " people × ") +
+          f.days +
+          (f.days === 1 ? " day" : " days") +
+          "</span></p></div>"
+        : "") +
+      "</div>" +
+      '<div class="mode-bar">' +
+      [
         ["any", "Anything"],
         ["pantry", "Pantry first"],
         ["only", "No shopping"],
       ]
         .map(
           ([v, label]) =>
-            `<button class="chip-button ${f.mode === v ? "selected" : ""}" data-act="mode" data-id="${v}" aria-pressed="${f.mode === v}">${label}</button>`,
+            '<button class="chip-button ' +
+            (f.mode === v ? "selected" : "") +
+            '" data-act="mode" data-id="' +
+            v +
+            '" aria-pressed="' +
+            (f.mode === v) +
+            '">' +
+            label +
+            "</button>",
         )
-        .join(
-          "",
-        )}</div>${filterExtras(false)}</section>${searchBox(false)}${results(false)}`
+        .join("") +
+      "</div>" +
+      filterExtras(batch) +
+      "</section>" +
+      searchBox(batch) +
+      results(batch) +
+      plannedBatches() +
+      (batch
+        ? batchHistory() +
+          '<details class="panel storage-details"><summary>Storage & reheating guidance</summary>' +
+          storageGuide() +
+          "</details>"
+        : "")
     );
+  }
+  function plannedBatches() {
+    const planned = state.batches.filter((b) => !b.cooked);
+    return planned.length
+      ? '<section class="batch-planned"><div class="section-bar"><h2 class="section-title">Your planned batches</h2><span class="small-count">' +
+          planned.reduce((n, b) => n + b.servings, 0) +
+          " portions planned</span></div>" +
+          planned.map(batchCard).join("") +
+          '<a class="button secondary" href="#shop">Open combined shopping list</a></section>'
+      : "";
   }
   function batchHistory() {
     const done = state.batches.filter((b) => b.cooked);
@@ -397,43 +516,6 @@
     const r = recipe(b.recipeId),
       suggest = C.suggestBatchSize(state, b, R, ingredients());
     return `<article class="plan-card"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(day(b.date))} · ${b.servings} portions</div><h3>${e(r.name)}</h3><p class="helper">${r.batch.type === "base" ? "Base only; sides are added when you plan stored portions." : "Complete meal, including its topping."}</p><div class="action-wrap">${btn("Recipe", "recipe", r.id)}${btn("Edit batch", "batch-edit", b.id)}${btn("Cooked — store portions", "batch-finish", b.id, "")}</div>${suggest ? `<div class="notice"><span>${amount(suggest.id, suggest.extra)} extra from packs. ${btn("Make " + suggest.servings + " portions", "batch-round", b.id, "ghost")}<small>Optional. All ingredients will scale; other purchases may increase.</small></span></div>` : ""}<button class="text-btn" data-act="batch-remove" data-id="${b.id}">Remove planned batch</button></div></article>`;
-  }
-  function batchPage() {
-    const f = state.batchFilters,
-      n = f.people * f.days,
-      planned = state.batches.filter((b) => !b.cooked),
-      total = planned.reduce((x, b) => x + b.servings, 0);
-    return (
-      head(
-        "Cook once. Plan ahead.",
-        "Batch recipes with portions for the fridge and freezer.",
-        "BATCH COOKING",
-      ) +
-      `<section class="panel batch-settings"><div class="form-grid three">${field("People", "bf-people", numInput("bf-people", f.people, 1, 6))}${field("Days", "bf-days", numInput("bf-days", f.days, 1, 7))}${field("Meal", "bf-meal", select("bf-meal", ["Breakfast", "Lunch", "Dinner"], f.meal))}</div><div class="batch-target"><strong>${n}</strong><span>portions for ${f.days} ${f.meal.toLowerCase()}${f.days === 1 ? "" : f.meal === "Lunch" ? "es" : "s"}<small>Choose one recipe or split the portions across several batches.</small></span></div>${field(
-        "Meal pattern",
-        "bf-style",
-        select(
-          "bf-style",
-          [
-            ["repeat", "Repeat one batch"],
-            ["variety", "Variety across batches"],
-          ],
-          f.style,
-        ),
-      )}${field(
-        "Pantry matching",
-        "bf-mode",
-        select(
-          "bf-mode",
-          [
-            ["any", "Anything"],
-            ["pantry", "Pantry first"],
-            ["only", "No shopping"],
-          ],
-          f.mode,
-        ),
-      )}<p class="helper">${f.style === "variety" ? "Start with half the days, then choose a complementary batch. Suggested portions stay editable." : "Repeat a favourite across the days you need."} Food preferences and available equipment apply to all suggestions.</p>${filterExtras(true)}</section>${planned.length ? `<section class="batch-planned"><div class="section-bar"><h2 class="section-title">Your planned batches</h2><span class="small-count">${total} portions planned</span></div>${planned.map(batchCard).join("")}<a class="button secondary" href="#shop">Open combined shopping list</a></section>` : ""}${searchBox(true)}${results(true)}${batchHistory()}<details class="panel storage-details"><summary>Storage & reheating guidance</summary>${storageGuide()}</details><p class="helper">Five pilot batch variants of the example library, not independently kitchen-tested or rated online. The larger sourced library is still to come.</p>`
-    );
   }
   function planCard(p) {
     const r = recipe(p.recipeId),
@@ -722,7 +804,7 @@
         )
         .join(
           "",
-        )}</div></section></div><div class="stack"><section class="panel"><h2 class="section-title">Saved & hidden recipes</h2><details class="details-box"><summary>Favourite recipes (${state.prefs.favourites.length})</summary>${state.prefs.favourites.map((id) => `<div class="favourite-row">${btn(e(recipe(id).name), "recipe", id, "ghost")}${btn("Unsave", "favourite", id, "ghost")}</div>`).join("") || '<p class="helper">Tap a recipe heart to save it.</p>'}</details><details class="details-box"><summary>Hidden recipes (${state.prefs.hidden.length})</summary>${state.prefs.hidden.map((id) => `<div class="favourite-row"><span>${e(recipe(id).name)}</span>${btn("Restore", "unhide", id, "ghost")}</div>`).join("") || '<p class="helper">Refreshing choices never hides a recipe permanently.</p>'}</details></section><section class="panel"><h2 class="section-title">Back up your data</h2><p class="helper">Pantry, batches, portions, shopping and preferences stay in this browser. Clearing browser data removes them. Export a backup regularly; there is no account or cloud sync.</p><div class="action-wrap">${btn("Export backup", "export")}${btn("Restore backup", "import")}</div><input type="file" id="backup-file" accept="application/json,.json" hidden><p class="helper">Version 1 backups are supported. The original v1 browser data is left untouched during upgrade.</p></section><section class="panel"><h2 class="section-title">About this version</h2><p class="helper">v3 · Batch planning, portion tracking, pack estimates and recipe search. The 40 original examples and 5 batch variants are not rated online or independently kitchen-tested. Timings are estimates. Scaling portions does not scale cooking time or guarantee appliance capacity.</p><details class="details-box"><summary>Storage guidance</summary>${storageGuide()}</details><button class="text-btn" data-act="reset">Delete all local app data</button></section></div></div>`
+        )}</div></section></div><div class="stack"><section class="panel"><h2 class="section-title">Saved & hidden recipes</h2><details class="details-box"><summary>Favourite recipes (${state.prefs.favourites.length})</summary>${state.prefs.favourites.map((id) => `<div class="favourite-row">${btn(e(recipe(id).name), "recipe", id, "ghost")}${btn("Unsave", "favourite", id, "ghost")}</div>`).join("") || '<p class="helper">Tap a recipe heart to save it.</p>'}</details><details class="details-box"><summary>Hidden recipes (${state.prefs.hidden.length})</summary>${state.prefs.hidden.map((id) => `<div class="favourite-row"><span>${e(recipe(id).name)}</span>${btn("Restore", "unhide", id, "ghost")}</div>`).join("") || '<p class="helper">Refreshing choices never hides a recipe permanently.</p>'}</details></section><section class="panel"><h2 class="section-title">Back up your data</h2><p class="helper">Pantry, batches, portions, shopping and preferences stay in this browser. Clearing browser data removes them. Export a backup regularly; there is no account or cloud sync.</p><div class="action-wrap">${btn("Export backup", "export")}${btn("Restore backup", "import")}</div><input type="file" id="backup-file" accept="application/json,.json" hidden><p class="helper">Version 1 backups are supported. The original v1 browser data is left untouched during upgrade.</p></section><section class="panel"><h2 class="section-title">About this version</h2><p class="helper">v3 · Batch planning, portion tracking, pack estimates and recipe search. 40 linked publisher recipes meet our selection threshold of 4.5/5 from at least 50 ratings, checked 28 September 2026. Original examples remain available and are marked unrated. Publisher methods open on their website; planning estimates are labelled. Timings are estimates. Scaling portions does not scale cooking time or guarantee appliance capacity.</p><details class="details-box"><summary>Storage guidance</summary>${storageGuide()}</details><button class="text-btn" data-act="reset">Delete all local app data</button></section></div></div>`
     );
   }
   function close() {
@@ -741,7 +823,7 @@
       : state.filters.servings;
     modal(
       e(r.name),
-      `<p class="meta-row">${e(method(r))} · ${r.prep} min prep · ${duration(r.total)} total (base recipe)</p>${r.batch ? `<p>${e(r.batch.note)}</p>` : ""}<label class="label" for="recipe-portions">Ingredient portions</label>${numInput("recipe-portions", n, 1, r.batch ? 48 : 12)}<div id="recipe-amounts">${ingredientList(r, n)}</div><h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">Example recipe, not independently kitchen-tested. Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${btn(r.batch ? "Plan batch" : "Add to plan", r.batch ? "batch-add" : "plan-add", r.id, "")}`,
+      `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} total (base recipe)</p>${r.batch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}<label class="label" for="recipe-portions">Ingredient portions</label>${numInput("recipe-portions", n, 1, r.batch ? 48 : 12)}<div id="recipe-amounts">${ingredientList(r, n)}</div>${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${btn(r.batch ? "Plan batch" : "Add to plan", r.batch ? "batch-add" : "plan-add", r.id, "")}`,
     );
     document
       .getElementById("recipe-portions")
@@ -993,6 +1075,47 @@
       id = b.dataset.id,
       batch = route === "batch",
       key = batch ? "batch" : "choose";
+    if (act === "quantity-step") {
+      if (b.getAttribute("aria-disabled") === "true") return;
+      const input = document.getElementById(b.dataset.target);
+      const value = Number(input.value) + Number(b.dataset.step);
+      if (!C.integer(value, Number(input.min), Number(input.max))) return;
+      input.value = value;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      return;
+    }
+    if (act === "meal-step") {
+      const meals = ["Breakfast", "Lunch", "Dinner"];
+      change(
+        () => {
+          const filters = batch ? state.batchFilters : state.filters;
+          filters.meal =
+            meals[
+              (meals.indexOf(filters.meal) +
+                Number(b.dataset.step) +
+                meals.length) %
+                meals.length
+            ];
+        },
+        "",
+        true,
+      );
+      return;
+    }
+    if (act === "recipe-filter") {
+      const filter = b.dataset.filter,
+        allowed =
+          filter === "time" ? times : filter === "method" ? methods : [];
+      if (!allowed.some(([value]) => value === id)) return;
+      change(
+        () => {
+          (batch ? state.batchFilters : state.filters)[filter] = id;
+        },
+        "",
+        true,
+      );
+      return;
+    }
     if (act === "lot-correct" || act === "lot-discard-some") {
       lotCorrectionModal(id, act === "lot-discard-some");
       return;
@@ -1141,7 +1264,7 @@
       () => {
         switch (act) {
           case "mode":
-            state.filters.mode = id;
+            (batch ? state.batchFilters : state.filters).mode = id;
             break;
           case "favourite":
             toggle("favourites", id);
@@ -1245,6 +1368,12 @@
   document.addEventListener("change", (ev) => {
     const t = ev.target,
       id = t.id;
+    if (id === "batch-mode") {
+      route = t.checked ? "batch" : "choose";
+      history.replaceState(null, "", "#" + route);
+      render();
+      return;
+    }
     if (id === "backup-file") {
       importData(t.files[0]);
       return;
