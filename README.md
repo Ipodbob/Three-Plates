@@ -2,7 +2,7 @@
 
 A mobile-first UK meal planner hosted on GitHub Pages at `/Three-Plates/`.
 Static HTML, CSS and JavaScript; no user account or runtime API keys. Barcode
-lookup uses Open Food Facts; an optional free UPC relay is prepared separately.
+lookup uses Open Food Facts; a free UPC fallback relay is deployed on Cloudflare.
 
 ## Develop and test
 
@@ -18,8 +18,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 101 checks: 31 core regressions, 11 added domain checks,
-20 catalogue checks, 20 existing DOM checks and 19 barcode/relay checks.
+`npm test` runs 102 checks: 31 core regressions, 11 added domain checks,
+20 catalogue checks, 20 existing DOM checks and 20 barcode/relay checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -31,9 +31,10 @@ stock is added. Full/half/quarter packs and pack counters reduce typing. Confirm
 barcode matches stay on the device and are included in the existing backups.
 Camera/photo decoding stays local; only new barcode numbers are looked up online.
 
-Open Food Facts works directly. **The free UPCitemdb fallback requires the prepared
-Cloudflare relay to be deployed; it is not active yet.** Its API blocks direct
-browser requests from GitHub Pages. See [setup and testing details](docs/barcode-scanning.md).
+Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
+from the local pantry UI.** This branch configures the live relay; GitHub Pages
+frontend integration still awaits release. The fallback shares 100 requests per
+day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
 ## Phase 1

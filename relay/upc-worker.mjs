@@ -60,7 +60,7 @@ export async function handle(request, env, fetcher = fetch) {
       {
         headers: { Accept: "application/json" },
         signal: AbortSignal.timeout(6500),
-        redirect: "error",
+        redirect: "manual",
       },
     );
     if (!result.ok)

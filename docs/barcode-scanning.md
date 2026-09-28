@@ -10,17 +10,17 @@ The product name, source and stated pack size appear with suggested recipe ingre
 
 Optional confirmed matches are bounded to 500 and stored in `barcodeMatches` within the existing `three-plates-v3` state. They roundtrip with backup/export; old backups remain valid. Invalid optional matches are discarded without altering pantry data. Forgetting matches leaves stock untouched. No scan changes shop purchase history or creates a bought transaction.
 
-## Providers and the UPC blocker
+## Providers and the deployed UPC backup
 
 Open Food Facts is called directly with public identification fields. API documentation: https://openfoodfacts.github.io/openfoodfacts-server/api/. Source attribution and an ODbL link are shown with matches. Product availability and quantities are not guaranteed. Direct read requests are throttled to at most one every 4.1 seconds per running page; repeated confirmed products are local. Provider/IP limits can still apply across tabs or devices.
 
-**UPCitemdb is not active in the default configuration.** Its free endpoint returned `Access-Control-Allow-Origin: https://www.upcitemdb.com` when tested with the GitHub Pages origin on 28 September 2026. Browsers therefore cannot call it directly from Three Plates. We do not use public CORS proxies or expose paid credentials.
+**The free UPCitemdb fallback is deployed and configured on this feature branch.** Its free endpoint returned `Access-Control-Allow-Origin: https://www.upcitemdb.com` when tested with the GitHub Pages origin on 28 September 2026. Browsers therefore cannot call it directly from Three Plates. We do not use public CORS proxies or expose paid credentials.
 
-`relay/upc-worker.mjs` is the prepared Cloudflare Worker for the free UPC endpoint. It accepts only the configured frontend origins, a valid barcode and the fixed `/lookup` route, with an eight-second client timeout. A SQLite Durable Object stores a global counter: at most 100 upstream requests per UTC day, separated by at least 10.1 seconds. The free quota is shared across this relay's users, not 100 per person; upstream shared-IP limits may be tighter. Origin checks are not authentication: a non-browser client could consume the bounded quota. It returns minimal product fields and has no arbitrary URL proxy or API secret.
+`relay/upc-worker.mjs` is the deployed Cloudflare Worker for the free UPC endpoint. It accepts only the configured frontend origins, a valid barcode and the fixed `/lookup` route, with an eight-second client timeout. A SQLite Durable Object stores a global counter: at most 100 upstream requests per UTC day, separated by at least 10.1 seconds. The free quota is shared across this relay's users, not 100 per person; upstream shared-IP limits may be tighter. Origin checks are not authentication: a non-browser client could consume the bounded quota. It returns minimal product fields and has no arbitrary URL proxy or API secret.
 
 Cloudflare supports SQLite Durable Objects on its Workers Free plan: https://developers.cloudflare.com/durable-objects/platform/pricing/. UPC free limits: https://www.upcitemdb.com/wp/docs/main/development/plan/. Stay on free plans; no paid provider is required.
 
-### Enable the optional relay
+### Redeploy the relay
 
 This requires the owner's Cloudflare account and deployment authorization. The website continues to run on GitHub Pages.
 
@@ -30,7 +30,11 @@ This requires the owner's Cloudflare account and deployment authorization. The w
 4. Set `upcRelay` in `barcode-config.js` to the returned HTTPS worker URL plus `/lookup`, then publish the frontend change.
 5. Verify the fallback from the actual Pages origin with a product absent from Open Food Facts but present in UPCitemdb. Verify quota/error responses do not mutate stock.
 
-No Cloudflare account was connected or worker deployed during implementation. The UI labels the backup as awaiting setup until configured. Relay unit tests are not a live integration verification.
+The owner authorized deployment on 28 September 2026. The live endpoint is `https://three-plates-upc.three-plates-ipodbob.workers.dev/lookup`, allowing `https://ipodbob.github.io` and the deliberately enabled local test origin `http://127.0.0.1:4173`. No paid provider subscription was created.
+
+Live checks verified a UPCitemdb product response, correct CORS, invalid barcode rejection (400), disallowed origin rejection (403), and the persistent cooldown (429). The local pantry UI also retrieved test barcode `4002293401102` through UPCitemdb after Open Food Facts missed it. This is a kitchen-tool test product, not food; no stock or remembered match was saved. The Worker uses manual redirect handling because the Cloudflare runtime does not support `redirect: "error"`; redirects are rejected as upstream failures.
+
+The relay backend is live. The frontend configuration is in the feature PR; GitHub Pages integration remains unverified until that frontend is released.
 
 ## Validation and remaining device checks
 
