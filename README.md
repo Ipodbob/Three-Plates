@@ -17,8 +17,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 67 checks: 31 core regressions, 11 added domain checks,
-9 catalogue checks and 16 DOM interaction checks. jsdom is test-only; it does not validate rendering
+`npm test` runs 74 checks: 31 core regressions, 11 added domain checks,
+14 catalogue checks and 18 DOM interaction checks. jsdom is test-only; it does not validate rendering
 or replace real browser checks. No development dependency is loaded by the app.
 
 ## Phase 1
@@ -63,9 +63,10 @@ overwriting another tab. Export/restore is available in Settings.
 
 ## Rated recipe catalogue
 
-The expanded library now contains **72 linked recipes from seven publishers**,
-plus the 45 preserved original examples. The latest 32 additions broaden the
-selection to traybakes, meal-prep bowls, soups, international dishes and baking.
+The expanded library now contains **338 linked recipes from seven publishers**,
+plus the 45 preserved original examples. The latest pass adds **266 recipes**, bringing the total to **383**: regional meals,
+seafood, soups, meal prep, sweet and savoury baking, and desserts. See the
+[large expansion register and quantity audit](docs/large-catalogue-expansion.md).
 Ratings are one selection signal rather than a strict admission gate; each new
 entry records its reason for inclusion. See [coverage, sources and mapping notes](docs/collection-expansion.md).
 

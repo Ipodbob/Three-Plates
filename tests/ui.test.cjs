@@ -1,5 +1,11 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
+test('expanded catalogue can find and plan a full bake with extra time visible',()=>{
+ const a=app();a.click('#f-time-any');while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');a.q('#recipe-search').value='steamed bao';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/extra time/);assert.match(a.q('.meal-card').textContent,/Hob/);a.click('[data-act="plan-add"]');assert.equal(a.state().plans[0].recipeId,'gf2-steamed-bao-buns');assert.equal(a.state().plans[0].servings,18);a.route('shop');assert.match(a.q('main').textContent,/flour/i);const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().plans[0].servings,18);a.dom.window.close();b.dom.window.close();
+});
+test('standalone sides remain searchable but are not offered as a main meal',()=>{
+ const a=app();a.click('#f-time-any');a.q('#recipe-search').value='padron peppers';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/Side dish \/ starter/);a.q('#recipe-search').value='';a.submit('#search-form');assert.equal(a.w.document.querySelectorAll('[data-act="recipe"][data-id="gf2-padron-peppers"]').length,0);assert.equal(a.w.document.querySelectorAll('.meal-card').length,3);a.dom.window.close();
+});
 test('Dessert and Baking use the shared selector and whole bakes survive reload',()=>{
  const a=app();a.click('#f-time-any');while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');a.q('#recipe-search').value='no-knead';a.submit('#search-form');assert.match(a.q('.meal-card').textContent,/Full bake · 36/);a.click('[data-act="plan-add"]');assert.equal(a.state().plans[0].servings,36);assert.equal(a.state().plans[0].meal,'Baking');
  const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().plans[0].servings,36);assert.equal(b.q('.meal-stepper span').textContent,'Baking');b.click('#f-meal-prev');assert.equal(b.q('.meal-stepper span').textContent,'Dessert');b.q('#recipe-search').value='fruit salad';b.submit('#search-form');b.click('[data-act="plan-add"]');assert.equal(b.state().plans.length,2);assert.equal(b.state().plans[1].meal,'Dessert');a.dom.window.close();b.dom.window.close();
@@ -25,7 +31,7 @@ function app(seed={},failStorage=false){
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
  for(const [key,value] of Object.entries(seed))w.localStorage.setItem(key,value);
  if(failStorage)w.Storage.prototype.setItem=()=>{throw Error('quota');};
- for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','core-v3.js','phase1.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
+ for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','core-v3.js','phase1.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
  const q=selector=>w.document.querySelector(selector),click=selector=>{assert.ok(q(selector),selector);q(selector).click();},set=(selector,value)=>{assert.ok(q(selector),selector);q(selector).value=value;q(selector).dispatchEvent(new w.Event('change',{bubbles:true}));};
  const route=name=>{w.location.hash=name;w.dispatchEvent(new w.HashChangeEvent('hashchange'));};
  const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));

@@ -722,8 +722,8 @@
   function matching(r, f, s, recipes, ingredients) {
     if (!permitted(r, s.prefs) || !r.meals.includes(f.meal)) return false;
     if (
-      (f.time === "15" && r.total > 15) ||
-      (f.time === "30" && r.total > 30) ||
+      (f.time === "15" && (r.total > 15 || r.additionalTime)) ||
+      (f.time === "30" && (r.total > 30 || r.additionalTime)) ||
       (f.time === "long" && r.total <= 30) ||
       (f.time === "slow" && !r.slow)
     )
