@@ -7,6 +7,9 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - PR 2 scanner branch: 108 tests passed before the broader consistency pass; real local browser verified scan lookup, explicit save, reload and stock removal. iPhone camera worked on the previous release, per user.
 
 ## Current work
+- Full suite now passes 117 tests. Browser verified custom product -> recipe ingredient -> reload with 250 g retained. Cleanup hit a native confirmation dialog and browser automation timed out; the local test tab may still contain 250 g Pasta. Production stock was not touched.
+- Product-to-recipe linking combines stock and remaps full-pack barcode quantities after explicit confirmation. Ordinary editing rejects implicit moves between ingredients. Domain and UI regressions cover merging, stale values and overwrite prevention.
+- Connected UI test verifies partial pantry -> whole-pack purchase -> transfer -> cook -> reload: 100 g + 500 g - 180 g = 420 g, with no second cooking action.
 - Implemented persistence failure atomicity across all forms, not only scanning; no false Saved messages.
 - Implemented pantry search, searchable ingredient/cuisine preferences and the active-trip shop label.
 - Verification: 111 checks passed before the cuisine control change; five focused UI checks then passed, including the new cuisine add/remove test (112 total tests now). Browser inspection confirmed searchable controls render on Pantry and Settings.

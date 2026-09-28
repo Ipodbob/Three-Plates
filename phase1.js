@@ -366,6 +366,56 @@
         : remaining || target,
     );
   };
+  C.linkPantryItem = (s, sourceId, targetId, qty, ingredients, expectedQty) => {
+    const source = s.pantry.find((p) => p.id === sourceId),
+      target = ingredients[targetId];
+    if (
+      !sourceId.startsWith("custom-") ||
+      !source ||
+      source.always ||
+      source.qty <= 0 ||
+      source.qty !== expectedQty
+    )
+      throw Error(
+        "This product changed or has no measured stock. Reopen it before linking.",
+      );
+    if (!target || targetId.startsWith("custom-"))
+      throw Error("Choose a recipe ingredient.");
+    if (!Number.isFinite(qty) || qty <= 0 || qty > 1e7)
+      throw Error("Enter the usable amount in the recipe ingredient's unit.");
+    const existing = s.pantry.find((p) => p.id === targetId);
+    if (existing?.always)
+      throw Error(
+        "Turn off Always stocked for that ingredient before linking measured stock.",
+      );
+    const total = Math.round(((existing?.qty || 0) + qty) * 1000) / 1000;
+    if (total > 1e7) throw Error("The combined stock is too large.");
+    const matches = Object.entries(s.barcodeMatches || {}).filter(
+      ([, m]) => m.ingredientId === sourceId,
+    );
+    const converted = matches.map(([code, m]) => [
+      code,
+      {
+        ...m,
+        ingredientId: targetId,
+        unit: target.unit,
+        qty: Math.round(((m.qty * qty) / source.qty) * 1000) / 1000,
+      },
+    ]);
+    if (
+      converted.some(
+        ([, m]) => !Number.isFinite(m.qty) || m.qty <= 0 || m.qty > 1e6,
+      )
+    )
+      throw Error(
+        "Check the amount: this would give an invalid full-pack size.",
+      );
+    s.pantry = s.pantry.filter((p) => p.id !== sourceId && p.id !== targetId);
+    s.pantry.push({ id: targetId, qty: total, always: false });
+    for (const [code, m] of converted) s.barcodeMatches[code] = m;
+    // Keep custom definitions for historical references; only active stock moves.
+    return total;
+  };
   C.choiceWeight = (r, s, batch, coverage = 0) => {
     let w = 1;
     if (s.prefs.favourites.includes(r.id)) w *= 2;

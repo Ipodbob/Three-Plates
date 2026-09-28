@@ -735,9 +735,9 @@
   }
   function pantryPage() {
     const prepared = state.lots.filter((l) => l.portions > 0),
-      stock = state.pantry.filter(p => C.text(ing(p.id).name).includes(C.text(pantryQuery))).sort((a, b) =>
-        ing(a.id).name.localeCompare(ing(b.id).name),
-      );
+      stock = state.pantry
+        .filter((p) => C.text(ing(p.id).name).includes(C.text(pantryQuery)))
+        .sort((a, b) => ing(a.id).name.localeCompare(ing(b.id).name));
     return (
       head(
         "What you already have.",
@@ -775,7 +775,7 @@
                 .map(lotCard)
                 .join("") || "No empty records."
             }</details><details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
-          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div><form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : (pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>')}</section>`
+          : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div><form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
       }`
     );
   }
@@ -792,12 +792,15 @@
     },
   };
   function preferenceSection(key, title) {
-    const options = [...Object.entries(groups).map(([id, g]) => ({id, name: g.name})), ...Object.values(I).sort((a,b)=>a.name.localeCompare(b.name))];
-    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label><input id="pref-${key}" type="search" list="pref-options-${key}" placeholder="Search ingredients" autocomplete="off" required><datalist id="pref-options-${key}">${options.map(i=>`<option value="${e(i.name)} [${e(i.id)}]"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs[key].map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(ing(id)?.name)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
+    const options = [
+      ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
+      ...Object.values(I).sort((a, b) => a.name.localeCompare(b.name)),
+    ];
+    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label><input id="pref-${key}" type="search" list="pref-options-${key}" placeholder="Search ingredients" autocomplete="off" required><datalist id="pref-options-${key}">${options.map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs[key].map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(ing(id)?.name)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
   }
   function cuisineSection() {
-    const choices = [...new Set(R.map(r=>r.cuisine))].sort();
-    return `<section class="panel"><h2 class="section-title">Preferred cuisines</h2><form id="cuisine-form" class="pref-form"><label class="sr-only" for="pref-cuisine">Search cuisines</label><input id="pref-cuisine" type="search" list="cuisine-options" placeholder="Search cuisines" required><datalist id="cuisine-options">${choices.map(c=>`<option value="${e(c)}"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs.cuisines.map(c=>`<button class="chip selected" data-act="cuisine" data-id="${e(c)}">${e(c)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
+    const choices = [...new Set(R.map((r) => r.cuisine))].sort();
+    return `<section class="panel"><h2 class="section-title">Preferred cuisines</h2><form id="cuisine-form" class="pref-form"><label class="sr-only" for="pref-cuisine">Search cuisines</label><input id="pref-cuisine" type="search" list="cuisine-options" placeholder="Search cuisines" required><datalist id="cuisine-options">${choices.map((c) => `<option value="${e(c)}"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs.cuisines.map((c) => `<button class="chip selected" data-act="cuisine" data-id="${e(c)}">${e(c)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
   }
   function settingsPage() {
     return (
@@ -948,6 +951,64 @@
       "Amount actually bought",
       `<h3>${e(ing(id).name)}</h3><form id="purchase-form" data-id="${id}">${field("Purchased amount (" + e(ing(id).unit) + ")", "purchase-qty", `<input id="purchase-qty" type="number" inputmode="decimal" min="0" max="10000000" step="any" value="${state.bought[id] || 0}" required>`)}<p class="helper">Includes the whole pack. Set zero to remove the purchase record.</p><button class="button wide" type="submit">Save bought amount</button></form>`,
     );
+  }
+  function pantryLinkModal(id) {
+    const source = state.pantry.find((p) => p.id === id);
+    if (!source) return;
+    modal(
+      "Link product to recipes",
+      `<p><strong>${e(ing(id).name)}</strong> · ${amount(id, source.qty)} in pantry</p><form id="pantry-link-form" data-id="${e(id)}" data-expected="${source.qty}"><label for="link-target">Recipe ingredient</label><input id="link-target" class="text-input" list="link-options" placeholder="Search equivalent ingredients" required><datalist id="link-options">${Object.values(
+        I,
+      )
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`)
+        .join(
+          "",
+        )}</datalist><label for="link-qty">Usable amount of this product <span id="link-unit"></span></label><input id="link-qty" class="text-input" type="number" min="0.001" max="10000000" step="any" inputmode="decimal" required><p id="link-preview" class="helper">Choose an ingredient to see the combined stock.</p><label class="check-label"><input id="link-confirm" type="checkbox" required>This product matches the ingredient and usable amount shown.</label><p class="helper">For tins use drained weight where needed. A sauce or ready meal is not equivalent to one of its ingredients. This combines existing stock and updates remembered barcodes; it does not record a purchase.</p><button class="button wide" type="submit">Link and combine stock</button></form>`,
+    );
+    const input = document.getElementById("link-target"),
+      qty = document.getElementById("link-qty");
+    const target = () =>
+      Object.values(I).find(
+        (i) =>
+          i.id === input.value ||
+          i.name === input.value ||
+          `${i.name} [${i.id}]` === input.value,
+      );
+    const preview = () => {
+      const i = target();
+      document.getElementById("link-unit").textContent = i
+        ? "(" + i.unit + ")"
+        : "";
+      document.getElementById("link-preview").textContent = i
+        ? "Existing: " +
+          amount(i.id, state.pantry.find((p) => p.id === i.id)?.qty || 0) +
+          ". Combined after linking: " +
+          amount(
+            i.id,
+            (state.pantry.find((p) => p.id === i.id)?.qty || 0) +
+              (+qty.value || 0),
+          ) +
+          ". Remembered full-pack sizes will scale by the same ratio."
+        : "Choose an ingredient from the suggestions.";
+    };
+    input.oninput = () => {
+      qty.value = "";
+      document.getElementById("link-confirm").checked = false;
+      preview();
+    };
+    input.onchange = () => {
+      const i = target();
+      if (
+        i &&
+        ing(id).unit === i.unit &&
+        i.unit !== "each" &&
+        !/drained/i.test(i.name)
+      )
+        qty.value = source.qty;
+      preview();
+    };
+    qty.oninput = preview;
   }
   function pantryModal(id) {
     const p = state.pantry.find((p) => p.id === id),
@@ -1193,7 +1254,15 @@
       purchaseModal(id);
       return;
     }
-    if (act === "pantry-search-clear") { pantryQuery = ""; render(); return; }
+    if (act === "pantry-link") {
+      pantryLinkModal(id);
+      return;
+    }
+    if (act === "pantry-search-clear") {
+      pantryQuery = "";
+      render();
+      return;
+    }
     if (act === "pantry-scan") {
       scannerCleanup = globalThis.PlatesBarcode.openUI({
         modal,
@@ -1473,7 +1542,14 @@
     const form = ev.target;
     if (!form.matches("form")) return;
     ev.preventDefault();
-    if (form.id === "pantry-search-form") { pantryQuery = document.getElementById("pantry-search").value.trim().slice(0,100); render(); return; }
+    if (form.id === "pantry-search-form") {
+      pantryQuery = document
+        .getElementById("pantry-search")
+        .value.trim()
+        .slice(0, 100);
+      render();
+      return;
+    }
     if (form.id === "search-form") {
       change(
         () => {
@@ -1492,14 +1568,32 @@
     }
     if (form.id === "cuisine-form") {
       const cuisine = document.getElementById("pref-cuisine").value.trim();
-      change(() => { if (!R.some(r=>r.cuisine === cuisine)) throw Error("Choose a cuisine from the suggestions."); state.prefs.cuisines = [...new Set([...state.prefs.cuisines, cuisine])]; }, "Preference saved.", true);
+      change(
+        () => {
+          if (!R.some((r) => r.cuisine === cuisine))
+            throw Error("Choose a cuisine from the suggestions.");
+          state.prefs.cuisines = [
+            ...new Set([...state.prefs.cuisines, cuisine]),
+          ];
+        },
+        "Preference saved.",
+        true,
+      );
       return;
     }
     if (form.matches(".pref-form")) {
       const key = form.dataset.key,
         input = document.getElementById("pref-" + key).value.trim(),
-        choices = [...Object.entries(groups).map(([id,g])=>({id,name:g.name})),...Object.values(I)],
-        id = choices.find(i=>i.id === input || `${i.name} [${i.id}]` === input || C.text(i.name) === C.text(input))?.id,
+        choices = [
+          ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
+          ...Object.values(I),
+        ],
+        id = choices.find(
+          (i) =>
+            i.id === input ||
+            `${i.name} [${i.id}]` === input ||
+            C.text(i.name) === C.text(input),
+        )?.id,
         ids = groups[id]?.ids || (I[id] ? [id] : []);
       change(
         () => {
@@ -1624,6 +1718,26 @@
             C.recordPurchase(state, id, q, ingredients(), { replace: true });
             break;
           }
+          case "pantry-link-form": {
+            const input = value("link-target"),
+              target = Object.values(I).find(
+                (i) =>
+                  i.id === input ||
+                  i.name === input ||
+                  `${i.name} [${i.id}]` === input,
+              );
+            if (!document.getElementById("link-confirm").checked)
+              throw Error("Confirm the ingredient and usable amount.");
+            C.linkPantryItem(
+              state,
+              id,
+              target?.id,
+              n("link-qty"),
+              ingredients(),
+              +form.dataset.expected,
+            );
+            break;
+          }
           case "pantry-form": {
             const name = value("pantry-name").trim(),
               unit = value("pantry-unit"),
@@ -1659,7 +1773,9 @@
             const qty = always ? 0 : C.convert(n("pantry-qty"), unit, i.unit);
             if (qty < 0 || qty > 1e7) throw Error("Check the quantity.");
             if (id && id !== i.id)
-              state.pantry = state.pantry.filter((p) => p.id !== id);
+              throw Error(
+                "Use Link to recipes to combine this product with another ingredient. To add a different product, use Add an ingredient.",
+              );
             state.pantry = state.pantry.filter((p) => p.id !== i.id);
             state.pantry.push({ id: i.id, qty, always });
             break;

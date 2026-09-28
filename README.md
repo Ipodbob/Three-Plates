@@ -18,8 +18,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 112 checks: 31 core regressions, 11 added domain checks,
-20 catalogue checks, 24 existing DOM checks and 26 barcode/relay checks.
+`npm test` runs 117 checks: 31 core regressions, 13 added domain checks,
+20 catalogue checks, 27 existing DOM checks and 26 barcode/relay checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -31,6 +31,9 @@ stock is added. A visible Add & scan next action, continuous camera, remaining-p
 and pack counter support fast cupboard setup. Update amount left corrects total
 stock or clears an item; planned meals retain their existing cooking deduction. Confirmed
 barcode matches stay on the device and are included in the existing backups.
+Separate pantry products have a Link to recipes action that combines stock with
+a confirmed ingredient and updates remembered barcode matches. Ordinary editing
+cannot overwrite another ingredient.
 Camera/photo decoding stays local; only new barcode numbers are looked up online.
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
