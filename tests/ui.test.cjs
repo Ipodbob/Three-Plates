@@ -38,12 +38,17 @@ function app(seed={},failStorage=false){
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
  for(const [key,value] of Object.entries(seed))w.localStorage.setItem(key,value);
  if(failStorage)w.Storage.prototype.setItem=()=>{throw Error('quota');};
- for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','recipes-specialists.js','core-v3.js','phase1.js','barcode-config.js','pantry-scan.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
+ for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','recipes-specialists.js','core-v3.js','phase1.js','menus.js','barcode-config.js','pantry-scan.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
  const q=selector=>w.document.querySelector(selector),click=selector=>{assert.ok(q(selector),selector);q(selector).click();if(q("#confirm-action"))q("#confirm-action").click();},set=(selector,value)=>{assert.ok(q(selector),selector);q(selector).value=value;q(selector).dispatchEvent(new w.Event('change',{bubbles:true}));};
  const route=name=>{w.location.hash=name;w.dispatchEvent(new w.HashChangeEvent('hashchange'));};
  const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
  return {w,q,click,set,route,submit,dom,state:()=>JSON.parse(w.localStorage.getItem('three-plates-v3'))};
 }
+test('a saved meal week previews conflicts, copies new portions and survives reload',()=>{
+ const a=app();a.q('#recipe-search').value='Pesto & pea pasta';a.submit('#search-form');a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');a.route('plan');a.click('[data-act="menus"]');a.click('[data-act="menu-save"]');a.set('#menu-name','Work lunches');a.submit('#menu-save-form');assert.equal(a.state().menus.length,1);a.click('[data-act="menu-use"]');
+ a.set('#menu-new-start',a.state().filters.date);assert.equal(a.q('#menu-apply').disabled,true);const start=a.w.PlatesCore.addDays(a.state().filters.date,7);a.set('#menu-new-start',start);a.q('#menu-adjust').checked=true;a.set('#menu-people','3');assert.match(a.q('#menu-preview').textContent,/3 portions/);a.submit('#menu-use-form');assert.equal(a.state().plans.length,2);assert.equal(a.state().plans[1].servings,3);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('plan');b.click('[data-act="menus"]');assert.match(b.q('.sheet').textContent,/Work lunches/);b.click('[data-act="menu-delete"]');assert.equal(b.state().menus.length,0);assert.equal(b.state().plans.length,2);a.dom.window.close();b.dom.window.close();
+});
 test('pantry reminders can be saved, used to find recipes, reloaded and cleared',()=>{
  const a=app();a.route('pantry');a.click('[data-act="pantry-add"]');a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');
  const today=a.w.PlatesCore.today();a.set('#pantry-use-soon',today);a.submit('#pantry-form');

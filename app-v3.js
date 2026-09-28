@@ -559,7 +559,7 @@
         C.sideIngredients(p.side, p.servings).some((i) =>
           state.prefs.exclusions.includes(i.id),
         );
-    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored ? `<p class="helper">${p.side === "none" ? "No additional side" : e(p.side) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
+    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored || p.side !== "none" ? `<p class="helper">${p.side === "none" ? "No additional side" : e(p.side) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
   }
   function planPage() {
     const pending = state.plans
@@ -578,7 +578,7 @@
         "Fresh meals, batch cooking and prepared portions in one place.",
         "YOUR PLAN",
       ) +
-      `<div class="action-wrap page-actions"><a class="button" href="#choose">Add a meal</a><a class="button secondary" href="#batch">Plan a batch</a>${btn("Use stored portions", "show-prepared")}</div>${batches.length ? `<h2 class="section-title section-space">Batch cooking days</h2>${batches.map(batchCard).join("")}` : ""}${
+      `<div class="action-wrap page-actions"><a class="button" href="#choose">Add a meal</a><a class="button secondary" href="#batch">Plan a batch</a>${btn("Use stored portions", "show-prepared")}${btn("Saved menus" + (state.menus.length ? " (" + state.menus.length + ")" : ""), "menus")}</div>${batches.length ? `<h2 class="section-title section-space">Batch cooking days</h2>${batches.map(batchCard).join("")}` : ""}${
         pending.length
           ? pending
               .map((p) => {
@@ -596,6 +596,76 @@
             )
       }${done.length ? `<details class="details-box"><summary>Finished meals (${done.length})</summary>${done.map(planCard).join("")}</details>` : ""}`
     );
+  }
+  function menuRows(entries, start) {
+    return entries
+      .map(
+        (p) =>
+          `<li><strong>${e(recipe(p.recipeId).name)}</strong><br>${e(day(p.date || C.addDays(start, p.day)))} · ${e(p.meal)} · ${p.servings} portions${p.side !== "none" ? " · with " + e(p.side) : ""}</li>`,
+      )
+      .join("");
+  }
+  function menusModal() {
+    modal(
+      "Saved menus",
+      `<p class="helper">Save a meal week, then copy its recipes to new dates. Existing meals and pantry stock stay in place.</p>${btn("Save a meal week", "menu-save", "", "")}<div class="stack section-space">${state.menus.map((m) => `<section class="panel"><h3>${e(m.name)}</h3><p>${m.entries.length} meal slot${m.entries.length === 1 ? "" : "s"}</p><div class="action-wrap">${btn("Use menu", "menu-use", m.id)}${btn("Delete menu", "menu-delete", m.id, "ghost")}</div></section>`).join("") || '<p class="helper">Plan some meals, then save a week you would like to repeat.</p>'}</div>`,
+    );
+  }
+  function saveMenuModal() {
+    modal(
+      "Save a meal week",
+      `<form id="menu-save-form">${field("Menu name", "menu-name", '<input id="menu-name" maxlength="60" placeholder="e.g. Five work lunches" required>')}${field("First day of week", "menu-start", '<input id="menu-start" type="date" value="' + e(state.filters.date) + '" required>')}${field("Meals to include", "menu-meal", select("menu-meal", [["all", "All meals"], ...C.meals.map((m) => [m, m])], "all"))}<p class="helper">Includes planned and finished meal slots over seven days. Stored meals are saved as fresh recipes with their sides. Batch cooking records and stock reservations are not copied.</p><ul id="menu-preview" class="menu-preview" aria-live="polite"></ul><button class="button wide" type="submit">Save menu</button></form>`,
+    );
+    const preview = () => {
+      try {
+        const entries = C.menuEntries(
+          state,
+          document.getElementById("menu-start").value,
+          document.getElementById("menu-meal").value,
+        );
+        document.getElementById("menu-preview").innerHTML =
+          menuRows(entries, document.getElementById("menu-start").value) ||
+          "<li>No meals in this selection.</li>";
+      } catch (err) {
+        document.getElementById("menu-preview").textContent = err.message;
+      }
+    };
+    document
+      .getElementById("menu-save-form")
+      .addEventListener("change", preview);
+    preview();
+  }
+  function useMenuModal(id) {
+    const m = state.menus.find((m) => m.id === id);
+    if (!m) return;
+    modal(
+      "Use " + e(m.name),
+      `<form id="menu-use-form" data-id="${e(id)}">${field("New first day", "menu-new-start", '<input id="menu-new-start" type="date" value="' + C.addDays(C.today(), 7) + '" required>')}<label class="check-label"><input id="menu-adjust" type="checkbox">Change people per meal</label><div id="menu-people-controls" hidden>${field("People per meal", "menu-people", numInput("menu-people", state.filters.servings, 1, 12))}</div><p class="helper">Unchecked keeps saved portions. Whole bakes always keep their saved yield. Copies start uncooked; stored meals become fresh recipes. Existing meal slots must be empty.</p><ul id="menu-preview" class="menu-preview" aria-live="polite"></ul><button class="button wide" id="menu-apply" type="submit">Copy meals to plan</button></form>`,
+    );
+    const preview = () => {
+      document.getElementById("menu-people-controls").hidden =
+        !document.getElementById("menu-adjust").checked;
+      try {
+        const plans = C.previewMenu(
+          state,
+          id,
+          document.getElementById("menu-new-start").value,
+          document.getElementById("menu-adjust").checked
+            ? +document.getElementById("menu-people").value
+            : null,
+          R,
+        );
+        document.getElementById("menu-preview").innerHTML = menuRows(plans);
+        document.getElementById("menu-apply").disabled = false;
+      } catch (err) {
+        document.getElementById("menu-preview").textContent = err.message;
+        document.getElementById("menu-apply").disabled = true;
+      }
+    };
+    document
+      .getElementById("menu-use-form")
+      .addEventListener("change", preview);
+    preview();
   }
   function shopSelector() {
     return `<section class="panel shop-controls"><div class="form-grid two">${field(
@@ -886,6 +956,15 @@
                 .join("") || `<p class="helper">No fresh side planned.</p>`
             }<details class="details-box"><summary>Already prepared ingredients — reference only</summary><p class="helper">These ingredients were counted when the batch was cooked. Do not buy or deduct them again.</p><div id="recipe-amounts">${ingredientList(r, n)}</div></details>`
           : `<div id="recipe-amounts">${ingredientList(r, n)}</div>`
+      }${
+        context && !context.stored && context.side !== "none"
+          ? `<h3>Fresh side</h3>${C.sideIngredients(context.side, n)
+              .map(
+                (i) =>
+                  `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
+              )
+              .join("")}`
+          : ""
       }${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${context ? btn("Close recipe", "close", "", "") : btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
     );
     document
@@ -1260,6 +1339,34 @@
     }
     if (act === "lot-correct" || act === "lot-discard-some") {
       lotCorrectionModal(id, act === "lot-discard-some");
+      return;
+    }
+    if (act === "menus") {
+      menusModal();
+      return;
+    }
+    if (act === "menu-save") {
+      saveMenuModal();
+      return;
+    }
+    if (act === "menu-use") {
+      useMenuModal(id);
+      return;
+    }
+    if (act === "menu-delete") {
+      confirmAction(
+        "Delete saved menu",
+        "Delete this reusable menu? Meals already copied to your plan stay in place.",
+        "Delete menu",
+        () => {
+          if (
+            change(() => {
+              state.menus = state.menus.filter((m) => m.id !== id);
+            }, "Menu deleted.")
+          )
+            menusModal();
+        },
+      );
       return;
     }
     if (act === "close") {
@@ -1746,6 +1853,26 @@
     const ok = change(
       () => {
         switch (form.id) {
+          case "menu-save-form":
+            C.saveMenu(
+              state,
+              value("menu-name").trim(),
+              value("menu-start"),
+              value("menu-meal"),
+              R,
+            );
+            break;
+          case "menu-use-form":
+            C.applyMenu(
+              state,
+              id,
+              value("menu-new-start"),
+              document.getElementById("menu-adjust").checked
+                ? n("menu-people")
+                : null,
+              R,
+            );
+            break;
           case "lot-correction-form":
             C.correctLot(state, id, n("lot-count"), value("lot-cooked-at"));
             break;
@@ -1934,7 +2061,9 @@
     if (ok) {
       close();
       if (form.id === "finish-batch-form") go("pantry");
-      if (form.id === "lot-plan-form") go("plan");
+      if (form.id === "lot-plan-form" || form.id === "menu-use-form")
+        go("plan");
+      if (form.id === "menu-save-form") menusModal();
     }
   });
   window.addEventListener("hashchange", () => {

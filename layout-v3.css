@@ -1045,6 +1045,10 @@
 #pantry-search-form { margin-bottom: 16px; }
 
 .three-v3 .use-soon-panel { margin: 16px 0; }
+.three-v3 .menu-preview { padding-left: 20px; overflow-wrap: anywhere; }
+.three-v3 .menu-preview li { margin: 12px 0; }
+.three-v3 #menu-save-form > .field,
+.three-v3 #menu-use-form > .field { margin-bottom: 16px; }
 .three-v3 .use-soon-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
 .three-v3 .use-soon-row > div { flex: 1 1 140px; min-width: 0; overflow-wrap: anywhere; }
 .three-v3 .use-soon-row small { display: block; color: var(--muted); }

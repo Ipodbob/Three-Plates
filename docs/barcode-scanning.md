@@ -38,13 +38,13 @@ The owner authorized deployment on 28 September 2026. The live endpoint is `http
 
 Live checks verified a UPCitemdb product response, correct CORS, invalid barcode rejection (400), disallowed origin rejection (403), and the persistent cooldown (429). The local pantry UI also retrieved test barcode `4002293401102` through UPCitemdb after Open Food Facts missed it. This is a kitchen-tool test product, not food; no stock or remembered match was saved. The Worker uses manual redirect handling because the Cloudflare runtime does not support `redirect: "error"`; redirects are rejected as upstream failures.
 
-The relay backend is live. The frontend configuration is in the feature PR; GitHub Pages integration remains unverified until that frontend is released.
+The relay and frontend are live. The v3.7.2 Pages run 36494047521 succeeded and all 16 public assets matched the released code.
 
 ## Validation and remaining device checks
 
 Automated tests cover barcode checksums, the actual bundled decoder against a generated EAN-13 image, product parsing, mass/volume separation, additive stock, backup preservation, local matches, provider failures/cooldowns, cancellation, escaped product names, barcode-photo handling, camera denial and late permission grants. Relay tests cover origin/route validation, quotas and minimal responses. The full existing regression suite remains part of `npm test`.
 
-Local real-browser testing checked an Open Food Facts lookup, product confirmation and responsive controls. No pantry stock was added during that browser smoke test. **Physical iPhone 17 Pro Max camera/Safari and Android camera testing remain unverified**; desktop emulation cannot establish autofocus, capture-picker behaviour or camera permission behaviour on those phones. The GitHub Pages deployment of this feature also remains unverified until the PR is merged and the live assets checked.
+Local real-browser testing checked an Open Food Facts lookup, product confirmation and responsive controls. No pantry stock was added during that browser smoke test. **Physical iPhone 17 Pro Max camera/Safari and Android camera testing remain unverified**; desktop emulation cannot establish autofocus, capture-picker behaviour or camera permission behaviour on those phones. The redesigned frontend was released; physical-device verification remains separate.
 
 The local vendor bundle comes from `@zxing/browser@0.2.1` with its dependency decoder; package-lock pins the dependency tree. MIT/Apache license files are retained in `vendor/`; only the unavailable source-map reference was removed from the minified file.
 

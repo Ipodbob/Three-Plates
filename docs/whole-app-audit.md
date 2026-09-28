@@ -3,12 +3,12 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main bef323f (PR #4): Pages run 36492957596 succeeded, all 16 checked public assets matched v3.7.1, and the live Pantry displayed v3.7.1. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main ee3a43b (PR #3): Pages run 36494047521 succeeded, all 16 checked public assets matched v3.7.2, and the live Pantry displayed v3.7.2. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
 - Recipe views opened from Plan and Batch use the selected record's portions, not the Choose filters. Stored meal views show fresh-side amounts separately, with already-cooked ingredients collapsed as reference. Prepared lot views show the original cooked batch quantities. Contextual views do not offer an accidental duplicate planning action.
-- The scanner and consistency changes below are now in the verified v3.7.0 release. Branch feat/pantry-use-soon adds optional ingredient reminder dates, due-soon ordering and ingredient-search actions; it is not yet deployed.
+- The scanner and consistency changes below are now in the verified v3.7.0 release. Optional ingredient reminder dates, due-soon ordering and ingredient-search actions are deployed in v3.7.2.
 - Reminders survive validated migration, barcode additions, stock corrections and purchases. Linking combines dates conservatively; full consumption clears the reminder. Existing v1/v3 entries need no dates.
 - Camera opens immediately; compact product confirmation, partial-pack slider, consecutive saves and remaining-stock correction.
 - Explicit product-to-recipe linking combines stock and remaps remembered full-pack quantities. Editing cannot silently overwrite another ingredient.
@@ -17,7 +17,11 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - All app changes require persistence. Failed writes roll back; restore detects intervening saved-data changes; failed reset attempts to restore removed keys.
 - Existing IDs, v3 backups, measured-unit separation, purchase history and three-choice workflow are retained.
 
+- Branch feat/reusable-menus adds saved seven-day meal menus, optional headcount changes and atomic conflict/preferences checks. Stored slots become fresh recipes with sides, without copying reservations or changing stock. Old backups remain valid. This feature is pending release verification.
+
 ## Verification evidence
+- Menu suite: 140 total checks pass. Domain tests cover five stored lunches copied as fresh meals, unchanged reservations, side shopping and once-only deduction, backup validation, conflicts and baking yields. Connected UI verifies save/copy/reload/delete. At 320 px, the real browser saved a menu, rejected an occupied date, copied two portions as three into a new week and retained both after reload.
+
 - Real browser: ten-portion variety planning proposed six portions of bolognese and four of dhal. Both batches were recorded cooked; bolognese split into two fridge and four freezer portions, dhal into four freezer portions. Booking two fridge portions with pasta left only 180 g pasta on Shopping after both batches were cooked.
 - Real browser: booking and partially defrosting two freezer portions left the other two frozen. Both meals were marked eaten. A 500 g pasta purchase minus the 180 g side left 320 g after reload. Temporary active test stock was removed/discarded; the original six prepared portions remained. Test history records remain locally.
 - This workflow exposed a save-reload failure: a whole-second defrost completion could precede its millisecond start within the same second. Regression and browser recovery are verified. The isolated data fix was merged and verified live as PR #4. It does not require resetting or replacing saved data. Full release suite: 125 passed. Full feature-branch suite: 133 passed.
@@ -34,8 +38,8 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Inspect remaining dialogs and alternate states: keyboard/focus, labels, touch targets, overflow, navigation clearance and long product names.
 - Finish real-browser ordinary fresh-meal and correction checks. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
-- Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients.
-- Continue the handover's Phase 2 direction: richer sides, cooking aids, reusable weeks and prep checklists. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. Browser examples needing review: Air Fryer Radishes offered as a Dinner main; Microwave macaroni cheese labelled Hob.
+- Continue the handover's Phase 2 direction: richer sides, cooking aids and prep checklists. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate

@@ -412,6 +412,7 @@
         else {
           const r = recipes.find((r) => r.id === p.recipeId);
           if (r) add(scaled(r, p.servings));
+          add(sideIngredients(p.side, p.servings));
         }
       }
     for (const b of s.batches)
@@ -642,6 +643,7 @@
           p.servings,
         ),
       );
+      deduct(s, sideIngredients(p.side, p.servings));
     }
     p.cooked = true;
   }
