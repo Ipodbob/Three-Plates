@@ -1,4 +1,17 @@
 /* v3 layout: keep the existing palette and make room for batch planning. */
+.three-v3 .recipe-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+.three-v3 .recipe-tags span {
+  background: var(--green-soft);
+  color: var(--green);
+  padding: 4px 8px;
+  border-radius: 7px;
+  font-size: 11px;
+}
 .three-v3 .recipe-rating {
   margin: 10px 0;
   font-size: 13px;

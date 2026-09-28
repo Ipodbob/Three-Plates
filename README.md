@@ -17,8 +17,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 61 checks: 31 core regressions, 11 added domain checks,
-5 catalogue checks and 14 DOM interaction checks. jsdom is test-only; it does not validate rendering
+`npm test` runs 67 checks: 31 core regressions, 11 added domain checks,
+9 catalogue checks and 16 DOM interaction checks. jsdom is test-only; it does not validate rendering
 or replace real browser checks. No development dependency is loaded by the app.
 
 ## Phase 1
@@ -63,7 +63,19 @@ overwriting another tab. Export/restore is available in Settings.
 
 ## Rated recipe catalogue
 
-The catalogue adds 40 distinct Good Food recipes, each with a visible publisher
+The expanded library now contains **72 linked recipes from seven publishers**,
+plus the 45 preserved original examples. The latest 32 additions broaden the
+selection to traybakes, meal-prep bowls, soups, international dishes and baking.
+Ratings are one selection signal rather than a strict admission gate; each new
+entry records its reason for inclusion. See [coverage, sources and mapping notes](docs/collection-expansion.md).
+
+**Dessert** and **Baking** are separate meal choices with planning and shopping
+support. Cakes, breads and pastries default to the full recipe yield; their saved
+plans allow up to 48 pieces/portions. Standard meals keep existing headcounts.
+Search supports dish style, publisher and effort (for example `traybake`, `pastry`,
+`soup`, `simple` or `complex`). Source batch recipes can also be planned fresh.
+
+The first expansion added 40 distinct Good Food recipes, each with a visible publisher
 rating of at least 4.5/5 from at least 50 ratings, checked on 28 September 2026.
 Four use an air fryer and 13 are available in Batch cook. These are selected
 recipes, not a claim to rank the entire web. See [the source register](docs/recipe-sources.md).
@@ -118,8 +130,8 @@ version live. The existing live baseline was inspected; Pages configuration is u
 ## Backlog
 
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
-- Original 400-recipe target: this update adds 40 verified rated source links.
-  Continue deduplicated sourcing with the same rating threshold; expand publisher
+- Original 400-recipe target: there are now 72 checked source links.
+  Continue deduplicated sourcing using the revised quality/coverage policy; expand publisher
   coverage and verify licensing before hosting full cooking methods or photographs.
 - Phase 2: use-soon dates, richer side recipes, cooking mode/timers/screen wake,
   reusable weeks and combined prep checklists.

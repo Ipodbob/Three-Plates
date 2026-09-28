@@ -157,6 +157,10 @@
     })[r.method] || "";
   const prepLabel = (r) =>
     r.prep === null ? "Prep time not listed" : `${r.prep} min prep`;
+  const recipeTags = (r) =>
+    r.tags?.length
+      ? `<p class="recipe-tags">${r.tags.map((tag) => `<span>${e(tag.replaceAll("-", " "))}</span>`).join("")}<span title="Three Plates effort estimate">${e(r.effort === "project" ? "More involved" : r.effort === "simple" ? "Simple" : "Some preparation")}</span></p>`
+      : "";
   function recipeSource(r, full = false) {
     if (!r.source)
       return '<p class="recipe-rating helper">Original example · not rated</p>';
@@ -168,7 +172,11 @@
       return "";
     }
     if (url.protocol !== "https:") return "";
-    return `<div class="recipe-rating"><a href="${e(url.href)}" target="_blank" rel="noopener noreferrer">★ ${s.rating.toFixed(1)}/5 · ${s.ratingCount.toLocaleString()} ratings · ${e(s.publisher)}</a>${full ? `<p class="helper">By ${e(s.author)}. Rating checked ${e(s.retrievedOn)}; ratings can change. Publisher yield: ${e(s.yield)}.</p><p>${e(r.planningNotes)}</p><p class="helper">These are planning quantities; count-to-weight and spoon estimates are stated above. Compare with the publisher’s ingredients before shopping. Counted chicken pieces and weighed chicken are separate pantry entries.</p>` : ""}</div>`;
+    const rating =
+      Number.isFinite(s.rating) && Number.isFinite(s.ratingCount)
+        ? `★ ${Number(s.rating.toFixed(2))}/5 · ${s.ratingCount.toLocaleString()} ${e(s.countLabel || "ratings")}`
+        : "Editorial selection · no published rating";
+    return `<div class="recipe-rating"><a href="${e(url.href)}" target="_blank" rel="noopener noreferrer">${rating} · ${e(s.publisher)}</a>${full ? `<p class="helper">By ${e(s.author)}. Source checked ${e(s.retrievedOn)}; ratings can change. Publisher yield: ${e(s.yield)}.</p>${s.selectionReason ? `<p class="helper">${e(s.selectionReason)} ${e(r.effortBasis || "")}</p>` : ""}<p>${e(r.planningNotes)}</p>${r.timingNote ? `<p class="helper">${e(r.timingNote)}</p>` : ""}<p class="helper">These are planning quantities; count-to-weight and spoon estimates are stated above. Compare with the publisher’s ingredients before shopping. ${r.ingredients.some((i) => ["chicken-breast-count", "chicken-thigh-count", "chicken-thigh-bone"].includes(i.id)) ? "Counted chicken pieces and weighed chicken are separate pantry entries." : ""}</p>` : ""}</div>`;
   }
   const opts = (values, value) =>
     values
@@ -293,7 +301,9 @@
   function pool(batch) {
     const f = currentFilters(batch);
     return R.filter(
-      (r) => !!r.batch === batch && C.matching(r, f, state, R, ingredients()),
+      (r) =>
+        (batch ? !!r.batch : !r.batch || !!r.source) &&
+        C.matching(r, f, state, R, ingredients()),
     );
   }
   function coverage(r, n) {
@@ -379,15 +389,15 @@
   }
   function searchBox(batch) {
     const f = currentFilters(batch);
-    return `<form id="search-form" class="recipe-search" data-batch="${batch}"><label class="sr-only" for="recipe-search">Search recipes or ingredients</label><input id="recipe-search" type="search" maxlength="100" placeholder="Search recipes or ingredients" value="${e(f.query)}"><button class="icon-btn" aria-label="Search recipes" type="submit">${icon("search")}</button>${f.query ? btn("Clear", "clear-search", "", "ghost") : ""}</form>`;
+    return `<form id="search-form" class="recipe-search" data-batch="${batch}"><label class="sr-only" for="recipe-search">Search recipes or ingredients</label><input id="recipe-search" type="search" maxlength="100" placeholder="Search dishes, ingredients or styles" aria-describedby="search-help" value="${e(f.query)}"><button class="icon-btn" aria-label="Search recipes" type="submit">${icon("search")}</button>${f.query ? btn("Clear", "clear-search", "", "ghost") : ""}</form><p id="search-help" class="helper">Try traybake, soup, pastry, savoury, simple or complex. Your meal, time and food filters still apply.</p>${["Baking", "Dessert"].includes(f.meal) ? '<p class="helper">Cakes, breads and other bakes start at the full recipe yield, regardless of headcount. You can adjust the quantity in the recipe.</p>' : ""}`;
   }
   function card(r, batch) {
     const key = batch ? "batch" : "choose",
       f = currentFilters(batch),
-      cv = coverage(r, f.servings),
+      cv = coverage(r, r.baking ? r.base : f.servings),
       liked = state.prefs.favourites.includes(r.id),
       kept = locked[key].includes(r.id);
-    return `<article class="meal-card"><div class="card-art"><span class="food-emoji" aria-hidden="true">${r.emoji}</span><span class="pick-label">${batch ? "BATCH COOKING" : e(r.cuisine)}</span><button class="icon-btn heart-btn ${liked ? "active" : ""}" data-act="favourite" data-id="${r.id}" aria-label="${liked ? "Unsave" : "Save"} ${e(r.name)}" aria-pressed="${liked}">${icon("heart")}</button></div><div class="card-body"><div class="card-kicker">${batch ? (r.batch.type === "base" ? "Base dish · choose a side later" : r.batch.type === "uncooked" ? "Prepared ahead · still needs cooking" : "Complete meal") : e(r.vegetarianSuitable === false ? "Contains animal-rennet cheese" : r.kind === "meat" ? "Meat" : r.kind === "fish" ? "Fish" : r.kind === "vegan" ? "Plant-based" : "Vegetarian")}</div><h3>${e(r.name)}</h3><p class="description">${e(r.source ? `By ${r.source.author}` : r.description)}</p>${recipeSource(r)}<div class="meta-row"><span>${icon("clock")}${duration(r.total)} total</span><span>${prepLabel(r)}</span><span>${e(method(r))}</span></div>${batch ? `<p class="batch-tag">Freezer suitability not verified${r.source ? "" : " · example recipe"}</p>` : `<div class="pantry-match"><span><strong>${cv.yes} / ${cv.total}</strong> ingredients covered</span><span>For ${f.servings}</span></div>`}<div class="card-actions">${btn("View recipe", "recipe", r.id)}${btn(batch ? "Plan batch" : "Add to plan", batch ? "batch-add" : "plan-add", r.id, "")}</div><div class="card-bottom"><button class="keep-btn ${kept ? "active" : ""}" data-act="keep" data-id="${r.id}" aria-pressed="${kept}">${icon("pin")}${kept ? "Kept" : "Keep this idea"}</button><button class="text-btn" data-act="hide" data-id="${r.id}">Not for me</button></div></div></article>`;
+    return `<article class="meal-card"><div class="card-art"><span class="food-emoji" aria-hidden="true">${r.emoji}</span><span class="pick-label">${batch ? "BATCH COOKING" : e(r.cuisine)}</span><button class="icon-btn heart-btn ${liked ? "active" : ""}" data-act="favourite" data-id="${r.id}" aria-label="${liked ? "Unsave" : "Save"} ${e(r.name)}" aria-pressed="${liked}">${icon("heart")}</button></div><div class="card-body"><div class="card-kicker">${batch ? (r.batch.type === "base" ? "Base dish · choose a side later" : r.batch.type === "uncooked" ? "Prepared ahead · still needs cooking" : "Complete meal") : e(r.vegetarianSuitable === false ? "Contains animal-rennet cheese" : r.kind === "meat" ? "Meat" : r.kind === "fish" ? "Fish" : r.kind === "vegan" ? "Plant-based" : "Vegetarian")}</div><h3>${e(r.name)}</h3><p class="description">${e(r.source ? `By ${r.source.author}` : r.description)}</p>${recipeSource(r)}${recipeTags(r)}${!batch && r.batch?.type === "base" ? '<p class="helper">Sauce / base only · plan a side separately</p>' : ""}<div class="meta-row"><span>${icon("clock")}${duration(r.total)} total</span><span>${prepLabel(r)}</span><span>${e(method(r))}</span></div>${batch ? `<p class="batch-tag">Freezer suitability not verified${r.source ? "" : " · example recipe"}</p>` : `<div class="pantry-match"><span><strong>${cv.yes} / ${cv.total}</strong> ingredients covered</span><span>${r.baking ? `Full bake · ${r.base} pieces/portions` : `For ${f.servings}`}</span></div>`}<div class="card-actions">${btn("View recipe", "recipe", r.id)}${btn(batch ? "Plan batch" : r.baking ? "Plan full bake" : "Add to plan", batch ? "batch-add" : "plan-add", r.id, "")}</div><div class="card-bottom"><button class="keep-btn ${kept ? "active" : ""}" data-act="keep" data-id="${r.id}" aria-pressed="${kept}">${icon("pin")}${kept ? "Kept" : "Keep this idea"}</button><button class="text-btn" data-act="hide" data-id="${r.id}">Not for me</button></div></div></article>`;
   }
   function results(batch) {
     const f = currentFilters(batch),
@@ -804,7 +814,7 @@
         )
         .join(
           "",
-        )}</div></section></div><div class="stack"><section class="panel"><h2 class="section-title">Saved & hidden recipes</h2><details class="details-box"><summary>Favourite recipes (${state.prefs.favourites.length})</summary>${state.prefs.favourites.map((id) => `<div class="favourite-row">${btn(e(recipe(id).name), "recipe", id, "ghost")}${btn("Unsave", "favourite", id, "ghost")}</div>`).join("") || '<p class="helper">Tap a recipe heart to save it.</p>'}</details><details class="details-box"><summary>Hidden recipes (${state.prefs.hidden.length})</summary>${state.prefs.hidden.map((id) => `<div class="favourite-row"><span>${e(recipe(id).name)}</span>${btn("Restore", "unhide", id, "ghost")}</div>`).join("") || '<p class="helper">Refreshing choices never hides a recipe permanently.</p>'}</details></section><section class="panel"><h2 class="section-title">Back up your data</h2><p class="helper">Pantry, batches, portions, shopping and preferences stay in this browser. Clearing browser data removes them. Export a backup regularly; there is no account or cloud sync.</p><div class="action-wrap">${btn("Export backup", "export")}${btn("Restore backup", "import")}</div><input type="file" id="backup-file" accept="application/json,.json" hidden><p class="helper">Version 1 backups are supported. The original v1 browser data is left untouched during upgrade.</p></section><section class="panel"><h2 class="section-title">About this version</h2><p class="helper">v3 · Batch planning, portion tracking, pack estimates and recipe search. 40 linked publisher recipes meet our selection threshold of 4.5/5 from at least 50 ratings, checked 28 September 2026. Original examples remain available and are marked unrated. Publisher methods open on their website; planning estimates are labelled. Timings are estimates. Scaling portions does not scale cooking time or guarantee appliance capacity.</p><details class="details-box"><summary>Storage guidance</summary>${storageGuide()}</details><button class="text-btn" data-act="reset">Delete all local app data</button></section></div></div>`
+        )}</div></section></div><div class="stack"><section class="panel"><h2 class="section-title">Saved & hidden recipes</h2><details class="details-box"><summary>Favourite recipes (${state.prefs.favourites.length})</summary>${state.prefs.favourites.map((id) => `<div class="favourite-row">${btn(e(recipe(id).name), "recipe", id, "ghost")}${btn("Unsave", "favourite", id, "ghost")}</div>`).join("") || '<p class="helper">Tap a recipe heart to save it.</p>'}</details><details class="details-box"><summary>Hidden recipes (${state.prefs.hidden.length})</summary>${state.prefs.hidden.map((id) => `<div class="favourite-row"><span>${e(recipe(id).name)}</span>${btn("Restore", "unhide", id, "ghost")}</div>`).join("") || '<p class="helper">Refreshing choices never hides a recipe permanently.</p>'}</details></section><section class="panel"><h2 class="section-title">Back up your data</h2><p class="helper">Pantry, batches, portions, shopping and preferences stay in this browser. Clearing browser data removes them. Export a backup regularly; there is no account or cloud sync.</p><div class="action-wrap">${btn("Export backup", "export")}${btn("Restore backup", "import")}</div><input type="file" id="backup-file" accept="application/json,.json" hidden><p class="helper">Version 1 backups are supported. The original v1 browser data is left untouched during upgrade.</p></section><section class="panel"><h2 class="section-title">About this version</h2><p class="helper">v3 · Batch planning, portion tracking, pack estimates and recipe search. 72 linked publisher recipes cover everyday meals, meal prep, desserts and baking. Selection considers technique, variety, clear quantities and publisher evidence alongside ratings, checked 28 September 2026. Original examples remain available and are marked unrated. Publisher methods open on their website; planning estimates are labelled. Timings are estimates. Scaling portions does not scale cooking time or guarantee appliance capacity.</p><details class="details-box"><summary>Storage guidance</summary>${storageGuide()}</details><button class="text-btn" data-act="reset">Delete all local app data</button></section></div></div>`
     );
   }
   function close() {
@@ -818,18 +828,22 @@
   function recipeModal(id) {
     const r = recipe(id);
     if (!r) return;
-    const n = r.batch
+    const asBatch = !!r.batch && (!r.source || route === "batch");
+    const portionLimit = asBatch || r.baking ? 48 : 12;
+    const n = asBatch
       ? Math.min(48, state.batchFilters.people * state.batchFilters.days)
-      : state.filters.servings;
+      : r.baking
+        ? r.base
+        : state.filters.servings;
     modal(
       e(r.name),
-      `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} total (base recipe)</p>${r.batch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}<label class="label" for="recipe-portions">Ingredient portions</label>${numInput("recipe-portions", n, 1, r.batch ? 48 : 12)}<div id="recipe-amounts">${ingredientList(r, n)}</div>${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${btn(r.batch ? "Plan batch" : "Add to plan", r.batch ? "batch-add" : "plan-add", r.id, "")}`,
+      `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} total (base recipe)</p>${asBatch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}${recipeTags(r)}${r.baking ? `<p class="helper">Full recipe makes ${r.base} pieces/portions. Baking starts at the full recipe yield; changing quantities may require different tins and baking times.</p>` : ""}<label class="label" for="recipe-portions">${r.baking ? "Pieces / portions to bake" : "Ingredient portions"}</label>${numInput("recipe-portions", n, 1, portionLimit)}<div id="recipe-amounts">${ingredientList(r, n)}</div>${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
     );
     document
       .getElementById("recipe-portions")
       .addEventListener("change", (ev) => {
         const n = +ev.target.value;
-        if (C.integer(n, 1, r.batch ? 48 : 12))
+        if (C.integer(n, 1, portionLimit))
           document.getElementById("recipe-amounts").innerHTML = ingredientList(
             r,
             n,
@@ -889,7 +903,7 @@
       per = Math.min(f.people, free);
     modal(
       "Plan stored portions",
-      `<h3>${e(r.name)}</h3><p>${free} unallocated portions · ${e(l.location)}</p><form id="lot-plan-form" data-id="${id}"><div class="form-grid two">${field("First day", "lot-date", `<input id="lot-date" type="date" min="${C.today()}" value="${C.today()}" required>`)}${field("Meal", "lot-meal", select("lot-meal", ["Breakfast", "Lunch", "Dinner"], f.meal))}${field("Serving time", "lot-time", `<input id="lot-time" type="time" value="${C.mealTimes[f.meal]}" required>`)}${field("Portions per meal", "lot-servings", numInput("lot-servings", per, 1, Math.min(12, free)))}${field("Consecutive days", "lot-days", numInput("lot-days", 1, 1, Math.min(7, Math.floor(free / per))))}${field(
+      `<h3>${e(r.name)}</h3><p>${free} unallocated portions · ${e(l.location)}</p><form id="lot-plan-form" data-id="${id}"><div class="form-grid two">${field("First day", "lot-date", `<input id="lot-date" type="date" min="${C.today()}" value="${C.today()}" required>`)}${field("Meal", "lot-meal", select("lot-meal", C.meals, f.meal))}${field("Serving time", "lot-time", `<input id="lot-time" type="time" value="${C.mealTimes[f.meal]}" required>`)}${field("Portions per meal", "lot-servings", numInput("lot-servings", per, 1, Math.min(12, free)))}${field("Consecutive days", "lot-days", numInput("lot-days", 1, 1, Math.min(7, Math.floor(free / per))))}${field(
         "Additional side",
         "lot-side",
         select(
@@ -958,8 +972,14 @@
       f = { ...state.filters };
     const modalPortions =
       sheet.open && document.getElementById("recipe-portions");
-    if (modalPortions && C.integer(+modalPortions.value, 1, 12))
+    if (r.baking) f.servings = r.base;
+    if (modalPortions) {
+      if (!C.integer(+modalPortions.value, 1, r.baking ? 48 : 12)) {
+        toast(`Choose 1–${r.baking ? 48 : 12} whole portions.`);
+        return;
+      }
       f.servings = +modalPortions.value;
+    }
     if (!C.permitted(r, state.prefs) || !r.meals.includes(f.meal)) {
       toast("This recipe conflicts with your meal slot or preferences.");
       return;
@@ -1085,7 +1105,7 @@
       return;
     }
     if (act === "meal-step") {
-      const meals = ["Breakfast", "Lunch", "Dinner"];
+      const meals = C.meals;
       change(
         () => {
           const filters = batch ? state.batchFilters : state.filters;
@@ -1217,11 +1237,13 @@
     }
     if (act === "plan-edit") {
       const p = state.plans.find((p) => p.id === id),
-        n = prompt("People eating this meal (1–12)", String(p.servings));
+        max = recipe(p.recipeId)?.baking ? 48 : 12,
+        n = prompt(`Portions to make (1–${max})`, String(p.servings));
       if (n !== null)
         change(
           () => {
-            if (!C.integer(+n, 1, 12)) throw Error("Choose 1–12 people.");
+            if (!C.integer(+n, 1, max))
+              throw Error(`Choose 1–${max} portions.`);
             p.servings = +n;
           },
           "Portions updated.",

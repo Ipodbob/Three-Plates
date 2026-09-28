@@ -1,6 +1,6 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-require('../recipes.js');require('../batch-v3.js');require('../recipes-rated.js');require('../core-v3.js');
+require('../recipes.js');require('../batch-v3.js');require('../recipes-rated.js');require('../recipes-diverse.js');require('../core-v3.js');
 const C=require('../phase1.js'),R=PLATES_DATA.recipes,I=PLATES_DATA.ingredients;
 const now=Date.parse('2026-09-28T10:00:00Z'),at=new Date(now-60000).toISOString();
 function batch(s,id,n,recipeId='prep-chilli'){s.batches.push({id,recipeId,servings:n,date:'2026-09-28',cooked:false});}

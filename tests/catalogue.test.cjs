@@ -2,8 +2,28 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 require('../recipes.js');require('../batch-v3.js');
 const original=JSON.stringify(PLATES_DATA);
-require('../recipes-rated.js');require('../core-v3.js');
-const C=require('../phase1.js'),R=PLATES_DATA.recipes,I=PLATES_DATA.ingredients,rated=R.filter(r=>r.source);
+require('../recipes-rated.js');require('../recipes-diverse.js');require('../core-v3.js');
+const C=require('../phase1.js'),R=PLATES_DATA.recipes,I=PLATES_DATA.ingredients,rated=R.filter(r=>r.id.startsWith("gf-"));
+const diverse=R.filter(r=>r.id.startsWith('curated-'));
+test('diverse catalogue has checked provenance and coverage across publishers and baking styles',()=>{
+ assert.equal(diverse.length,32);assert.equal(new Set(diverse.map(r=>r.source.publisher)).size,7);assert.equal(new Set(R.map(r=>r.id)).size,R.length);assert.equal(new Set(R.filter(r=>r.source).map(r=>r.source.url)).size,72);
+ for(const r of diverse){assert.ok(r.source.selectionReason);assert.ok(r.source.rating>0&&r.source.rating<=5);assert.ok(r.source.ratingCount>0);assert.ok(['simple','moderate','project'].includes(r.effort));assert.ok(r.total>0&&Number.isFinite(r.total));assert.ok(r.prep===null||r.prep<=r.total);assert.ok(r.meals.every(m=>C.meals.includes(m)));assert.ok(r.base<=48);assert.equal(new Set(r.ingredients.map(i=>i.id)).size,r.ingredients.length);for(const i of r.ingredients){assert.ok(I[i.id],i.id);assert.ok(i.qty>0);}}
+ for(const tag of ['traybake','soup','pastry','cake','bread','cookies','pie','meal-prep'])assert.ok(diverse.some(r=>r.tags.includes(tag)),tag);
+ assert.equal(diverse.filter(r=>r.meals.includes('Dessert')).length,11);assert.equal(diverse.filter(r=>r.baking).length,15);
+});
+test('styles, effort and publisher searches respect normal dietary and time filters',()=>{
+ const s=C.defaults(),r=diverse.find(r=>r.id==='curated-sallysbakingaddiction-homemade-croissants');const f={...s.filters,meal:'Baking',time:'any',method:'any'};
+ for(const query of ['pastries','complex','French','Sally'])assert.ok(C.matching(r,{...f,query},s,R,I),query);
+ assert.equal(C.matching(r,{...f,time:'30'},s,R,I),false);s.prefs.diet='vegan';assert.equal(C.matching(r,f,s,R,I),false);
+});
+test('dessert and baking slots roundtrip alongside dinner; large bake yield is preserved',()=>{
+ const s=C.defaults(),date=C.today();s.filters.meal='Baking';s.batchFilters.meal='Dessert';s.plans=[{id:'dinner',recipeId:'pesto-pea-pasta',date,meal:'Dinner',servings:2,cooked:false},{id:'dessert',recipeId:'curated-bbcgoodfood-fruit-salad',date,meal:'Dessert',servings:2,cooked:false},{id:'bake',recipeId:'curated-kingarthurbaking-no-knead-crusty-white-bread-recipe',date,meal:'Baking',servings:36,cooked:false}];
+ const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.equal(restored.plans.length,3);assert.equal(restored.plans.find(p=>p.id==='bake').servings,36);assert.equal(restored.filters.meal,'Baking');assert.equal(restored.batchFilters.meal,'Dessert');assert.equal(C.requirements(restored,R).flour,900);
+});
+test('pantry-only checks full baking yield, and rice meal prep uses the shorter limit',()=>{
+ const s=C.defaults(),r=diverse.find(r=>r.id==='curated-kingarthurbaking-no-knead-crusty-white-bread-recipe');s.pantry=r.ingredients.map(i=>({id:i.id,qty:i.qty/2,always:false}));const f={...s.filters,meal:'Baking',mode:'only',time:'any',servings:2};assert.equal(C.matching(r,f,s,R,I),false);s.pantry=r.ingredients.map(i=>({id:i.id,qty:i.qty,always:false}));assert.equal(C.matching(r,f,s,R,I),true);
+ for(const r of diverse.filter(r=>r.batch&&r.ingredients.some(i=>i.id==='rice')))assert.equal(r.batch.fridgeHours,24);
+});
 test('catalogue adds 40 unique rated sources without changing original data',()=>{
  const old=JSON.parse(original);assert.deepEqual(R.slice(0,45),old.recipes);
  for(const [id,value] of Object.entries(old.ingredients))assert.deepEqual(I[id],value);

@@ -34,7 +34,14 @@
     "Morrisons",
     "Other",
   ];
-  const mealTimes = { Breakfast: "08:00", Lunch: "12:00", Dinner: "18:00" };
+  const mealTimes = {
+    Breakfast: "08:00",
+    Lunch: "12:00",
+    Dinner: "18:00",
+    Dessert: "20:00",
+    Baking: "15:00",
+  };
+  const meals = Object.keys(mealTimes);
   const has = (o, k) => Object.hasOwn(o, k);
   const sides = {
     none: [],
@@ -177,7 +184,7 @@
       p = raw.prefs || {};
     if (validDate(f.date)) s.filters.date = f.date;
     for (const [key, allowed] of Object.entries({
-      meal: ["Breakfast", "Lunch", "Dinner"],
+      meal: meals,
       time: ["any", "15", "30", "long", "slow"],
       method: [
         "any",
@@ -218,7 +225,7 @@
     for (const k of ["people", "days"])
       if (integer(b[k], 1, k === "people" ? 6 : 7)) s.batchFilters[k] = b[k];
     for (const [k, allowed] of Object.entries({
-      meal: ["Breakfast", "Lunch", "Dinner"],
+      meal: meals,
       time: ["any", "15", "30", "long", "slow"],
       method: [
         "any",
@@ -331,8 +338,12 @@
         p &&
         ids.has(p.recipeId) &&
         validDate(p.date) &&
-        ["Breakfast", "Lunch", "Dinner"].includes(p.meal) &&
-        integer(p.servings, 1, 12) &&
+        meals.includes(p.meal) &&
+        integer(
+          p.servings,
+          1,
+          recipes.find((r) => r.id === p.recipeId)?.baking ? 48 : 12,
+        ) &&
         !slots.has(p.date + "|" + p.meal)
       ) {
         const kind = p.kind === "stored" ? "stored" : "cook";
@@ -547,7 +558,7 @@
       !integer(servings, 1, 12) ||
       !integer(repeats, 1, 7) ||
       !validDate(date) ||
-      !["Breakfast", "Lunch", "Dinner"].includes(meal) ||
+      !meals.includes(meal) ||
       !has(sides, side) ||
       !/^([01]\d|2[0-3]):[0-5]\d$/.test(serveTime)
     )
@@ -733,6 +744,27 @@
         [
           r.name,
           r.cuisine,
+          ...(r.tags || []),
+          ...(r.tags || []).map((tag) => tag.replaceAll("-", " ")),
+          ...(r.tags || []).map(
+            (tag) =>
+              ({
+                traybake: "tray bake traybakes tray bakes sheet pan",
+                pastry: "pastries",
+                savoury: "savory",
+                cake: "cakes",
+                soup: "soups",
+                bread: "breads",
+                cookies: "biscuits",
+              })[tag] || "",
+          ),
+          r.effort,
+          r.effort === "project"
+            ? "complex advanced"
+            : r.effort === "simple"
+              ? "easy beginner"
+              : "",
+          r.source?.publisher,
           ...r.ingredients.map((i) => ingredients[i.id]?.name),
         ].join(" "),
       ).includes(q)
@@ -741,7 +773,7 @@
     if (f.mode === "only") {
       const req = requirements(s, recipes);
       if (
-        scaled(r, f.servings || 1).some(
+        scaled(r, r.baking ? r.base : f.servings || 1).some(
           (i) =>
             Math.max(0, stock(s, i.id) - (req[i.id] || 0)) + 0.0005 < i.qty,
         )
@@ -775,6 +807,7 @@
   }
   const api = {
     mealTimes,
+    meals,
     dateLocal,
     foodAllowed,
     thawPlan,
