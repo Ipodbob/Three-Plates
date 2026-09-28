@@ -27,7 +27,7 @@
         !C.integer(e.day, 0, 6) ||
         !C.meals.includes(e.meal) ||
         !C.integer(e.servings, 1, C.maxServings(r)) ||
-        !Object.hasOwn(C.sides, e.side) ||
+        !C.validSide(e.side, recipes) ||
         !/^([01]\d|2[0-3]):[0-5]\d$/.test(e.serveTime) ||
         slots.has(slot)
       )
@@ -107,12 +107,7 @@
         throw Error(
           `${date} ${e.meal} already has a meal. Choose another week or remove that meal first.`,
         );
-      if (
-        !C.permitted(r, s.prefs) ||
-        C.sideIngredients(e.side, 1).some((i) =>
-          s.prefs.exclusions.includes(i.id),
-        )
-      )
+      if (!C.permitted(r, s.prefs) || !C.sideAllowed(e.side, s.prefs, recipes))
         throw Error(
           `${r.name} or its side conflicts with your current food preferences, hidden recipes or equipment.`,
         );

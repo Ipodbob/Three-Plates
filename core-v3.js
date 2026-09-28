@@ -264,10 +264,7 @@
       if (Object.keys(out).length) s.packs[shop] = out;
     }
     const seen = new Set();
-    for (const p of (Array.isArray(raw.pantry) ? raw.pantry : []).slice(
-      0,
-      1000,
-    ))
+    for (const p of Array.isArray(raw.pantry) ? raw.pantry : [])
       if (
         p &&
         ing.has(p.id) &&
@@ -368,6 +365,10 @@
             s.lots.find((l) => l.id === p.lotId).recipeId !== p.recipeId)
         )
           throw Error("A planned stored meal is missing its matching batch.");
+        if (p.side && !validSide(p.side, recipes))
+          throw Error(
+            "A planned side recipe is missing or invalid. Original data has not been replaced.",
+          );
         const id = idOK(p.id) && !planIds.has(p.id) ? p.id : uid();
         s.plans.push({
           id,
@@ -377,7 +378,7 @@
           date: p.date,
           meal: p.meal,
           servings: p.servings,
-          side: has(sides, p.side) ? p.side : "none",
+          side: p.side || "none",
           serveTime: /^([01]\d|2[0-3]):[0-5]\d$/.test(p.serveTime || "")
             ? p.serveTime
             : mealTimes[p.meal],
@@ -398,11 +399,63 @@
       qty: round((i.qty * servings) / r.base),
     }));
   }
-  function sideIngredients(side, n) {
-    return (sides[side] || []).map((i) => ({
-      id: i.id,
-      qty: round(i.qty * n),
-    }));
+  function sideRecipe(side, recipes = []) {
+    return typeof side === "string" && side.startsWith("recipe:")
+      ? recipes.find((r) => r.id === side.slice(7)) || null
+      : null;
+  }
+  function validSide(side, recipes = []) {
+    return (
+      typeof side === "string" &&
+      (has(sides, side) || !!sideRecipe(side, recipes))
+    );
+  }
+  function sideName(side, recipes = []) {
+    return (
+      sideRecipe(side, recipes)?.name ||
+      {
+        none: "No side",
+        rice: "Rice",
+        pasta: "Pasta",
+        bread: "Bread",
+        wraps: "Wraps",
+      }[side] ||
+      "Unknown side"
+    );
+  }
+  function sideIngredients(side, n, recipes = []) {
+    side ||= "none";
+    if (!validSide(side, recipes) || !integer(n))
+      throw Error("Choose a valid side and number of portions.");
+    const r = sideRecipe(side, recipes);
+    return r
+      ? scaled(r, n)
+      : sides[side].map((i) => ({ id: i.id, qty: round(i.qty * n) }));
+  }
+  function sideAllowed(side, prefs, recipes = []) {
+    if (!validSide(side, recipes)) return false;
+    const r = sideRecipe(side, recipes);
+    return r
+      ? permitted(r, prefs)
+      : !sides[side].some((i) => prefs.exclusions.includes(i.id));
+  }
+  function setPlanSide(s, id, side, recipes) {
+    const p = s.plans.find((p) => p.id === id && !p.cooked);
+    if (!p) throw Error("This meal has finished or is no longer available.");
+    if (!sideAllowed(side, s.prefs, recipes))
+      throw Error(
+        "This side conflicts with your preferences or is unavailable.",
+      );
+    const r = sideRecipe(side, recipes);
+    if (
+      r &&
+      (r.id === p.recipeId ||
+        (p.side !== side && (r.dishRole !== "side" || r.baking)))
+    )
+      throw Error(
+        "Choose a side dish for this meal. Whole bakes are planned separately.",
+      );
+    p.side = side;
   }
   function requirements(s, recipes) {
     const needs = {};
@@ -410,11 +463,12 @@
       items.forEach((i) => (needs[i.id] = round((needs[i.id] || 0) + i.qty)));
     for (const p of s.plans)
       if (!p.cooked) {
-        if (p.kind === "stored") add(sideIngredients(p.side, p.servings));
+        if (p.kind === "stored")
+          add(sideIngredients(p.side, p.servings, recipes));
         else {
           const r = recipes.find((r) => r.id === p.recipeId);
           if (r) add(scaled(r, p.servings));
-          add(sideIngredients(p.side, p.servings));
+          add(sideIngredients(p.side, p.servings, recipes));
         }
       }
     for (const b of s.batches)
@@ -578,7 +632,7 @@
       !integer(repeats, 1, 7) ||
       !validDate(date) ||
       !meals.includes(meal) ||
-      !has(sides, side) ||
+      !validSide(side, recipes) ||
       !/^([01]\d|2[0-3]):[0-5]\d$/.test(serveTime)
     )
       throw Error("Check the date, meal, portions and number of days.");
@@ -587,7 +641,7 @@
         recipes.find((r) => r.id === l.recipeId),
         s.prefs,
       ) ||
-      sideIngredients(side, 1).some((i) => s.prefs.exclusions.includes(i.id))
+      !sideAllowed(side, s.prefs, recipes)
     )
       throw Error("This meal or side conflicts with your food preferences.");
     if (servings * repeats > lotAvailable(s, l))
@@ -634,7 +688,7 @@
           "Thaw in the fridge and mark fully defrosted in Pantry before eating.",
         );
       transferBought(s);
-      deduct(s, sideIngredients(p.side, p.servings));
+      deduct(s, sideIngredients(p.side, p.servings, recipes));
       l.portions -= p.servings;
     } else {
       transferBought(s);
@@ -645,7 +699,7 @@
           p.servings,
         ),
       );
-      deduct(s, sideIngredients(p.side, p.servings));
+      deduct(s, sideIngredients(p.side, p.servings, recipes));
     }
     p.cooked = true;
   }
@@ -854,6 +908,11 @@
     migrate,
     scaled,
     sideIngredients,
+    sideRecipe,
+    validSide,
+    sideName,
+    sideAllowed,
+    setPlanSide,
     requirements,
     stock,
     shopping,

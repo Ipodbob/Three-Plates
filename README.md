@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 145 checks: 31 core regressions, 21 added domain checks,
-23 catalogue checks, 40 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 154 checks: 31 core regressions, 27 added domain checks,
+23 catalogue checks, 43 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -46,20 +46,32 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.7.2 was verified live after PR #3 (merge ee3a43b, successful
-Pages run 36494047521 and all 16 checked public assets matched). The fallback shares 100 requests per
+frontend v3.8.1 was verified live after PR #6 (merge 56dec3a, successful
+Pages run 36496620030 and all 18 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
 ## Catalogue review and search
 
-A reviewed metadata layer corrects 54 dish roles, meal categories and cooking
+A reviewed metadata layer corrects 55 dish roles, meal categories and cooking
 methods; the evidence register is [classification-review.json](docs/catalogue/classification-review.json).
 Savoury pastries stay in Baking, complete cakes are no longer hidden as icing
 components, and sides stay out of automatic main-meal choices while remaining
 searchable. Bread remains available as a Baking suggestion. Broad searches start
 with 12 cards and reveal more on request, moving keyboard focus to the new results.
 Recipe IDs, ratings, ingredients and existing plan quantities remain intact.
+
+## Fresh sides
+
+Plan → Add side / Change side offers rice, pasta, bread, wraps and 44 searchable
+recipe sides. Preview scaled ingredients and open the publisher method, then choose
+one fresh side for the meal. Whole breads/bakes stay separate in Baking. Food
+preferences apply; recipes retain their published yield for checking serving sizes.
+Side amounts follow the meal portions. Fresh meals add both recipes to shopping;
+stored portions add only the side, then deduct it once when eaten. Saved menus and
+backups preserve the side link. Missing side references stop restore rather than
+silently changing shopping. The pantry import no longer truncates valid entries
+after the first 1,000. Recipe and allocation counts use the shared touch steppers.
 
 ## Reusable menus
 
@@ -194,7 +206,7 @@ version live. The existing live baseline was inspected; Pages configuration is u
 
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
 - Continue deduplicated sourcing and improve ingredient equivalence and method classification. Verify licensing before hosting full publisher methods or photographs.
-- Phase 2 remaining: richer side recipes, cooking mode/timers/screen wake,
+- Phase 2 remaining: cooking mode/timers/screen wake,
   and combined prep checklists.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,
   and physical-device/WebKit testing.
