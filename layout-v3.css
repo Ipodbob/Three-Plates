@@ -1050,3 +1050,6 @@
 .three-v3 .use-soon-row small { display: block; color: var(--muted); }
 .three-v3 .use-soon-row .button { min-height: 44px; }
 .three-v3 .pantry-item .item-name { overflow-wrap: anywhere; min-width: 0; }
+@media (max-width: 590px) {
+  .three-v3 .pantry-item .item-name { flex-basis: 100%; }
+}

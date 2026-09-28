@@ -18,8 +18,16 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 133 checks: 31 core regressions, 17 added domain checks,
-20 catalogue checks, 37 DOM checks and 28 barcode/relay checks.
+For responsive checks, open `/preview?width=320&page=pantry` on the development
+server. It embeds the real app in a fixed-width viewport; supported widths are
+320, 390, 430 and 1280. Pages are choose, batch, plan, shop, pantry and you. This
+preview exists only in the local server. `PORT` can select an alternate local port;
+the deployed UPC relay allows the default 4173 origin, not arbitrary preview ports.
+The server serves the local vendor decoder while keeping repository metadata,
+scripts and dependencies unavailable through HTTP.
+
+`npm test` runs 135 checks: 31 core regressions, 17 added domain checks,
+20 catalogue checks, 37 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
