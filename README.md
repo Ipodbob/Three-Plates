@@ -18,8 +18,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 108 checks: 31 core regressions, 11 added domain checks,
-20 catalogue checks, 20 existing DOM checks and 26 barcode/relay checks.
+`npm test` runs 112 checks: 31 core regressions, 11 added domain checks,
+20 catalogue checks, 24 existing DOM checks and 26 barcode/relay checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -35,7 +35,8 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend integration still awaits release. The fallback shares 100 requests per
+frontend v3.6.1 was verified live after PR #1; the scanner and consistency
+updates in PR #2 remain unreleased. The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
@@ -75,8 +76,8 @@ Legacy purchases retain their amounts without invented retailer/pack history.
 Legacy portion corrections are bounded by their known remaining stock.
 
 Invalid linked batch/portion backups are rejected before replacement. Failed
-loads pause saving and retain the original export. Failed writes report a warning;
-export the current in-memory state. Cross-tab changes pause saving to avoid
+loads pause saving and retain the original export. Failed writes report a warning and roll back the attempted change;
+the form stays open for retry. Cross-tab changes pause saving to avoid
 overwriting another tab. Export/restore is available in Settings.
 
 ## Rated recipe catalogue
