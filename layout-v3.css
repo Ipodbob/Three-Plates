@@ -981,3 +981,13 @@
 .three-v3 .batch-settings > .field {
   margin-top: 16px;
 }
+/* Barcode camera and confirmation controls fit narrow phone screens. */
+.scan-file { display: block; max-width: 100%; margin: 12px 0; }
+#scan-root video { width: 100%; max-height: 320px; object-fit: cover; border-radius: 16px; background: #17251c; margin: 12px 0; }
+#scan-root [hidden] { display: none !important; }
+#scan-root input:not([type="checkbox"]), #scan-root select { width: 100%; min-width: 0; box-sizing: border-box; font-size: 16px; min-height: 46px; border: 1px solid #d9dfd5; border-radius: 10px; padding: 10px 12px; background: #fff; color: #293a2d; margin: 6px 0 12px; }
+#scan-root .quantity-stepper input { margin: 0; border: 0; }
+#scan-root label:not(.button), #scan-root summary { margin-top: 14px; display: block; }
+.scan-matches { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.scan-matches button { white-space: normal; text-align: left; }
+#scan-status { min-height: 1.5em; }

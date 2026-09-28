@@ -1,7 +1,8 @@
 # Three Plates
 
 A mobile-first UK meal planner hosted on GitHub Pages at `/Three-Plates/`.
-Static HTML, CSS and JavaScript; no backend, account or runtime API keys.
+Static HTML, CSS and JavaScript; no user account or runtime API keys. Barcode
+lookup uses Open Food Facts; an optional free UPC relay is prepared separately.
 
 ## Develop and test
 
@@ -17,9 +18,23 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 82 checks: 31 core regressions, 11 added domain checks,
-20 catalogue checks and 20 DOM interaction checks. jsdom is test-only; it does not validate rendering
-or replace real browser checks. No development dependency is loaded by the app.
+`npm test` runs 101 checks: 31 core regressions, 11 added domain checks,
+20 catalogue checks, 20 existing DOM checks and 19 barcode/relay checks.
+jsdom is test-only; it does not validate rendering or replace real browser checks.
+The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
+
+## Pantry barcode scanning
+
+Pantry has live rear-camera scanning, barcode-photo capture/upload and a number
+fallback. Product lookup suggests ingredients and amounts; users confirm before
+stock is added. Full/half/quarter packs and pack counters reduce typing. Confirmed
+barcode matches stay on the device and are included in the existing backups.
+Camera/photo decoding stays local; only new barcode numbers are looked up online.
+
+Open Food Facts works directly. **The free UPCitemdb fallback requires the prepared
+Cloudflare relay to be deployed; it is not active yet.** Its API blocks direct
+browser requests from GitHub Pages. See [setup and testing details](docs/barcode-scanning.md).
+Physical iPhone/Safari and Android camera support still needs device testing.
 
 ## Phase 1
 
