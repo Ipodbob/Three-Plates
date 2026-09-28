@@ -71,3 +71,13 @@ test('rice exception wins over generic batch metadata',()=>{
 });
 test('linking a scanned product combines stock, remaps full packs and preserves backups',()=>{const s=C.defaults();s.custom={'custom-pasta':{id:'custom-pasta',name:'Penne brand',unit:'g',group:'Other'}};s.pantry=[{id:'custom-pasta',qty:250,always:false},{id:'pasta',qty:100,always:false}];s.barcodeMatches={'3017620422003':{ingredientId:'custom-pasta',qty:500,unit:'g',name:'Penne brand'}};C.linkPantryItem(s,'custom-pasta','pasta',250,{...I,...s.custom},250);assert.equal(s.pantry.length,1);assert.equal(s.pantry[0].qty,350);assert.equal(s.barcodeMatches['3017620422003'].ingredientId,'pasta');assert.equal(s.barcodeMatches['3017620422003'].qty,500);const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.equal(restored.pantry[0].qty,350);assert.throws(()=>C.linkPantryItem(s,'custom-pasta','pasta',250,I,250));});
 test('linking rejects stale amounts, always-stocked destinations and invalid mapping before mutation',()=>{for(const kind of ['stale','always','invalid']){const s=C.defaults();s.custom={'custom-x':{id:'custom-x',name:'X',unit:'each'}};s.pantry=[{id:'custom-x',qty:2,always:false},{id:'pasta',qty:20,always:kind==='always'}];const before=JSON.stringify(s);assert.throws(()=>C.linkPantryItem(s,'custom-x','pasta',kind==='invalid'?-1:500,I,kind==='stale'?3:2));assert.equal(JSON.stringify(s),before);}});
+
+test('same-second defrost completion survives reload and older rounded records recover',()=>{
+ const s=C.defaults();batch(s,'rounded',6);finish(s,'rounded',2,4);
+ const started=now+10700;C.scheduleLot(s,s.lots[1].id,'2026-09-29','Lunch',2,1,'none',R,started);
+ const lid=C.thawPlan(s,s.plans[0].id,R,started),lot=s.lots.find(l=>l.id===lid),rounded=new Date(now+10000).toISOString();
+ C.changeStorage(s,lid,'defrosted',R,started+100,rounded);assert.equal(lot.thawedAt,lot.thawStartedAt);
+ C.finishPlan(s,s.plans[0].id,R,started+200);const restored=C.migrate(C.clone(s),R,I);assert.equal(restored.lots.find(l=>l.id===lid).consumed,2);assert.equal(restored.plans[0].cooked,true);
+ const old=C.clone(s);old.lots.find(l=>l.id===lid).thawedAt=rounded;assert.equal(C.migrate(old,R,I).lots.find(l=>l.id===lid).thawedAt,lot.thawStartedAt);assert.equal(old.lots.find(l=>l.id===lid).thawedAt,rounded);
+ old.lots.find(l=>l.id===lid).thawedAt=new Date(now+9000).toISOString();assert.throws(()=>C.migrate(old,R,I),/out of order/);
+});
