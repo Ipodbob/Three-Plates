@@ -220,8 +220,15 @@
       if (["thawing", "thawed"].includes(l.location) && !l.thawStartedAt) {
         throw Error("Defrosting portions need the recorded thaw-start time.");
       }
-      if (l.thawedAt && Date.parse(l.thawedAt) < Date.parse(l.thawStartedAt))
-        throw Error("Defrosting dates are out of order.");
+      if (l.thawedAt && Date.parse(l.thawedAt) < Date.parse(l.thawStartedAt)) {
+        const completion = Date.parse(l.thawedAt),
+          start = Date.parse(l.thawStartedAt);
+        // Recover the whole-second value written by older forms, only within
+        // the same second. Genuine reversed history remains invalid.
+        if (Math.floor(completion / 1000) === Math.floor(start / 1000))
+          l.thawedAt = l.thawStartedAt;
+        else throw Error("Defrosting dates are out of order.");
+      }
     }
     for (const b of s.batches) {
       const src = raw.batches.find((x) => x.id === b.id);

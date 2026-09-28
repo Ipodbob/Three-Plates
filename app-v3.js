@@ -44,6 +44,8 @@
     `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n] || paths.choose}"/></svg>`;
   const btn = (label, act, id = "", cls = "secondary") =>
     `<button type="button" class="button ${cls}" data-act="${act}" data-id="${e(id)}">${label}</button>`;
+  const plannedRecipeButton = (record, kind) =>
+    `<button type="button" class="button secondary" data-act="recipe" data-id="${e(record.recipeId)}" data-record="${e(record.id)}" data-context="${kind}">Recipe</button>`;
   const number = (n, max = 3) =>
     Number(n).toLocaleString("en-GB", { maximumFractionDigits: max });
   const counts = {
@@ -545,7 +547,7 @@
   function batchCard(b) {
     const r = recipe(b.recipeId),
       suggest = C.suggestBatchSize(state, b, R, ingredients());
-    return `<article class="plan-card"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(day(b.date))} · ${b.servings} portions</div><h3>${e(r.name)}</h3><p class="helper">${r.batch.type === "base" ? "Base only; sides are added when you plan stored portions." : "Complete meal, including its topping."}</p><div class="action-wrap">${btn("Recipe", "recipe", r.id)}${btn("Edit batch", "batch-edit", b.id)}${btn("Cooked — store portions", "batch-finish", b.id, "")}</div>${suggest ? `<div class="notice"><span>${amount(suggest.id, suggest.extra)} extra from packs. ${btn("Make " + suggest.servings + " portions", "batch-round", b.id, "ghost")}<small>Optional. All ingredients will scale; other purchases may increase.</small></span></div>` : ""}<button class="text-btn" data-act="batch-remove" data-id="${b.id}">Remove planned batch</button></div></article>`;
+    return `<article class="plan-card"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(day(b.date))} · ${b.servings} portions</div><h3>${e(r.name)}</h3><p class="helper">${r.batch.type === "base" ? "Base only; sides are added when you plan stored portions." : "Complete meal, including its topping."}</p><div class="action-wrap">${plannedRecipeButton(b, "batch")}${btn("Edit batch", "batch-edit", b.id)}${btn("Cooked — store portions", "batch-finish", b.id, "")}</div>${suggest ? `<div class="notice"><span>${amount(suggest.id, suggest.extra)} extra from packs. ${btn("Make " + suggest.servings + " portions", "batch-round", b.id, "ghost")}<small>Optional. All ingredients will scale; other purchases may increase.</small></span></div>` : ""}<button class="text-btn" data-act="batch-remove" data-id="${b.id}">Remove planned batch</button></div></article>`;
   }
   function planCard(p) {
     const r = recipe(p.recipeId),
@@ -557,7 +559,7 @@
         C.sideIngredients(p.side, p.servings).some((i) =>
           state.prefs.exclusions.includes(i.id),
         );
-    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored ? `<p class="helper">${p.side === "none" ? "No additional side" : e(p.side) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${btn("Recipe", "recipe", r.id)}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
+    return `<article class="plan-card ${p.cooked ? "done" : ""}"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div class="plan-info"><div class="card-kicker">${e(p.meal)} · ${p.servings} portions${p.cooked ? " · Finished" : stored ? " · From " + e(l?.location || "stored batch") : " · Cook fresh"}</div><h3>${e(r.name)}</h3>${stored ? `<p class="helper">${p.side === "none" ? "No additional side" : e(p.side) + " added separately"} · ${e(p.serveTime || C.mealTimes[p.meal])}</p>` : ""}${conflict ? '<p class="storage-alert">Conflicts with current food preferences. Review before cooking.</p>' : ""}${unsafe ? '<p class="storage-alert">Past the recorded storage deadline. Do not eat.</p>' : ""}${stored && !p.cooked && l?.location === "freezer" ? '<p class="helper">Move just these portions to the fridge in time to defrost fully.</p>' : ""}<div class="action-wrap">${plannedRecipeButton(p, "plan")}${!p.cooked ? (stored && l?.location === "freezer" ? btn("Start defrosting", "thaw-plan", p.id) : stored && l?.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : btn(stored ? "Eaten" : "Cooked", "plan-finish", p.id, "")) + (!stored ? btn("Change portions", "plan-edit", p.id) : "") : ""}</div><button class="text-btn" data-act="plan-remove" data-id="${p.id}">${p.cooked ? "Remove record" : "Remove from plan"}</button></div></article>`;
   }
   function planPage() {
     const pending = state.plans
@@ -731,7 +733,7 @@
       reserved = C.reserved(state, l.id),
       deadline = C.expiry(l, R),
       expired = C.expired(l, R);
-    return `<article class="panel prepared-card"><div class="prepared-heading"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div><div class="card-kicker">${e(l.location === "thawed" ? "Defrosted · fridge" : l.location === "thawing" ? "Defrosting in fridge" : l.location)}</div><h3>${e(r.name)}</h3></div><strong class="portion-count">${l.portions}<small>portions</small></strong></div><p class="helper">${free} unallocated · ${reserved} planned<br>Cooked ${e(stamp(l.cookedAt))}${l.frozenAt ? "<br>Frozen " + e(stamp(l.frozenAt)) : ""}</p>${l.thawStartedAt ? '<p class="helper">Defrosting started ' + e(stamp(l.thawStartedAt)) + (l.thawedAt ? "<br>Fully defrosted " + e(stamp(l.thawedAt)) : "") + "</p>" : ""}${deadline ? `<p class="${expired ? "storage-alert" : "deadline"}">${expired ? "Past storage limit" : "Use by"}: ${e(stamp(deadline))}</p>` : l.location === "freezer" ? '<p class="helper">Freeze in separate portions. Schedule only what you need to thaw.</p>' : '<p class="deadline">Check thawing progress. Record the actual time fully defrosted; the 24-hour limit starts then, not when you press the button.</p>'}<div class="action-wrap">${free && !expired ? btn("Plan portions", "lot-plan", l.id, "") : ""}${l.location === "fridge" && !expired ? btn("Freeze these portions", "freeze-lot", l.id) : ""}${l.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : ""}${btn("Recipe", "recipe", r.id)}${btn("Correct record", "lot-correct", l.id)}${free ? btn("Discard some", "lot-discard-some", l.id) : ""}</div><button class="text-btn" data-act="discard-lot" data-id="${l.id}">Discard remaining portions</button></article>`;
+    return `<article class="panel prepared-card"><div class="prepared-heading"><span class="plan-emoji" aria-hidden="true">${r.emoji}</span><div><div class="card-kicker">${e(l.location === "thawed" ? "Defrosted · fridge" : l.location === "thawing" ? "Defrosting in fridge" : l.location)}</div><h3>${e(r.name)}</h3></div><strong class="portion-count">${l.portions}<small>portions</small></strong></div><p class="helper">${free} unallocated · ${reserved} planned<br>Cooked ${e(stamp(l.cookedAt))}${l.frozenAt ? "<br>Frozen " + e(stamp(l.frozenAt)) : ""}</p>${l.thawStartedAt ? '<p class="helper">Defrosting started ' + e(stamp(l.thawStartedAt)) + (l.thawedAt ? "<br>Fully defrosted " + e(stamp(l.thawedAt)) : "") + "</p>" : ""}${deadline ? `<p class="${expired ? "storage-alert" : "deadline"}">${expired ? "Past storage limit" : "Use by"}: ${e(stamp(deadline))}</p>` : l.location === "freezer" ? '<p class="helper">Freeze in separate portions. Schedule only what you need to thaw.</p>' : '<p class="deadline">Check thawing progress. Record the actual time fully defrosted; the 24-hour limit starts then, not when you press the button.</p>'}<div class="action-wrap">${free && !expired ? btn("Plan portions", "lot-plan", l.id, "") : ""}${l.location === "fridge" && !expired ? btn("Freeze these portions", "freeze-lot", l.id) : ""}${l.location === "thawing" ? btn("Fully defrosted", "defrosted", l.id) : ""}${plannedRecipeButton(l, "lot")}${btn("Correct record", "lot-correct", l.id)}${free ? btn("Discard some", "lot-discard-some", l.id) : ""}</div><button class="text-btn" data-act="discard-lot" data-id="${l.id}">Discard remaining portions</button></article>`;
   }
   function useSoonPanel() {
     const items = C.useSoonItems(state);
@@ -857,23 +859,38 @@
     };
     sheet.querySelector('[data-act="close"]')?.focus();
   }
-  function recipeModal(id) {
+  function recipeModal(id, context = null) {
     const r = recipe(id);
     if (!r) return;
-    const asBatch = !!r.batch && (!r.source || route === "batch");
+    const asBatch = context
+      ? context.kind === "batch"
+      : !!r.batch && (!r.source || route === "batch");
     const portionLimit = asBatch || r.baking ? 48 : 12;
-    const n = asBatch
-      ? Math.min(48, state.batchFilters.people * state.batchFilters.days)
-      : r.baking
-        ? r.base
-        : state.filters.servings;
+    const n = context
+      ? context.servings
+      : asBatch
+        ? Math.min(48, state.batchFilters.people * state.batchFilters.days)
+        : r.baking
+          ? r.base
+          : state.filters.servings;
     modal(
       e(r.name),
-      `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} ${r.additionalTime ? "prep/cook + extra time" : "total"} (base recipe)</p>${asBatch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}${recipeTags(r)}${r.baking ? `<p class="helper">Full recipe makes ${r.base} pieces/portions. Baking starts at the full recipe yield; changing quantities may require different tins and baking times.</p>` : ""}<label class="label" for="recipe-portions">${r.baking ? "Pieces / portions to bake" : "Ingredient portions"}</label>${numInput("recipe-portions", n, 1, portionLimit)}<div id="recipe-amounts">${ingredientList(r, n)}</div>${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
+      `<p class="meta-row">${e(method(r))} · ${prepLabel(r)} · ${duration(r.total)} ${r.additionalTime ? "prep/cook + extra time" : "total"} (base recipe)</p>${asBatch && !r.source ? `<p>${e(r.batch.note)}</p>` : ""}${recipeTags(r)}${r.baking ? `<p class="helper">Full recipe makes ${r.base} pieces/portions. Baking starts at the full recipe yield; changing quantities may require different tins and baking times.</p>` : ""}${context ? `<p class="notice">${e(context.label)} · ${n} portions</p>` : `<label class="label" for="recipe-portions">${r.baking ? "Pieces / portions to bake" : "Ingredient portions"}</label>${numInput("recipe-portions", n, 1, portionLimit)}`}${
+        context?.stored
+          ? `<h3>Fresh side for this meal</h3>${
+              C.sideIngredients(context.side, n)
+                .map(
+                  (i) =>
+                    `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
+                )
+                .join("") || `<p class="helper">No fresh side planned.</p>`
+            }<details class="details-box"><summary>Already prepared ingredients — reference only</summary><p class="helper">These ingredients were counted when the batch was cooked. Do not buy or deduct them again.</p><div id="recipe-amounts">${ingredientList(r, n)}</div></details>`
+          : `<div id="recipe-amounts">${ingredientList(r, n)}</div>`
+      }${r.source ? `${recipeSource(r, true)}<a class="button wide section-space" href="${e(r.source.url)}" target="_blank" rel="noopener noreferrer">Read cooking method at ${e(r.source.publisher)} ↗</a><p class="helper">The full method stays with the publisher. An internet connection is needed to read it.</p>` : `<h3 class="section-space">Method</h3><ol class="method-list">${r.steps.map((s) => `<li>${e(s)}</li>`).join("")}</ol>`}${r.batch ? `<details class="details-box"><summary>Storage & reheating</summary>${storageGuide()}</details>` : ""}<div class="notice">${r.source ? "Publisher recipe; planning quantities have not been kitchen-tested by Three Plates." : "Example recipe, not independently kitchen-tested."} Ingredients scale; cooking times and appliance capacity do not. Check doneness and food labels.</div>${context ? btn("Close recipe", "close", "", "") : btn(asBatch ? "Plan batch" : r.baking ? "Plan bake" : "Add to plan", asBatch ? "batch-add" : "plan-add", r.id, "")}`,
     );
     document
       .getElementById("recipe-portions")
-      .addEventListener("change", (ev) => {
+      ?.addEventListener("change", (ev) => {
         const n = +ev.target.value;
         if (C.integer(n, 1, portionLimit))
           document.getElementById("recipe-amounts").innerHTML = ingredientList(
@@ -1250,7 +1267,36 @@
       return;
     }
     if (act === "recipe") {
-      recipeModal(id);
+      let context = null;
+      if (b.dataset.context) {
+        const kind = b.dataset.context;
+        const record = (
+          kind === "plan"
+            ? state.plans
+            : kind === "batch"
+              ? state.batches
+              : state.lots
+        ).find((x) => x.id === b.dataset.record && x.recipeId === id);
+        if (!record) return;
+        const originalBatch =
+          kind === "lot" && state.batches.find((x) => x.id === record.batchId);
+        context = {
+          kind,
+          servings:
+            kind === "lot"
+              ? originalBatch?.servings || recipe(id).base
+              : record.servings,
+          stored: kind === "plan" && record.kind === "stored",
+          side: record.side || "none",
+          label:
+            kind === "lot"
+              ? "Original cooked batch (reference)"
+              : kind === "batch"
+                ? "Planned batch for " + day(record.date)
+                : record.meal + " on " + day(record.date),
+        };
+      }
+      recipeModal(id, context);
       return;
     }
     if (act === "refresh") {

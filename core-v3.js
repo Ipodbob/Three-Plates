@@ -701,7 +701,11 @@
           "Enter the actual time fully defrosted, after thawing started and not in the future.",
         );
       l.location = "thawed";
-      l.thawedAt = new Date(t).toISOString();
+      // The form records whole seconds; do not place completion just before
+      // its millisecond-precision start when both occur within one second.
+      l.thawedAt = new Date(
+        Math.max(t, Date.parse(l.thawStartedAt || l.frozenAt || l.cookedAt)),
+      ).toISOString();
     } else throw Error("That storage change is not available.");
   }
   // Split off only the servings needed for one planned meal; the rest stay frozen.
