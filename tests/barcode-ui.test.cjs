@@ -304,3 +304,4 @@ test("camera starts once and continues after confirmation without another permis
   assert.ok(stops > 0);
   a.dom.window.close();
 });
+test('forgetting barcode matches requires explicit confirmation and never changes pantry stock',async()=>{const a=app();await lookup(a);a.click('#scan-save');const before=JSON.stringify(a.state().pantry);a.click('#scan-forget');assert.ok(a.state().barcodeMatches[code]);a.click('#scan-forget-no');assert.ok(a.state().barcodeMatches[code]);a.click('#scan-forget');a.click('#scan-forget-yes');assert.deepEqual(a.state().barcodeMatches,{});assert.equal(JSON.stringify(a.state().pantry),before);a.dom.window.close();});

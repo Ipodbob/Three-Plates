@@ -1052,12 +1052,12 @@
       }
     });
   }
-  function addPlan(id) {
+  function addPlan(id, confirmed = false, selection = null) {
     const r = recipe(id),
-      f = { ...state.filters };
+      f = selection || { ...state.filters };
     const modalPortions =
       sheet.open && document.getElementById("recipe-portions");
-    if (r.baking) f.servings = r.base;
+    if (r.baking && !selection) f.servings = r.base;
     if (modalPortions) {
       if (!C.integer(+modalPortions.value, 1, r.baking ? 48 : 12)) {
         toast(`Choose 1–${r.baking ? 48 : 12} whole portions.`);
@@ -1072,13 +1072,19 @@
     const existing = state.plans.find(
       (p) => p.date === f.date && p.meal === f.meal,
     );
-    if (
-      existing &&
-      !confirm(
-        "Replace the existing meal? This releases reserved portions but does not undo any previous cooking.",
-      )
-    )
+    if (existing && !confirmed) {
+      confirmAction(
+        "Replace planned meal",
+        "Replace " +
+          recipe(existing.recipeId).name +
+          " with " +
+          r.name +
+          "? Reserved portions are released; previous cooking is not reversed.",
+        "Replace meal",
+        () => addPlan(id, true, f),
+      );
       return;
+    }
     if (
       change(
         () => {
@@ -1117,7 +1123,7 @@
       });
     const text =
       "THREE PLATES — " +
-      (state.shop === "none" ? "SHOPPING" : state.shop) +
+      (C.activeShop(state) === "none" ? "SHOPPING" : C.activeShop(state)) +
       "\n" +
       (lines.join("\n") || "Nothing left to buy.");
     try {
@@ -1148,27 +1154,34 @@
       if (file.size > 2e6)
         throw Error("Backup is too large. Use a file below 2 MB.");
       const next = C.migrate(JSON.parse(await file.text()), R, I);
-      if (
-        !confirm(
-          "Replace this device’s data with the backup? Export the current data first to keep a copy.",
-        )
-      )
-        return;
-      const old = state;
-      try {
-        localStorage.setItem(KEY, JSON.stringify(next));
-      } catch (err) {
-        state = old;
-        throw Error(
-          "The browser could not save the restored data. Nothing was replaced.",
-        );
-      }
-      state = next;
-      blocked = false;
-      storageError = "";
-      clearChoices();
-      render();
-      toast("Backup restored.");
+      const currentSaved = localStorage.getItem(KEY);
+      confirmAction(
+        "Restore backup",
+        "Replace this device's data with the selected backup? Export your current data first to keep a copy.",
+        "Replace with backup",
+        () => {
+          try {
+            if (localStorage.getItem(KEY) !== currentSaved)
+              throw Error(
+                "Data changed after you selected the backup. Select it again to review the replacement.",
+              );
+            localStorage.setItem(KEY, JSON.stringify(next));
+            state = next;
+            blocked = false;
+            storageError = "";
+            clearChoices();
+            render();
+            toast("Backup restored.");
+          } catch (err) {
+            toast(
+              err.message ===
+                "Data changed after you selected the backup. Select it again to review the replacement."
+                ? err.message
+                : "The browser could not save the restored data. Nothing was replaced.",
+            );
+          }
+        },
+      );
     } catch (err) {
       toast(err.message || "Invalid backup. Existing data was not changed.");
     }
@@ -1321,23 +1334,42 @@
       return;
     }
     if (act === "reset") {
-      if (
-        confirm(
-          "Delete all Three Plates data in this browser, including the old version backup? This cannot be undone.",
-        )
-      ) {
-        try {
-          localStorage.removeItem(KEY);
-          localStorage.removeItem(OLD);
-          blocked = false;
-          storageError = "";
-          state = C.defaults();
-          clearChoices();
-          render();
-          toast("Local data deleted.");
-        } catch (err) {
-          toast("The browser did not allow deletion.");
+      if (!approved) {
+        confirmAction(
+          "Delete local app data",
+          "Delete all Three Plates data in this browser, including the old version backup? This cannot be undone. Export a backup first if you want to keep it.",
+          "Delete local data",
+          () => handleAction(b, true),
+        );
+        return;
+      }
+      const previous = {};
+      try {
+        previous[KEY] = localStorage.getItem(KEY);
+        previous[OLD] = localStorage.getItem(OLD);
+        localStorage.removeItem(KEY);
+        localStorage.removeItem(OLD);
+        blocked = false;
+        storageError = "";
+        state = C.defaults();
+        clearChoices();
+        render();
+        toast("Local data deleted.");
+      } catch (err) {
+        let restored = true;
+        for (const key of [KEY, OLD]) {
+          try {
+            if (previous[key] !== undefined && previous[key] !== null)
+              localStorage.setItem(key, previous[key]);
+          } catch {
+            restored = false;
+          }
         }
+        toast(
+          restored
+            ? "The browser did not allow deletion. Existing data was retained."
+            : "Deletion could not finish. Export your current data in Settings before reloading.",
+        );
       }
       return;
     }
@@ -1351,6 +1383,24 @@
       modal(
         "Change portions",
         `<p>${e(recipe(p.recipeId).name)}</p><form id="plan-portions-form" data-id="${e(id)}">${field("Portions to make", "plan-portions", quantityInput("plan-portions", p.servings, 1, max, "portions"))}<p class="helper">Updates the ingredients needed for this meal. Existing purchases keep their recorded quantities.</p><button class="button wide" type="submit">Save portions</button></form>`,
+      );
+      return;
+    }
+    if (act === "batch-round" && !approved) {
+      const batch = state.batches.find((x) => x.id === id),
+        suggestion =
+          batch && C.suggestBatchSize(state, batch, R, ingredients());
+      if (!suggestion) {
+        toast("No pack adjustment is currently available.");
+        return;
+      }
+      confirmAction(
+        "Adjust batch size",
+        "Make " +
+          suggestion.servings +
+          " portions? All ingredients will scale and other purchases may increase.",
+        "Adjust portions",
+        () => handleAction(b, true),
       );
       return;
     }
@@ -1429,12 +1479,6 @@
             const batch = state.batches.find((x) => x.id === id),
               s = C.suggestBatchSize(state, batch, R, ingredients());
             if (!s) throw Error("No pack adjustment is currently available.");
-            if (
-              !confirm(
-                `Make ${s.servings} portions? Other ingredient quantities and purchases may increase.`,
-              )
-            )
-              return;
             batch.servings = s.servings;
             break;
           }

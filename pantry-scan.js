@@ -537,14 +537,27 @@
       found(q("#barcode-number").value);
     };
     q("#scan-forget").onclick = () => {
-      if (
-        confirm(
-          "Forget all remembered barcode matches? Pantry amounts will stay unchanged.",
-        )
-      )
-        commit((s) => {
-          s.barcodeMatches = {};
-        }, "Barcode matches forgotten.");
+      const button = q("#scan-forget");
+      if (q("#scan-forget-confirm")) return;
+      const box = document.createElement("div");
+      box.id = "scan-forget-confirm";
+      box.innerHTML =
+        '<p>Forget remembered barcode matches? Pantry amounts stay unchanged.</p><button type="button" class="button secondary" id="scan-forget-yes">Forget matches</button> <button type="button" class="text-btn" id="scan-forget-no">Cancel</button>';
+      button.after(box);
+      q("#scan-forget-no").onclick = () => {
+        box.remove();
+        button.focus();
+      };
+      q("#scan-forget-yes").onclick = () => {
+        if (
+          commit((s) => {
+            s.barcodeMatches = {};
+          }, "Barcode matches forgotten.")
+        ) {
+          box.remove();
+          status("Barcode matches forgotten. Pantry stock is unchanged.");
+        }
+      };
     };
     function nextScan() {
       current = null;

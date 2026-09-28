@@ -18,8 +18,8 @@ Open `http://127.0.0.1:4173/Three-Plates/`. The development server deliberately
 uses the case-sensitive Pages prefix. There is no production build step: Pages
 continues serving the repository root. Do not replace its hosting configuration.
 
-`npm test` runs 119 checks: 31 core regressions, 13 added domain checks,
-20 catalogue checks, 29 existing DOM checks and 26 barcode/relay checks.
+`npm test` runs 124 checks: 31 core regressions, 13 added domain checks,
+20 catalogue checks, 33 existing DOM checks and 27 barcode/relay checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
