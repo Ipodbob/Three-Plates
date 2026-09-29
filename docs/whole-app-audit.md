@@ -141,3 +141,9 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - A separate read-only inventory review found no non-meat classifications among recipes containing named lamb, turkey or gelatine ingredients. Vegan recipe ingredient-name review found plant alternatives (coconut/oat/soy milk, vegetable stock, nut butter), not animal dairy among the inspected matches. This is ingredient-record review, not label/allergen validation.
 
 - Seafood diet release validation: all 216 full-suite checks passed.
+
+## Remaining compact touch targets
+
+- Rendered audit found 42px mode/pantry tabs and smaller pantry row buttons. Shared CSS now gives these, scanner fraction presets and summary headings a 44px minimum height; pantry row buttons/presets also have a 44px minimum width.
+- Browser measured mode tabs, pantry tabs and Settings summary headings at 44px; pantry Edit/Remove measured 44 by 44px. A 320px pantry screenshot was inspected with stock present. Temporary 500g Pasta test stock was removed and reload completed.
+- CSS-only change plus release version. `git diff --check` passed; no new calculation logic or test suite rerun was needed. Prior functional baseline remains 216 passing checks. Physical phone ergonomics remain unverified.
