@@ -304,3 +304,10 @@ test('every recipe containing reviewed meat is excluded by vegetarian and pescat
  const recipes=R.filter(r=>r.ingredients.some(i=>meat.has(i.id)));assert.ok(recipes.length>100);
  for(const r of recipes){assert.equal(r.kind,'meat',r.id);for(const diet of ['vegetarian','vegan','pescatarian'])assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet}),false,r.id+' '+diet);}
 });
+
+test('all reviewed seafood ingredients stay out of vegetarian and vegan discovery',()=>{
+ const seafood=new Set(PLATES_DATA.preferenceFamilies.find(f=>f.anchors.includes('tuna')).members);
+ const recipes=R.filter(r=>r.ingredients.some(i=>seafood.has(i.id)));assert.ok(recipes.length>50);
+ for(const r of recipes){assert.ok(['fish','meat'].includes(r.kind),r.id);for(const diet of ['vegetarian','vegan'])assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet}),false,r.id);}
+ for(const id of ['gf2-greek-style-roast-fish','sp-gfmore-peppered-mackerel-pink-pickled-onion-salad'])assert.equal(C.foodAllowed(find(id),{...C.defaults().prefs,diet:'pescatarian'}),true,id);
+});

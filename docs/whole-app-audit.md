@@ -133,3 +133,11 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Four further beef classifications corrected: Philly cheesesteak, Beef Rice Noodles, Beef Steak Marinade and Thai Steak Salad. A catalogue-wide regression checks all recipes containing reviewed meat against vegetarian, vegan and pescatarian diets. Full suite passed 214 checks before these final four metadata corrections; all 12 catalogue-review checks passed afterward. Browser verified Beef Steak Marinade disappears under Pescatarian and returns unrestricted. Test preferences restored.
 
 - The steak marinade recipe includes two steaks and their cooking method; corrected its component-only role to a main for Lunch/Dinner. Browser confirmed the corrected main appears unrestricted, disappears under Pescatarian, and returns when the diet is removed. All 12 catalogue-review checks passed after the final role correction.
+
+## Seafood diet consistency
+
+- Greek-style roast fish and Peppered mackerel & pink pickled onion salad contained explicit fish ingredients but were labelled vegetarian. Publisher pages confirmed pollock and smoked mackerel respectively; both now use Fish, preserving portions and dish roles.
+- Catalogue-wide regression covers every recipe containing the 74 reviewed seafood identities: all reject Vegetarian/Vegan. Both corrected recipes remain allowed for Pescatarian. Browser verified Greek-style roast fish disappears under Vegetarian and returns labelled Fish under Pescatarian. Test settings restored.
+- A separate read-only inventory review found no non-meat classifications among recipes containing named lamb, turkey or gelatine ingredients. Vegan recipe ingredient-name review found plant alternatives (coconut/oat/soy milk, vegetable stock, nut butter), not animal dairy among the inspected matches. This is ingredient-record review, not label/allergen validation.
+
+- Seafood diet release validation: all 216 full-suite checks passed.
