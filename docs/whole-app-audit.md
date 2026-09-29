@@ -116,3 +116,10 @@ The handover is a brief, not evidence of completion. Later user choices supersed
 | GitHub Pages and PR delivery | Exact merge/run and public asset proofs for each release | Verify each new release separately |
 
 Independent kitchen testing of every publisher recipe is not a deliverable claimed by this app; the planning-estimate label remains necessary. Physical-phone checks are not substituted by DOM tests.
+
+## Favourite ingredient consistency
+
+- Fresh and batch ranking now expands the reviewed favourite ingredient families, so imported cuts receive the preference weight too. Exclusions still win. The UI renders broad favourites as one chip, preserving existing anchor IDs.
+- Domain checks verify imported ground chicken receives extra weight in both modes, vegan chicken does not, exclusions still reject the dish, and saved IDs round-trip. Connected UI checks reload and removal without changing an unrelated exclusion. Browser verified the compact Chicken group survives reload and removes cleanly; test preference cleared.
+
+- Verification accounting: the full run passed 212 checks and failed the new UI test because its setup selected the same liked and excluded group. Existing conflict handling correctly removed the favourite. After correcting the test to use an unrelated exclusion, both new targeted checks passed. No production code changed after that full run.

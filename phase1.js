@@ -521,12 +521,13 @@
           a.useSoon.localeCompare(b.useSoon) || a.id.localeCompare(b.id),
       );
   C.choiceWeight = (r, s, batch, coverage = 0) => {
+    const liked = C.preferenceIds(s.prefs.likedIngredients);
     let w = 1;
     if (s.prefs.favourites.includes(r.id)) w *= 2;
     if (s.prefs.cuisines.includes(r.cuisine)) w *= 1.5;
     w *=
       1 +
-      r.ingredients.filter((i) => s.prefs.likedIngredients.includes(i.id))
+      r.ingredients.filter((i) => liked.has(i.id))
         .length *
         0.5;
     if ((batch ? s.batchFilters.mode : s.filters.mode) === "pantry")

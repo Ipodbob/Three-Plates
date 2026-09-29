@@ -230,3 +230,8 @@ test('save guard preserves newer data before the storage event is delivered',()=
 test('cleared storage cannot be resurrected by a stale tab, with or without its event',()=>{
  for(const event of [true,false]){const a=app();a.click("#f-time-any");a.w.localStorage.clear();if(event)a.w.dispatchEvent(new a.w.StorageEvent('storage',{key:null,newValue:null}));a.click('[data-act="plan-add"]');assert.equal(a.w.localStorage.getItem('three-plates-v3'),null);assert.match(a.q('.storage-warning').textContent,/another tab/);a.dom.window.close();}
 });
+
+test('favourite ingredient groups stay compact and remove independently of exclusions',()=>{
+ const a=app();a.route('you');a.set('#pref-likedIngredients','Chicken — all cuts');a.submit('.pref-form[data-key="likedIngredients"]');a.set('#pref-exclusions','Garlic cloves');a.submit('.pref-form[data-key="exclusions"]');
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('you');assert.equal(b.w.document.querySelectorAll('[data-act="pref-remove"][data-key="likedIngredients"]').length,1);b.click('[data-act="pref-remove"][data-key="likedIngredients"][data-id="group-chicken"]');assert.deepEqual(b.state().prefs.likedIngredients,[]);assert.deepEqual(b.state().prefs.exclusions,['garlic']);a.dom.window.close();b.dom.window.close();
+});

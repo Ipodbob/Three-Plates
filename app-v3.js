@@ -1188,7 +1188,7 @@
   };
   function preferenceSection(key, title) {
     const selected = [...state.prefs[key]];
-    if (key === "exclusions") {
+    if (key === "exclusions" || key === "likedIngredients") {
       for (const [groupId, group] of Object.entries(groups)) {
         if (!group.ids.every((id) => selected.includes(id))) continue;
         const first = Math.min(...group.ids.map((id) => selected.indexOf(id)));
