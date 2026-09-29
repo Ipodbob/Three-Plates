@@ -2,6 +2,13 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Cooked-batch and empty-portion history
+
+- The remaining cooked-batch and empty-container histories rendered every saved record. Both now use a shared searchable archive component: twenty records initially, newest cooking dates first, exact local date search, Clear, and Show older records with keyboard focus on the first added result. Stable record identities, allocations, capacities, stock and storage deadlines remain unchanged.
+- Cooked batches now offer contextual Recipe access; the dialog uses original batch portions and labels the batch Cooked rather than Planned. Empty records retain their recipe reference and correction controls. A restored discarded portion leaves the empty archive and returns to active prepared meals without deducting ingredients again.
+- All 42 relevant checks passed: 38 history/storage/phase checks plus four connected shopping/batch checks. New regressions exercise 1,002 records in each archive, old-date discovery, focus, unchanged saved data, original recipe portions and restoring one mistakenly discarded portion. Prior full-suite baseline remains 242 checks; this release does not claim a new full-suite run.
+- Browser verified creating a two-portion batch, finding its cooked record and original recipe, discarding a container, finding its empty record, restoring one portion and retaining that portion after reload. Synthetic localhost data was cleared through Settings afterward. Physical phone checks remain outstanding.
+
 ## Searchable purchase history
 
 - Purchase history previously rendered every saved entry inside its collapsed section. It now uses the same progressive history pattern as finished meals: twenty recent records initially, Show older purchases, search and Clear, with focus maintained after filtering and loading. Every saved record remains available; browsing does not persist changes or trim history.
