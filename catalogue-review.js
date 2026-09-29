@@ -333,6 +333,18 @@
     "ex-pepperoni-slices-d83045ab",
   ];
   const patches = {
+    "gf2-cheesy-black-bean-quesadillas": { kind: "vegetarian", emoji: "🫓" },
+    "sp-gfmore-no-cook-chicken-couscous": {
+      method: "no-cook",
+      methodNote:
+        "Uses ready-cooked chicken and boiling-hot stock; a kettle or another way to heat the stock is needed.",
+    },
+    "gf2-quick-sushi-bowl": {
+      method: "hob",
+      methodNote:
+        "Cook the rice following its pack instructions. Uses ready-cooked salmon.",
+    },
+
     "gf2-greek-style-roast-fish": { kind: "fish" },
     "sp-gfmore-peppered-mackerel-pink-pickled-onion-salad": { kind: "fish" },
 

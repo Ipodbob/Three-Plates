@@ -155,3 +155,14 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Regression covers every affected recipe, exact ingredient exclusions, remaining vegetable exclusions and unchanged saved recipe/stock records. Browser verified Grasshopper Cupcakes is available with Peppers excluded; all test settings restored.
 
 - Full release validation: all 217 checks passed (31 core checks and 186 Node test-runner checks).
+
+## Cooking method follow-up
+
+- Publisher methods confirm No-cook chicken couscous uses cooked chicken and hot stock; changed Hob to No cook with an explicit heating note. Quick sushi bowl requires cooking rice; changed No cook to Hob with a cooked-salmon note. Original ingredient identities and quantities remain unchanged.
+- Reviewed title/method matches across all air-fryer, microwave, pressure/Instant Pot and slow-cooked titles. The only apparent mismatch was the pork cider hotpot; the publisher confirms both hob and oven, so retained that classification. Smoothie and overnight-oat titles already use No cook; overnight cinnamon rolls correctly use Oven. Title checks are screening evidence, not verification of every recipe method.
+- Browser verified couscous appears under No cook and disappears under Hob; sushi bowl does the reverse with Any time selected. Both display preparation notes. Test search and filters restored.
+
+- Corrected Cheesy black bean quesadillas from Fish to Vegetarian using the publisher classification and ingredient list. The method mentions a fish slice as equipment.
+- Newly found outstanding ingredient completeness gaps: Lentil & tuna salad, Sardine Salad and Tuna White Bean Salad have no fish ingredient records. Review publisher quantities and saved-plan effects before changing requirements. Miso soup (dashi) and Tteokbokki (eomuk) also need their imported ingredient identities reviewed for broad fish exclusions. These are now explicit outstanding audit items.
+
+- Validation: full run passed 218 checks before the final quesadilla metadata correction; all 16 catalogue checks passed afterward. Browser confirmed vegetarian quesadilla discovery and restored the diet preference. Replaced its misleading fish illustration with flatbread.
