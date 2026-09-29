@@ -171,6 +171,7 @@ test("batch guidance includes reviewed planning notes instead of stale omission 
   assert.deepEqual(affected.map(r => r.id).sort(), [
     'gf2-slow-cooker-pork-casserole', 'gf2-slow-cooker-ratatouille',
     'sp-gfmore-courgette-potato-cheddar-soup', 'sp-gfmore-pasta-e-fagioli',
+    'sp-lovelemons-tomato-soup-recipe',
     'sp-amyjacky-instant-pot-chicken-noodle-soup', 'sp-budgetbytes-slow-cooker-chicken-noodle-soup',
     'sp-budgetbytes-slow-cooker-meatball-subs', 'sp-skinnytaste-crock-pot-carne-guisada-latin-beef-stew',
   ].sort());
@@ -711,4 +712,36 @@ test('reviewed seasonings and explicit soup weights scale, reload and deduct onc
  assert.equal(cake.ingredients.find(i=>i.id==='salt').qty,1);
  assert.equal(omittedReview.entries.find(e=>e.recipeId===cake.id).status,'reviewed-conditional');
  assert.match(omittedReview.entries.find(e=>e.recipeId===cake.id).decision,/only if/);
+});
+
+
+test('every omitted-quantity correction survives scaled shopping and once-only cooking',()=>{
+ for(const correction of omittedReview.corrections){
+  const r=find(correction.recipeId),s=C.defaults(),portions=Math.max(1,Math.floor(r.base/2));
+  s.plans=[{id:'omission-check',recipeId:r.id,date:C.today(),meal:r.meals[0],servings:portions,side:'none',cooked:false}];
+  const saved=C.migrate(C.clone(s),R,I), amounts={};
+  for(const item of correction.items){
+   const qty=C.round(item.qty*portions/r.base);amounts[item.id]=qty;
+   assert.equal(C.requirements(saved,R)[item.id],qty,r.id+':'+item.id);
+   assert.equal(C.shopping(saved,R).find(i=>i.id===item.id).remaining,qty);
+   assert.equal(C.foodAllowed(r,{...saved.prefs,exclusions:[item.id]}),false);
+   saved.pantry.push({id:item.id,qty:C.round(qty*2),always:false});
+  }
+  const restored=C.migrate(C.clone(saved),R,I);assert.deepEqual(restored.pantry,saved.pantry);
+  C.finishPlan(restored,'omission-check',R);
+  for(const [id,qty]of Object.entries(amounts))assert.equal(C.stock(restored,id),qty,r.id+':'+id);
+  const done=C.migrate(C.clone(restored),R,I);assert.deepEqual(done.pantry,restored.pantry);
+  assert.throws(()=>C.finishPlan(done,'omission-check',R));
+ }
+ assert.equal(omittedReview.entries.filter(e=>e.status==='pending').length,0);
+ const peach=find('sp-kingarthur-tender-peach-scones-recipe');
+ assert.equal(peach.ingredients.some(i=>i.id==='nutmeg'),false);
+ assert.equal(omittedReview.entries.find(e=>e.recipeId===peach.id).status,'reviewed-optional');
+ const beef=find('sp-skinnytaste-vietnamese-shaking-beef-bo-luc-lac');
+ assert.match(beef.ingredientGuidance,/estimated as 136g/);assert.equal(4*34,136);
+ assert.deepEqual(I['orange-baking-oil'].unit,'tsp');assert.deepEqual(I['lemon-baking-oil'].unit,'tsp');
+ const breaded=find('sp-skinnytaste-air-fryer-breaded-chicken-breast');
+ assert.equal(breaded.ingredients.find(i=>i.id==='olive-oil').qty,15+2.25*5);
+ assert.equal(breaded.ingredients.find(i=>i.id==='red-wine-vinegar').qty,2.25*5);
+ assert.equal(breaded.ingredients.find(i=>i.id==='salt').qty,.25+.125+.25);
 });

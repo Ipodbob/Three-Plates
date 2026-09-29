@@ -1263,7 +1263,7 @@
   }
 ]);
   // Reviewed quantified omissions; sources and decisions are retained in docs/catalogue.
-  for (const ingredient of [{"id":"prepared-mashed-potato","name":"Prepared mashed potato (not raw)","unit":"g","group":"Chilled"}]) root.PLATES_DATA.ingredients[ingredient.id] = ingredient;
+  for (const ingredient of [{"id":"prepared-mashed-potato","name":"Prepared mashed potato (not raw)","unit":"g","group":"Chilled"},{"id":"orange-baking-oil","name":"Orange oil (food-grade baking flavouring)","unit":"tsp","group":"Staples"},{"id":"lemon-baking-oil","name":"Lemon oil (food-grade baking flavouring)","unit":"tsp","group":"Staples"},{"id":"fiori-di-sicilia","name":"Fiori di Sicilia baking flavouring","unit":"tsp","group":"Staples"}]) root.PLATES_DATA.ingredients[ingredient.id] = ingredient;
   requiredIngredientCorrections.push(...[
   {
     "recipeId": "sp-amyjacky-instant-pot-beef-broccoli",
@@ -1594,6 +1594,383 @@
     ],
     "note": "Includes 1500ml unsalted chicken stock and 220g carrots, using the publisher’s explicit metric quantities. Lemon juice is an optional finishing addition and is not included in shopping.",
     "ingredientGuidance": "Includes 1500ml unsalted chicken stock and 220g carrots, using the publisher’s explicit metric quantities. Lemon juice is an optional finishing addition and is not included in shopping."
+  },
+  {
+    "recipeId": "sp-lovelemons-celery-salad",
+    "source": "https://www.loveandlemons.com/celery-salad/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0.5,
+        "qty": 0.75
+      }
+    ],
+    "replace": [
+      [
+        "¼ teaspoon sea salt (plus more to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes half a teaspoon of salt in the salad plus a quarter teaspoon for the full dressing (0.75 teaspoons total).",
+    "ingredientGuidance": "Includes half a teaspoon of salt in the salad plus a quarter teaspoon for the full dressing (0.75 teaspoons total)."
+  },
+  {
+    "recipeId": "sp-lovelemons-roasted-delicata-squash",
+    "source": "https://www.loveandlemons.com/roasted-delicata-squash/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.25
+      }
+    ],
+    "replace": [
+      [
+        "Heaping ¼ teaspoon sea salt (plus more to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes a nominal quarter teaspoon of salt for planning. The publisher specifies a heaped spoon; the extra heap and final adjustment remain unquantified.",
+    "ingredientGuidance": "Includes a nominal quarter teaspoon of salt for planning. The publisher specifies a heaped spoon; the extra heap and final adjustment remain unquantified."
+  },
+  {
+    "recipeId": "sp-lovelemons-tomato-soup-recipe",
+    "source": "https://www.loveandlemons.com/tomato-soup-recipe/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 1
+      }
+    ],
+    "replace": [
+      [
+        "1 teaspoon sea salt (plus more to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes the listed 1 teaspoon of salt. The initial pinch and further seasoning remain adjustable.",
+    "ingredientGuidance": "Includes the listed 1 teaspoon of salt. The initial pinch and further seasoning remain adjustable."
+  },
+  {
+    "recipeId": "sp-lovelemons-turkish-eggs",
+    "source": "https://www.loveandlemons.com/turkish-eggs/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.25
+      }
+    ],
+    "replace": [
+      [
+        "¼ teaspoon sea salt (plus more to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes a quarter teaspoon of salt in the yogurt; further seasoning remains adjustable.",
+    "ingredientGuidance": "Includes a quarter teaspoon of salt in the yogurt; further seasoning remains adjustable."
+  },
+  {
+    "recipeId": "sp-skinnytaste-air-fryer-breaded-chicken-breast",
+    "source": "https://www.skinnytaste.com/air-fryer-breaded-chicken-breast/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0.25,
+        "qty": 0.625
+      },
+      {
+        "id": "olive-oil",
+        "oldQty": 16.25,
+        "qty": 26.25
+      },
+      {
+        "id": "red-wine-vinegar",
+        "oldQty": 1.25,
+        "qty": 11.25
+      }
+    ],
+    "replace": [
+      [
+        "1/4 plus 1/8 teaspoon kosher salt ( and black pepper, to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes three eighths of a teaspoon of salt for the chicken and a quarter for the salad (0.625 teaspoons total). Corrects the salad measures to 2.25 teaspoons each of oil and vinegar: 26.25ml olive oil total and 11.25ml vinegar. The separate 5ml pan-spray allowance is retained.",
+    "ingredientGuidance": "Includes three eighths of a teaspoon of salt for the chicken and a quarter for the salad (0.625 teaspoons total). Corrects the salad measures to 2.25 teaspoons each of oil and vinegar: 26.25ml olive oil total and 11.25ml vinegar. The separate 5ml pan-spray allowance is retained."
+  },
+  {
+    "recipeId": "sp-skinnytaste-air-fryer-chicken-wings",
+    "source": "https://www.skinnytaste.com/air-fryer-chicken-wings/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 1
+      }
+    ],
+    "replace": [
+      [
+        "1 teaspoon kosher salt (or more to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes 1 teaspoon of salt in the wing seasoning; further salt remains adjustable.",
+    "ingredientGuidance": "Includes 1 teaspoon of salt in the wing seasoning; further salt remains adjustable."
+  },
+  {
+    "recipeId": "sp-skinnytaste-chipotle-chicken",
+    "source": "https://www.skinnytaste.com/chipotle-chicken/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 1.25
+      }
+    ],
+    "replace": [
+      [
+        "1 1/4 teaspoons kosher salt (and fresh ground black pepper, to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes 1.25 teaspoons of salt for seasoning the chicken. Black pepper remains unquantified.",
+    "ingredientGuidance": "Includes 1.25 teaspoons of salt for seasoning the chicken. Black pepper remains unquantified."
+  },
+  {
+    "recipeId": "sp-skinnytaste-grilled-chicken-with-black-bean-mango",
+    "source": "https://www.skinnytaste.com/grilled-chicken-with-black-bean-mango/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 1.25
+      }
+    ],
+    "replace": [
+      [
+        "1 teaspoon kosher salt ( and fresh cracked pepper, to taste)",
+        "further adjustment to taste (amount not specified)"
+      ],
+      [
+        "1/4 teaspoon kosher salt (or more to taste )",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes 1 teaspoon of salt for the chicken and a quarter teaspoon for the salsa (1.25 teaspoons total). Further seasoning remains adjustable.",
+    "ingredientGuidance": "Includes 1 teaspoon of salt for the chicken and a quarter teaspoon for the salsa (1.25 teaspoons total). Further seasoning remains adjustable."
+  },
+  {
+    "recipeId": "sp-skinnytaste-healthy-baked-chicken-nuggets",
+    "source": "https://www.skinnytaste.com/healthy-baked-chicken-nuggets/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.5
+      }
+    ],
+    "replace": [
+      [
+        "1/2 teaspoon kosher salt ( and black pepper, to taste)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes half a teaspoon of salt for the chicken. Black pepper remains unquantified.",
+    "ingredientGuidance": "Includes half a teaspoon of salt for the chicken. Black pepper remains unquantified."
+  },
+  {
+    "recipeId": "sp-skinnytaste-turkey-sausage-patties-from-scratch",
+    "source": "https://www.skinnytaste.com/turkey-sausage-patties-from-scratch/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.75
+      }
+    ],
+    "replace": [
+      [
+        "3/4 teaspoon kosher salt ( and black pepper to taste, divided)",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes three quarters of a teaspoon of salt, divided between the onions and sausage mixture. Black pepper remains unquantified.",
+    "ingredientGuidance": "Includes three quarters of a teaspoon of salt, divided between the onions and sausage mixture. Black pepper remains unquantified."
+  },
+  {
+    "recipeId": "sp-kingarthur-bread-flour-english-muffins-recipe",
+    "source": "https://www.kingarthurbaking.com/recipes/bread-flour-english-muffins-recipe",
+    "items": [
+      {
+        "id": "ex-table-salt-43921cdd",
+        "oldQty": 0,
+        "qty": 1.5
+      }
+    ],
+    "replace": [
+      [
+        "1 1/4 to 1 1/2 teaspoons table salt, to taste",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes table salt at the upper end of the publisher’s range (1.25 to 1.5 teaspoons) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes table salt at the upper end of the publisher’s range (1.25 to 1.5 teaspoons) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-kingarthur-cinnamon-sugar-doughnut-muffins-recipe",
+    "source": "https://www.kingarthurbaking.com/recipes/cinnamon-sugar-doughnut-muffins-recipe",
+    "items": [
+      {
+        "id": "nutmeg",
+        "oldQty": 0,
+        "qty": 1.25
+      }
+    ],
+    "replace": [
+      [
+        "1 to 1 1/4 teaspoons ground nutmeg, to taste",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes nutmeg at the upper end of the publisher’s range (1 to 1.25 teaspoons) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes nutmeg at the upper end of the publisher’s range (1 to 1.25 teaspoons) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-kingarthur-classic-beer-bread-recipe",
+    "source": "https://www.kingarthurbaking.com/recipes/classic-beer-bread-recipe",
+    "items": [
+      {
+        "id": "sugar",
+        "oldQty": 0,
+        "qty": 50
+      }
+    ],
+    "replace": [
+      [
+        "1 to 4 tablespoons (14g to 50g) granulated sugar, to taste",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes sugar at the upper end of the publisher’s range (14g to 50g) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes sugar at the upper end of the publisher’s range (14g to 50g) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-kingarthur-cranberry-orange-brioche-recipe",
+    "source": "https://www.kingarthurbaking.com/recipes/cranberry-orange-brioche-recipe",
+    "items": [
+      {
+        "id": "orange-baking-oil",
+        "oldQty": 0,
+        "qty": 0.25
+      }
+    ],
+    "replace": [
+      [
+        "1/8 to 1/4 teaspoon orange oil, to taste*",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes food-grade orange baking oil at the upper end of the publisher’s range (0.125 to 0.25 teaspoon) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes food-grade orange baking oil at the upper end of the publisher’s range (0.125 to 0.25 teaspoon) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-kingarthur-lemon-poppy-seed-muffins-recipe",
+    "source": "https://www.kingarthurbaking.com/recipes/lemon-poppy-seed-muffins-recipe",
+    "items": [
+      {
+        "id": "lemon-baking-oil",
+        "oldQty": 0,
+        "qty": 0.5
+      }
+    ],
+    "replace": [
+      [
+        "1/4 to 1/2 teaspoon lemon oil, to taste",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes food-grade lemon baking oil at the upper end of the publisher’s range (0.25 to 0.5 teaspoon) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes food-grade lemon baking oil at the upper end of the publisher’s range (0.25 to 0.5 teaspoon) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-kingarthur-panettone-muffins-recipe",
+    "source": "https://www.kingarthurbaking.com/recipes/panettone-muffins-recipe",
+    "items": [
+      {
+        "id": "fiori-di-sicilia",
+        "oldQty": 0,
+        "qty": 0.25
+      }
+    ],
+    "replace": [
+      [
+        "1/8 to 1/4 teaspoon King Arthur Fiori di Sicilia, to taste",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes Fiori di Sicilia baking flavouring at the upper end of the publisher’s range (0.125 to 0.25 teaspoon) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes Fiori di Sicilia baking flavouring at the upper end of the publisher’s range (0.125 to 0.25 teaspoon) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-recipetineats-marinated-bbq-vegetables",
+    "source": "https://www.recipetineats.com/marinated-bbq-vegetables/",
+    "items": [
+      {
+        "id": "chilli",
+        "oldQty": 0,
+        "qty": 1
+      }
+    ],
+    "replace": [
+      [
+        "1/2 - 1 tsp chilli flakes ((adjust spice to taste, Note 3))",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes chilli flakes at the upper end of the publisher’s range (0.5 to 1 teaspoon) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes chilli flakes at the upper end of the publisher’s range (0.5 to 1 teaspoon) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-recipetineats-vegetarian-pasta-salad",
+    "source": "https://www.recipetineats.com/vegetarian-pasta-salad/",
+    "items": [
+      {
+        "id": "chilli",
+        "oldQty": 0,
+        "qty": 1
+      }
+    ],
+    "replace": [
+      [
+        "1/2 - 1 tsp chilli flakes ((adjust spice to taste, Note 3))",
+        "further adjustment to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes chilli flakes at the upper end of the publisher’s range (0.5 to 1 teaspoon) for shopping. Adjust the amount used to taste.",
+    "ingredientGuidance": "Includes chilli flakes at the upper end of the publisher’s range (0.5 to 1 teaspoon) for shopping. Adjust the amount used to taste."
+  },
+  {
+    "recipeId": "sp-skinnytaste-vietnamese-shaking-beef-bo-luc-lac",
+    "source": "https://www.skinnytaste.com/vietnamese-shaking-beef-bo-luc-lac/",
+    "items": [
+      {
+        "id": "ex-watercress-6c01a4a4",
+        "oldQty": 0,
+        "qty": 136
+      }
+    ],
+    "replace": [
+      [
+        "4 cups watercress leaves  (or mixed baby greens)",
+        ""
+      ]
+    ],
+    "note": "Includes 4 cups watercress leaves, estimated as 136g for shopping using a 34g-per-cup raw chopped watercress reference. Leaf packing varies; follow the publisher’s cup measure. Mixed baby greens are an alternative.",
+    "ingredientGuidance": "Includes 4 cups watercress leaves, estimated as 136g for shopping using a 34g-per-cup raw chopped watercress reference. Leaf packing varies; follow the publisher’s cup measure. Mixed baby greens are an alternative.",
+    "estimateSource": "https://tools.myfooddata.com/nutrition-facts/170068/wt1",
+    "estimateBasis": "USDA Standard Release reference as displayed by MyFoodData: 1 cup chopped raw watercress = 34g. This is a disclosed planning estimate for leaves, not a publisher weight."
   }
 ]);
   for (const correction of requiredIngredientCorrections) {
