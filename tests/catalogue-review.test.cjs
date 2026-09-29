@@ -39,8 +39,11 @@ function correctedReference(old) {
 }
 const correctedRecipes = before.recipes.map(correctedReference);
 
-test('required cocoa icing and slurry amounts affect shopping and consume stock once', () => {
+test('required quantified ingredients affect shopping and consume stock once', () => {
  const expected=[
+  ['sp-gfmore-classic-potato-salad','ex-mayonnaise-5bde4603',9],
+  ['sp-lovelemons-roasted-cauliflower','olive-oil',30],
+  ['sp-skinnytaste-deviled-egg-salad','ex-dijon-mustard-cadd5781',1],
   ['sp-amyjacky-instant-pot-beef-broccoli','cornflour',22.5],
   ['sp-sally-stamped-chocolate-espresso-cookies','ex-unsweetened-natural-cocoa-powder-34c6cb2e',62],
   ['sp-sally-chocolate-pastry-pop-tarts','ex-unsweetened-natural-1668438f',31],

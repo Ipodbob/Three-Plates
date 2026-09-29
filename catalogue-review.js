@@ -1364,6 +1364,63 @@
     ],
     "note": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified.",
     "ingredientGuidance": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified."
+  },
+  {
+    "recipeId": "sp-gfmore-classic-potato-salad",
+    "source": "https://www.bbcgoodfood.com/recipes/classic-potato-salad",
+    "items": [
+      {
+        "id": "ex-mayonnaise-5bde4603",
+        "oldQty": 0,
+        "qty": 9
+      }
+    ],
+    "replace": [
+      [
+        "3 tbsp mayonnaise or to taste",
+        "extra mayonnaise to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes the listed 3 tablespoons of mayonnaise (9 teaspoons). Adjust to taste; optional capers and cornichons remain optional.",
+    "ingredientGuidance": "Includes the listed 3 tablespoons of mayonnaise (9 teaspoons). Adjust to taste; optional capers and cornichons remain optional."
+  },
+  {
+    "recipeId": "sp-lovelemons-roasted-cauliflower",
+    "source": "https://www.loveandlemons.com/roasted-cauliflower/",
+    "items": [
+      {
+        "id": "olive-oil",
+        "oldQty": 0,
+        "qty": 30
+      }
+    ],
+    "replace": [
+      [
+        "2 tablespoons extra-virgin olive oil (plus more as needed)",
+        "extra olive oil as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 2 tablespoons of olive oil (30ml) for roasting. Extra oil for a larger cauliflower remains adjustable.",
+    "ingredientGuidance": "Includes 2 tablespoons of olive oil (30ml) for roasting. Extra oil for a larger cauliflower remains adjustable."
+  },
+  {
+    "recipeId": "sp-skinnytaste-deviled-egg-salad",
+    "source": "https://www.skinnytaste.com/deviled-egg-salad/",
+    "items": [
+      {
+        "id": "ex-dijon-mustard-cadd5781",
+        "oldQty": 0,
+        "qty": 1
+      }
+    ],
+    "replace": [
+      [
+        "1 teaspoon Dijon mustard (or more to taste)",
+        "extra Dijon mustard to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes 1 teaspoon of Dijon mustard in the dressing. Further mustard and optional garnishes remain adjustable.",
+    "ingredientGuidance": "Includes 1 teaspoon of Dijon mustard in the dressing. Further mustard and optional garnishes remain adjustable."
   }
 ]);
   for (const correction of requiredIngredientCorrections) {
