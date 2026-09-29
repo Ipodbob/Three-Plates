@@ -32,12 +32,14 @@
     {
       "recipeId": "gf2-new-york-cheesecake",
       "source": "https://www.bbcgoodfood.com/recipes/new-york-cheesecake",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Extra yolks source verified; whole-egg allowance and visible usage split recorded in finishing-ingredient-corrections.json."
     },
     {
       "recipeId": "gf2-next-level-chocolate-chip-cookies",
       "source": "https://www.bbcgoodfood.com/recipes/next-level-chocolate-chip-cookies",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Extra yolks source verified; whole-egg allowance and visible usage split recorded in finishing-ingredient-corrections.json."
     },
     {
       "recipeId": "gf2-peach-raspberry-almond-crumble-cake",
@@ -52,7 +54,8 @@
     {
       "recipeId": "gf2-smoked-trout-tartlets",
       "source": "https://www.bbcgoodfood.com/recipes/smoked-trout-tartlets",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Extra yolks source verified; whole-egg allowance and visible usage split recorded in finishing-ingredient-corrections.json."
     },
     {
       "recipeId": "sp-gfmore-microwave-garam-masala-vegetable-curry",
@@ -78,7 +81,8 @@
     {
       "recipeId": "sp-sally-soft-chewy-chocolate-chip-cookie-bars",
       "source": "https://sallysbakingaddiction.com/soft-chewy-chocolate-chip-cookie-bars/",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Extra yolks source verified; whole-egg allowance and visible usage split recorded in finishing-ingredient-corrections.json."
     }
   ]
 }

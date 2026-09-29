@@ -971,6 +971,84 @@
     "note": "Includes 135g chocolate chips in the batter and the publisher's measured 22g topping, 157g total. No spoon-to-weight estimate is needed. Follow the publisher method for the hot water, which is not a shopping item."
   }
 ]);
+  requiredIngredientCorrections.push(...[
+  {
+    "recipeId": "gf2-new-york-cheesecake",
+    "source": "https://www.bbcgoodfood.com/recipes/new-york-cheesecake",
+    "items": [
+      {
+        "id": "eggs",
+        "oldQty": 3,
+        "qty": 4
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 3 large eggs plus 1 yolk",
+        "Extra yolks are included in the whole-egg shopping allowance."
+      ]
+    ],
+    "note": "Whole-egg shopping allowance: the full recipe uses 3 whole eggs plus 1 extra yolk. Separate 1 egg and reserve the spare white. Adjust this split if changing portions; follow the publisher method. Cooking deducts the opened whole eggs; spare whites are not automatically recorded as pantry stock.",
+    "ingredientGuidance": "Whole-egg shopping allowance: the full recipe uses 3 whole eggs plus 1 extra yolk. Separate 1 egg and reserve the spare white. Adjust this split if changing portions; follow the publisher method."
+  },
+  {
+    "recipeId": "gf2-next-level-chocolate-chip-cookies",
+    "source": "https://www.bbcgoodfood.com/recipes/next-level-chocolate-chip-cookies",
+    "items": [
+      {
+        "id": "eggs",
+        "oldQty": 1,
+        "qty": 3
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 1 large egg plus 2 large yolks",
+        "Extra yolks are included in the whole-egg shopping allowance."
+      ]
+    ],
+    "note": "Whole-egg shopping allowance: the full recipe uses 1 whole egg plus 2 extra yolks. Separate 2 eggs and reserve the spare whites. Adjust this split if changing portions; follow the publisher method. Cooking deducts the opened whole eggs; spare whites are not automatically recorded as pantry stock.",
+    "ingredientGuidance": "Whole-egg shopping allowance: the full recipe uses 1 whole egg plus 2 extra yolks. Separate 2 eggs and reserve the spare whites. Adjust this split if changing portions; follow the publisher method."
+  },
+  {
+    "recipeId": "gf2-smoked-trout-tartlets",
+    "source": "https://www.bbcgoodfood.com/recipes/smoked-trout-tartlets",
+    "items": [
+      {
+        "id": "eggs",
+        "oldQty": 2,
+        "qty": 3
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 2 eggs plus 1 egg yolk",
+        "Extra yolks are included in the whole-egg shopping allowance."
+      ]
+    ],
+    "note": "Whole-egg shopping allowance: the full recipe uses 2 whole eggs plus 1 extra yolk. Separate 1 egg and reserve the spare white. Adjust this split if changing portions; follow the publisher method. Cooking deducts the opened whole eggs; spare whites are not automatically recorded as pantry stock.",
+    "ingredientGuidance": "Whole-egg shopping allowance: the full recipe uses 2 whole eggs plus 1 extra yolk. Separate 1 egg and reserve the spare white. Adjust this split if changing portions; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-soft-chewy-chocolate-chip-cookie-bars",
+    "source": "https://sallysbakingaddiction.com/soft-chewy-chocolate-chip-cookie-bars/",
+    "items": [
+      {
+        "id": "eggs",
+        "oldQty": 1,
+        "qty": 2
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 1 large egg plus 1 large egg yolk",
+        "Extra yolks are included in the whole-egg shopping allowance."
+      ]
+    ],
+    "note": "Whole-egg shopping allowance: the full recipe uses 1 whole egg plus 1 extra yolk. Separate 1 egg and reserve the spare white. Adjust this split if changing portions; follow the publisher method. Cooking deducts the opened whole eggs; spare whites are not automatically recorded as pantry stock.",
+    "ingredientGuidance": "Whole-egg shopping allowance: the full recipe uses 1 whole egg plus 1 extra yolk. Separate 1 egg and reserve the spare white. Adjust this split if changing portions; follow the publisher method."
+  }
+]);
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,
@@ -986,6 +1064,7 @@
           ...(item.avoidIds ? { avoidIds: item.avoidIds } : {}),
         });
     }
+    if (correction.ingredientGuidance) r.ingredientGuidance = correction.ingredientGuidance;
     for (const [oldText, newText] of correction.replace)
       r.planningNotes = r.planningNotes.replace(oldText, newText);
     const note =
