@@ -527,7 +527,7 @@
     if (s.prefs.cuisines.includes(r.cuisine)) w *= 1.5;
     w *=
       1 +
-      r.ingredients.filter((i) => liked.has(i.id))
+      [...r.ingredients, ...(r.unmeasuredIngredients || [])].filter((i) => liked.has(i.id))
         .length *
         0.5;
     if ((batch ? s.batchFilters.mode : s.filters.mode) === "pantry")

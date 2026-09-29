@@ -113,7 +113,17 @@
         a.record.date.localeCompare(b.record.date) ||
         a.recipe.name.localeCompare(b.recipe.name),
     );
-    return { chosen, missing, items, outdated };
+    const unmeasured = chosen.flatMap((x) =>
+      x.view.groups.flatMap((g) =>
+        (g.unmeasured || []).map((i) => ({
+          ...i,
+          recipeId: x.recipe.id,
+          recipeName: g.name,
+          source: g.source,
+        })),
+      ),
+    );
+    return { chosen, missing, items, outdated, unmeasured };
   };
   C.selectPrep = (s, selected, recipes) => {
     const options = C.prepOptions(s, recipes);

@@ -431,7 +431,8 @@
       if (have + 0.0005 >= i.qty) yes++;
       ratio += Math.min(1, have / i.qty);
     }
-    return { yes, total: items.length, ratio: ratio / items.length };
+    const total = items.length + (r.unmeasuredIngredients?.length || 0);
+    return { yes, total, ratio: total ? ratio / total : 0 };
   }
   function suggestions(batch, refresh = false) {
     const key = batch ? "batch" : "choose",
@@ -724,7 +725,7 @@
               method(r),
               r.cuisine,
               ...(r.tags || []),
-              ...r.ingredients.map((i) => ing(i.id).name),
+              ...[...r.ingredients, ...(r.unmeasuredIngredients || [])].map((i) => ing(i.id).name),
             ].join(" "),
             query,
           ),
@@ -882,7 +883,7 @@
     );
     modal(
       "Prep checklist",
-      `<div id="prep-panel"><p class="helper">Gather these ingredients, keeping each recipe's share separate. These checks do not change pantry stock or mark meals cooked.</p><div class="action-wrap">${btn("Change meals", "prep-select")}${btn("Clear ready checks", "prep-reset", "", "ghost")}</div>${view.missing.length ? `<p class="notice">${view.missing.length} selected meal(s) finished or were removed and are no longer included. Change meals to review your selection.</p>` : ""}${view.outdated ? '<p class="notice">The plan changed. Ingredients with changed amounts are unchecked; review their new quantities.</p>' : ""}<p id="prep-progress" class="cook-progress">${items.filter((i) => i.checked).length} of ${items.length} ingredients ready · ${view.chosen.length} meals / batches</p><label for="prep-ingredient-search">Find an ingredient</label><input id="prep-ingredient-search" type="search" class="text-input" placeholder="Search this checklist"><p id="prep-no-matches" class="helper" hidden>No matching ingredients. Clear the search to see the whole checklist.</p>${
+      `<div id="prep-panel"><p class="helper">Gather these ingredients, keeping each recipe's share separate. These checks do not change pantry stock or mark meals cooked.</p><div class="action-wrap">${btn("Change meals", "prep-select")}${btn("Clear ready checks", "prep-reset", "", "ghost")}</div>${view.missing.length ? `<p class="notice">${view.missing.length} selected meal(s) finished or were removed and are no longer included. Change meals to review your selection.</p>` : ""}${view.outdated ? '<p class="notice">The plan changed. Ingredients with changed amounts are unchecked; review their new quantities.</p>' : ""}<p id="prep-progress" class="cook-progress">${items.filter((i) => i.checked).length} of ${items.length} measured ingredients ready · ${view.chosen.length} meals / batches</p><label for="prep-ingredient-search">Find an ingredient</label><input id="prep-ingredient-search" type="search" class="text-input" placeholder="Search this checklist"><p id="prep-no-matches" class="helper" hidden>No matching ingredients. Clear the search to see the whole checklist.</p>${
         items
           .map(
             (i) =>
@@ -897,7 +898,7 @@
                 .join("")}</details></section>`,
           )
           .join("") || "<p>No fresh ingredients to gather for these meals.</p>"
-      }<section class="section-space"><h3>Prepare each recipe</h3><p class="helper">Open Cooking for its method and timers. Follow each recipe's preparation order; this checklist does not predict a shared finishing time.</p>${view.chosen.map((x) => `<article class="prep-recipe"><h4>${e(x.recipe.name)}</h4><p class="helper">${e(day(x.record.date))} · ${x.kind === "batch" ? "Batch" : e(x.record.meal)} · ${x.record.servings} portions</p><div class="action-wrap">${plannedRecipeButton(x.record, x.kind)}${cookingButton(x.record, x.kind)}</div></article>`).join("")}</section></div>`,
+      }${unmeasuredNotice(view.unmeasured)}<section class="section-space"><h3>Prepare each recipe</h3><p class="helper">Open Cooking for its method and timers. Follow each recipe's preparation order; this checklist does not predict a shared finishing time.</p>${view.chosen.map((x) => `<article class="prep-recipe"><h4>${e(x.recipe.name)}</h4><p class="helper">${e(day(x.record.date))} · ${x.kind === "batch" ? "Batch" : e(x.record.meal)} · ${x.record.servings} portions</p><div class="action-wrap">${plannedRecipeButton(x.record, x.kind)}${cookingButton(x.record, x.kind)}</div></article>`).join("")}</section></div>`,
     );
     document.getElementById("prep-ingredient-search").oninput = (ev) => {
       const q = ev.target.value.trim().toLowerCase();
@@ -921,7 +922,7 @@
         ev.target.checked = !ev.target.checked;
       const current = C.prepView(state, R);
       document.getElementById("prep-progress").textContent =
-        `${current.items.filter((i) => i.checked).length} of ${current.items.length} ingredients ready · ${current.chosen.length} meals / batches`;
+        `${current.items.filter((i) => i.checked).length} of ${current.items.length} measured ingredients ready · ${current.chosen.length} meals / batches`;
     });
   }
   function menuRows(entries, start) {
@@ -1016,6 +1017,10 @@
       ),
     )}</div><label class="check-label"><input id="shop-trip" type="checkbox" ${state.tripShop ? "checked" : ""}>Use a different shop for this trip</label><p class="helper">Usual shop: ${e(state.shop === "none" ? "No preference" : state.shop)}. ${state.tripShop ? "Untick to return to your usual shop." : "Changes to Shopping at save your usual choice."}</p><p class="helper">${C.activeShop(state) === "none" ? "Choose exact quantities or editable common-pack estimates." : "Pack sizes are saved separately for " + e(C.activeShop(state)) + "."} Exact recipe amounts includes loose / exact-weight purchasing. No live retailer catalogue, prices or stock. Unedited pack sizes are generic estimates, not verified shop sizes.</p></section>`;
   }
+  function unmeasuredNotice(items) {
+    if (!items?.length) return "";
+    return `<section class="notice unmeasured-ingredients"><h3>Check amounts</h3><p class="helper">These required ingredients have no measured quantity. Check what you have before shopping or cooking. They are not included in quantity totals or automatic stock deductions.</p>${items.map(i => `<div class="section-space"><strong>${e(ing(i.id)?.name || i.id)} · Check amount</strong>${i.recipeName ? `<p class="helper">${e(i.recipeName)}</p>` : ""}<p>${e(i.note)}</p>${i.source ? `<a href="${e(i.source.url)}" target="_blank" rel="noopener noreferrer">Check publisher method ↗</a>` : ""}</div>`).join("")}</section>`;
+  }
   function shoppingRow(i) {
     const p = C.purchase(state, i.id, i.remaining, ingredients());
     return `<div class="shopping-row ${i.checked ? "checked" : ""}"><button class="check-button ${i.checked ? "checked" : ""}" data-act="bought" data-id="${i.id}" aria-label="${i.checked ? "Unmark" : "Mark"} ${e(ing(i.id).name)} as bought" aria-pressed="${i.checked}">${i.checked ? icon("check") : ""}</button><div class="shopping-name"><span>${e(ing(i.id).name)}</span><small>Need ${amount(i.id, i.qty)}${i.have > 0 && i.have !== Infinity ? " · " + amount(i.id, i.have) + " in pantry" : ""}</small>${i.bought > 0 ? `<small>${amount(i.id, i.bought)} bought${i.bought > i.need ? " · " + amount(i.id, i.bought - i.need) + " extra" : ""}</small>` : ""}<small>Additional needed: ${amount(i.id, i.need)} · Still to buy: ${amount(i.id, i.remaining)}</small>${p.pack && i.remaining > 0 ? `<small>${e(p.pack.basis)} · ${p.count} × ${amount(i.id, p.pack.size)}${p.extra > 0 ? " · " + amount(i.id, p.extra) + " extra" : ""}</small>` : ""}<div class="row-links"><button class="text-btn" data-act="pack-edit" data-id="${i.id}">Pack size / exact weight</button>${i.bought > 0 ? `<button class="text-btn" data-act="purchase-edit" data-id="${i.id}">Edit bought amount</button>` : ""}</div></div><strong class="shopping-qty">${i.remaining > 0 ? amount(i.id, p.qty) : "Bought"}</strong></div>`;
@@ -1034,6 +1039,7 @@
         "SHOPPING",
       ) +
       shopSelector() +
+      unmeasuredNotice(C.unmeasuredRequirements(state, R)) +
       `<div class="action-wrap page-actions">${btn("Copy list", "copy-list")}${purchased.length ? btn("Put bought items in pantry", "stock-bought", "", "") : ""}</div>${
         rows.length
           ? `<div class="list-layout"><section class="panel"><div class="section-bar"><h2 class="section-title">To buy</h2><span class="small-count">${need.filter((i) => i.remaining > 0).length} left</span></div>${
@@ -1047,7 +1053,7 @@
                           .join("")}`,
                     )
                     .join("")
-                : '<p class="helper">Everything is covered by your recorded pantry.</p>'
+                : '<p class="helper">All measured amounts are covered by your recorded pantry.</p>'
             }</section><aside class="panel"><h2 class="section-title">Already have</h2>${have.map((i) => `<div class="shopping-row"><span class="check-button covered">${icon("check")}</span><div class="shopping-name">${e(ing(i.id).name)}<small>${amount(i.id, i.qty)} needed${i.have === Infinity ? " · assumed always stocked" : ""}</small></div></div>`).join("") || '<p class="helper">No fully covered ingredients yet.</p>'}<a class="button ghost wide" href="#pantry">Check pantry</a></aside></div>`
           : empty(
               "Your list starts with a plan.",
@@ -1286,6 +1292,7 @@
         recipes: R,
         ingredients,
         amount,
+        unmeasuredNotice,
         modal,
         getState: () => state,
         commit: (fn) => change(fn),
@@ -1362,7 +1369,7 @@
         (i) =>
           `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
       )
-      .join("");
+      .join("") + unmeasuredNotice(r.unmeasuredIngredients);
   }
   function batchModal(id, edit = false) {
     const b = edit ? state.batches.find((b) => b.id === id) : null,
@@ -1617,6 +1624,8 @@
         const p = C.purchase(state, i.id, i.remaining, ingredients());
         return `☐ ${ing(i.id).name}: ${amount(i.id, p.qty)}${p.pack ? " (" + p.count + " × " + amount(i.id, p.pack.size) + "; " + p.pack.basis + ")" : ""}`;
       });
+    for (const i of C.unmeasuredRequirements(state, R))
+      lines.push(`☐ CHECK AMOUNT: ${ing(i.id).name} — ${i.recipeName}. ${i.note}`);
     const text =
       "THREE PLATES — " +
       (C.activeShop(state) === "none" ? "SHOPPING" : C.activeShop(state)) +

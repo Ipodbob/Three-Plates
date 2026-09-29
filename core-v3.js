@@ -513,6 +513,25 @@
       }
     return needs;
   }
+  function unmeasuredRequirements(s, recipes) {
+    const rows = new Map();
+    const add = (r) => {
+      for (const item of r?.unmeasuredIngredients || [])
+        rows.set(r.id + ":" + item.id, {
+          ...item,
+          recipeId: r.id,
+          recipeName: r.name,
+          source: r.source,
+        });
+    };
+    for (const p of s.plans.filter((p) => !p.cooked)) {
+      if (p.kind !== "stored") add(recipes.find((r) => r.id === p.recipeId));
+      add(sideRecipe(p.side, recipes));
+    }
+    for (const b of s.batches.filter((b) => !b.cooked))
+      add(recipes.find((r) => r.id === b.recipeId));
+    return [...rows.values()];
+  }
   function stock(s, id) {
     const p = s.pantry.find((p) => p.id === id);
     return p?.always ? Infinity : p?.qty || 0;
@@ -776,7 +795,7 @@
         excluded.add(id);
     return (
       !!r &&
-      !r.ingredients.some(
+      ![...r.ingredients, ...(r.unmeasuredIngredients || [])].some(
         (i) =>
           excluded.has(i.id) ||
           (
@@ -921,13 +940,16 @@
               ? "easy beginner"
               : "",
           r.source?.publisher,
-          ...r.ingredients.map((i) => ingredients[i.id]?.name),
+          ...[...r.ingredients, ...(r.unmeasuredIngredients || [])].map(
+            (i) => ingredients[i.id]?.name,
+          ),
         ].join(" "),
         q,
       )
     )
       return false;
     if (f.mode === "only") {
+      if (r.unmeasuredIngredients?.length) return false;
       const req = requirements(s, recipes);
       if (
         scaled(r, r.baking ? r.base : f.servings || 1).some(
@@ -997,6 +1019,7 @@
     sideAllowed,
     setPlanSide,
     requirements,
+    unmeasuredRequirements,
     stock,
     shopping,
     packFor,
