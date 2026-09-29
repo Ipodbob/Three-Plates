@@ -1120,3 +1120,19 @@
 .three-v3 .scan-presets button {
   min-width: 44px;
 }
+
+/* Keep all allocation buttons visible in narrow batch dialogs. */
+@media (max-width: 590px) {
+  .three-v3 #finish-batch-form > .form-grid.three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .three-v3 #finish-batch-form > .form-grid.three > .field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px;
+    align-items: center;
+    gap: 12px;
+  }
+  .three-v3 #finish-batch-form > .form-grid.three > .field label {
+    margin: 0;
+  }
+}
