@@ -1,4 +1,6 @@
-# Whole-app completion audit
+# Whole-app evidence history
+
+For current requirements, release evidence and remaining exit checks, use [current-completion-audit.md](current-completion-audit.md). Entries below are historical observations, not current release declarations.
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 

@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 216 checks: 31 core regressions, 46 added domain checks,
-34 catalogue checks, 75 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs the domain, catalogue, scanner, server and connected UI regressions.
+The current result and its limits are recorded in [the completion audit](docs/current-completion-audit.md).
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -46,8 +46,7 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.11.0 was verified live after PR #9 (merge 20b7729, successful
-Pages run 36501405285 and all 21 checked public assets matched). The fallback shares 100 requests per
+frontend release verification is recorded in [the current audit](docs/current-completion-audit.md). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
@@ -285,10 +284,9 @@ The reviewed mapping is in `docs/catalogue/seafood-preferences.json`.
 
 ## Verification and release status
 
-The latest verified release is v3.11.7 at `3f305d4` (PR #16): Pages run
-36506074752 succeeded, all 21 checked public assets matched, and a fresh live
-navigation displayed v3.11.7. The current v3.11.8 seafood preference coverage
-awaits release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
+The current verified release and exact Pages run are recorded in
+[the completion audit](docs/current-completion-audit.md). Historical release notes
+in `UPGRADE-v3.md` and the whole-app audit describe earlier baselines.
 
 The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:
 all six destinations fit without horizontal overflow or fields leaving the viewport.
@@ -316,7 +314,8 @@ imported cuts and stocks. Each broad exclusion appears as one removable chip.
 Existing saved anchor IDs remain valid; these mappings do not substitute pantry
 stock or convert quantities. Vegan chicken, unrelated steaks, seasoning and graham
 crackers stay outside the relevant families. The [review register](docs/catalogue/meat-preferences.json)
-records scope and remaining ambiguous sausage/cured-meat review.
+records the mapping scope; the later sausage review below covers the previously
+ambiguous sausage/cured-meat identities.
 
 ## Shopping pack editor
 
