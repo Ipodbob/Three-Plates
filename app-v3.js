@@ -1639,6 +1639,11 @@
     }
   }
   document.addEventListener("click", (ev) => {
+    if (ev.target.closest(".skip-link")) {
+      ev.preventDefault();
+      main.focus();
+      return;
+    }
     const b = ev.target.closest("[data-act]");
     if (b) handleAction(b);
   });

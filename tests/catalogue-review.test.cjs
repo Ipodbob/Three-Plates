@@ -177,3 +177,34 @@ test("longer-time filter includes additional chilling or proving without admitti
     false,
   );
 });
+
+test("reviewed animal ingredients exclude eleven recipes from vegetarian and vegan discovery", () => {
+  const meat = [
+    "gf2-air-fryer-crispy-chilli-beef",
+    "gf2-korean-style-fried-rice",
+    "sp-gfmore-deli-pasta-salad",
+    "sp-gfmore-healthy-ragu",
+    "sp-sally-my-favorite-pepperoni-pizza-dip",
+    "sp-kingarthur-flaky-pastry-recipe",
+    "sp-kingarthur-strawberry-filled-angel-food-cake-recipe",
+  ];
+  const fish = [
+    "sp-sally-easy-coconut-shrimp",
+    "sp-skinnytaste-scallops-grapefruit-arugula-and-spinach",
+    "sp-skinnytaste-shrimp-piccata-foil-packets",
+    "sp-skinnytaste-shrimp-tacos",
+  ];
+  for (const id of [...meat, ...fish]) {
+    const r = find(id),
+      s = C.defaults();
+    assert.equal(r.kind, meat.includes(id) ? "meat" : "fish", id);
+    for (const diet of ["vegan", "vegetarian"])
+      assert.equal(C.foodAllowed(r, { ...s.prefs, diet }), false, id);
+    assert.equal(
+      C.foodAllowed(r, { ...s.prefs, diet: "pescatarian" }),
+      fish.includes(id),
+      id,
+    );
+    assert.equal(C.foodAllowed(r, s.prefs), true, id);
+  }
+});

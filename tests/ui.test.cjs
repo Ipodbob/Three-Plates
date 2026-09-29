@@ -192,3 +192,7 @@ test('low-count publisher recipes leave discovery while saved plans remain reada
  const a=app();a.click('#f-time-any');a.q('#recipe-search').value='Creamy White Bean Soup';a.submit('#search-form');assert.equal(a.q('[data-act="recipe"][data-id="curated-workweeklunch-white-bean-soup"]'),null);
  const state=a.state();state.plans=[{id:'legacy-rating',recipeId:'curated-workweeklunch-white-bean-soup',date:a.w.PlatesCore.today(),meal:'Dinner',servings:3,cooked:false}];const b=app({'three-plates-v3':JSON.stringify(state)});b.route('plan');b.click('[data-act="recipe"]');assert.match(b.q('#sheet').textContent,/Kept for saved recipes/);assert.match(b.q('#sheet').textContent,/2 ratings/);assert.equal(b.state().plans[0].recipeId,'curated-workweeklunch-white-bean-soup');b.click('[data-act="close"]');b.route('shop');assert.ok(b.q('.shopping-row'));a.dom.window.close();b.dom.window.close();
 });
+
+test('skip to content focuses the current page without changing route or saved data',()=>{
+ const a=app();for(const name of ['choose','batch','plan','shop','pantry','you']){a.route(name);const heading=a.q('h1').textContent,saved=a.w.localStorage.getItem('three-plates-v3');const event=new a.w.MouseEvent('click',{bubbles:true,cancelable:true});a.q('.skip-link').dispatchEvent(event);assert.equal(event.defaultPrevented,true);assert.equal(a.w.location.hash,'#'+name);assert.equal(a.q('h1').textContent,heading);assert.equal(a.w.document.activeElement,a.q('main'));assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved);}a.dom.window.close();
+});

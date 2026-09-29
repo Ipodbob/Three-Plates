@@ -2,6 +2,16 @@
 (function (root) {
   "use strict";
   const patches = {
+    "sp-skinnytaste-shrimp-tacos": { kind: "fish" },
+    "sp-skinnytaste-shrimp-piccata-foil-packets": { kind: "fish" },
+    "sp-skinnytaste-scallops-grapefruit-arugula-and-spinach": { kind: "fish" },
+    "sp-sally-easy-coconut-shrimp": { kind: "fish" },
+    "sp-kingarthur-strawberry-filled-angel-food-cake-recipe": { kind: "meat" },
+    "sp-kingarthur-flaky-pastry-recipe": { kind: "meat" },
+    "sp-gfmore-healthy-ragu": { kind: "meat" },
+    "sp-gfmore-deli-pasta-salad": { kind: "meat" },
+    "gf2-korean-style-fried-rice": { kind: "meat" },
+    "gf2-air-fryer-crispy-chilli-beef": { kind: "meat" },
     "gf2-no-bake-pbj-cheesecake-squares": {
       method: "no-cook",
       methodNote:
@@ -101,6 +111,7 @@
       dishRole: "side",
     },
     "sp-sally-my-favorite-pepperoni-pizza-dip": {
+      kind: "meat",
       dishRole: "side",
     },
     "sp-skinnytaste-air-fryer-radishes": {

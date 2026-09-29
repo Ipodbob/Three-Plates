@@ -711,5 +711,104 @@
       "method": "no-cook",
       "methodNote": "No oven or hob required; boiling kettle water melts the butter and dissolves the jelly."
     }
+  },
+  {
+    "id": "gf2-air-fryer-crispy-chilli-beef",
+    "url": "https://www.bbcgoodfood.com/recipes/air-fryer-crispy-chilli-beef",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Thin-cut minute steak. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "gf2-korean-style-fried-rice",
+    "url": "https://www.bbcgoodfood.com/recipes/korean-style-fried-rice",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Rump steak. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-gfmore-deli-pasta-salad",
+    "url": "https://www.bbcgoodfood.com/recipes/deli-pasta-salad",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Prosciutto. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-gfmore-healthy-ragu",
+    "url": "https://www.bbcgoodfood.com/recipes/healthy-ragu",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Steak mince. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-sally-my-favorite-pepperoni-pizza-dip",
+    "url": "https://sallysbakingaddiction.com/my-favorite-pepperoni-pizza-dip/",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Pepperoni slices. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-kingarthur-flaky-pastry-recipe",
+    "url": "https://www.kingarthurbaking.com/recipes/flaky-pastry-recipe",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Lard. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-kingarthur-strawberry-filled-angel-food-cake-recipe",
+    "url": "https://www.kingarthurbaking.com/recipes/strawberry-filled-angel-food-cake-recipe",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Envelope unflavored gelatin (count). Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-sally-easy-coconut-shrimp",
+    "url": "https://sallysbakingaddiction.com/easy-coconut-shrimp/",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Raw large shrimp. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "fish"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-scallops-grapefruit-arugula-and-spinach",
+    "url": "https://www.skinnytaste.com/scallops-grapefruit-arugula-and-spinach/",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Sea scallops. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "fish"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-shrimp-piccata-foil-packets",
+    "url": "https://www.skinnytaste.com/shrimp-piccata-foil-packets/",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Raw shrimp. Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "fish"
+    }
+  },
+  {
+    "id": "sp-skinnytaste-shrimp-tacos",
+    "url": "https://www.skinnytaste.com/shrimp-tacos/",
+    "reviewedOn": "2026-09-29",
+    "reason": "The mapped recipe includes an animal ingredient: Jumbo shrimp (count). Classification follows the included ingredient, not optional vegetarian substitutions.",
+    "patch": {
+      "kind": "fish"
+    }
   }
 ]
