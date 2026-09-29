@@ -34,6 +34,15 @@ function correctedReference(old) {
   return r;
 }
 const correctedRecipes = before.recipes.map(correctedReference);
+
+test("batch guidance includes reviewed planning notes instead of stale omission claims", () => {
+  const affected = R.filter(r => r.batch && r.planningNotes !== before.recipes.find(x => x.id === r.id).planningNotes);
+  assert.deepEqual(affected.map(r => r.id).sort(), [
+    'gf2-slow-cooker-pork-casserole', 'gf2-slow-cooker-ratatouille',
+    'sp-gfmore-courgette-potato-cheddar-soup', 'sp-gfmore-pasta-e-fagioli',
+  ].sort());
+  for (const r of affected) assert.ok(r.batch.note.includes(r.planningNotes), r.id);
+});
 test("review preserves identities and ratings with only documented ingredient corrections", () => {
   assert.equal(R.length, before.recipes.length);
   assert.deepEqual(Object.fromEntries(Object.entries(I).filter(([id]) => !definitionAdditions.has(id))), before.ingredients);
@@ -45,7 +54,10 @@ test("review preserves identities and ratings with only documented ingredient co
     assert.deepEqual(r.ingredients.filter(i => !additions.has(i.id)), correctedReference(old).ingredients, old.id);
     assert.deepEqual(r.ingredients.filter(i => additions.has(i.id)), corrections.filter(c => c.recipeId === old.id).map(c => ({id:c.ingredient.id,qty:c.qty,avoidIds:c.avoidIds})),old.id);
     assert.deepEqual(r.source, old.source, old.id);
-    assert.deepEqual(r.batch, old.batch, old.id);
+    const expectedBatch = old.batch && r.planningNotes !== old.planningNotes
+      ? { ...old.batch, note: old.batch.note.replace(old.planningNotes, r.planningNotes) }
+      : old.batch;
+    assert.deepEqual(r.batch, expectedBatch, old.id);
     const s = C.defaults();
     s.plans = [
       {

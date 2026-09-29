@@ -1,6 +1,9 @@
 /* Reviewed catalogue metadata; evidence in docs/catalogue/classification-review.json. */
 (function (root) {
   "use strict";
+  const originalPlanningNotes = new Map(
+    root.PLATES_DATA.recipes.map((r) => [r.id, r.planningNotes]),
+  );
   const fishIngredientCorrections = [
     {
       recipeId: "sp-gfmore-lentil-tuna-salad",
@@ -360,6 +363,13 @@
       " Existing uncooked plans include these corrected amounts.";
     if (!r.planningNotes.includes(note))
       r.planningNotes = (r.planningNotes.trim() + " " + note).trim();
+  }
+  // Imported batch guidance embeds the planning notes; retain its separate
+  // batch instructions while replacing the reviewed ingredient guidance.
+  for (const r of root.PLATES_DATA.recipes) {
+    const original = originalPlanningNotes.get(r.id);
+    if (r.batch && original && original !== r.planningNotes)
+      r.batch.note = r.batch.note.replace(original, r.planningNotes);
   }
   // Required seasoning confirmed in the publisher's courgette soup method.
   const soup = root.PLATES_DATA.recipes.find(

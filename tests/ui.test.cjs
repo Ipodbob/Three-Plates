@@ -1,6 +1,21 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
 
+test('batch creation and editing show the same reviewed ingredient guidance as the recipe', (t) => {
+ const a=app(); t.after(()=>a.dom.window.close()); a.route('batch');
+ a.q('#recipe-search').value='courgette potato cheddar soup'; a.submit('#search-form');
+ a.click('[data-act="batch-add"][data-id="sp-gfmore-courgette-potato-cheddar-soup"]');
+ for (const stage of ['create','edit']) {
+   assert.equal(a.q('#batch-recipe-notes').open,false);
+   assert.match(a.q('#sheet').textContent,/Includes one bunch of spring onions/);
+   assert.match(a.q('#sheet').textContent,/nutmeg is also required/);
+   assert.doesNotMatch(a.q('#sheet').textContent,/bunch spring onion sliced - save 1 for serving/);
+   if(stage==='create'){a.submit('#batch-form');a.click('[data-act="batch-edit"]');}
+ }
+ assert.equal(a.state().batches.length,1);
+ assert.equal(a.state().pantry.length,0);
+});
+
 test('bought amounts remain editable when pantry additions cover the recipe', (t) => {
  const a=app(); t.after(()=>a.dom.window.close());
  a.q('#recipe-search').value='pesto pea pasta'; a.submit('#search-form');

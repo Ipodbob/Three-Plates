@@ -2,6 +2,13 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Reviewed guidance in batch dialogs
+
+- A catalogue audit found four batch notes still embedded their pre-correction omission claims: pork casserole, ratatouille, courgette soup and pasta e fagioli. The reviewed planning notes were already correct and their quantities already included the restored ingredients. Catalogue review now replaces the embedded original text while retaining the surrounding batch instructions. No new ingredient amounts, source ratings or storage guidance are introduced.
+- Batch creation/editing puts the complete guidance in expandable Recipe notes so long source/conversion explanations do not push the main action down. Base-only and uncooked status remain visible above the notes; original examples retain their notes too.
+- All 25 relevant checks passed: 23 catalogue checks (including all recipe identities, source metadata, documented quantities, unchanged non-note batch metadata and saved-plan requirements), plus two batch UI workflows. The note-consistency regression failed before the fix. Browser verified the courgette dialog shows a compact initial view and expands to the corrected spring-onion and required-nutmeg guidance. No synthetic batch was saved; test search was cleared.
+- This consistency correction does not verify every remaining catalogue omission note or claim an additional full-suite run.
+
 ## Cooked-batch and empty-portion history
 
 - The remaining cooked-batch and empty-container histories rendered every saved record. Both now use a shared searchable archive component: twenty records initially, newest cooking dates first, exact local date search, Clear, and Show older records with keyboard focus on the first added result. Stable record identities, allocations, capacities, stock and storage deadlines remain unchanged.
