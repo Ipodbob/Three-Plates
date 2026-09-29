@@ -22,20 +22,66 @@ const additions = new Set(corrections.map(c => c.ingredient.id));
 const herbReview = require("../docs/catalogue/herb-ingredient-corrections.json");
 const bakingCorrections = require("../docs/catalogue/baking-ingredient-corrections.json").corrections;
 const finishingCorrections = require("../docs/catalogue/finishing-ingredient-corrections.json").corrections;
-const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections,...finishingCorrections];
-const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id)]);
+const mixedReview = require("../docs/catalogue/mixed-quantity-corrections.json");
+const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections,...finishingCorrections,...mixedReview.corrections];
+const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id),...mixedReview.ingredients.map(i=>i.id)]);
 function correctedReference(old) {
   const r = JSON.parse(JSON.stringify(old));
   const correction = requiredCorrections.find(c => c.recipeId === old.id);
   for (const item of correction?.items || []) {
-    const existing = r.ingredients.find(i => i.id === item.id);
+    const existing = r.ingredients.find(i => i.id === (item.oldId || item.id));
     assert.equal(existing?.qty || 0, item.oldQty, old.id + ':' + item.id);
-    if (existing) existing.qty = item.qty;
+    if (existing) { existing.id=item.id; existing.qty=item.qty; if(item.avoidIds) existing.avoidIds=item.avoidIds; }
     else r.ingredients.push({id:item.id,qty:item.qty,...(item.avoidIds ? {avoidIds:item.avoidIds} : {})});
   }
   return r;
 }
 const correctedRecipes = before.recipes.map(correctedReference);
+
+test('mixed source quantities scale, preserve incompatible stock, and deduct once after reload', () => {
+  const expected = {
+    'gf2-easy-caramel-cake': {'caramel-sauce-ml':45},
+    'gf2-lebanese-poussin-spiced-aubergine-pilaf': {'olive-oil':30,'ex-allspice-0aad6291':0.5},
+    'gf2-lemon-sponge': {salt:0.5},
+    'gf2-peach-raspberry-almond-crumble-cake': {sugar:212,salt:0.125},
+    'gf2-roast-cod-paella-saffron-olive-oil': {'ex-mussels-34ebd4b6':18},
+    'sp-gfmore-microwave-garam-masala-vegetable-curry': {'ex-coriander-fabde51f':6,'tomato-tin':400,salt:0.125},
+    'sp-gfmore-raspberry-ripple-blondies': {'brown-sugar':204,salt:0.125},
+    'sp-gfmore-spicy-tuna-wrap': {'jalapeno-brine':30},
+  };
+  for (const [recipeId, amounts] of Object.entries(expected)) {
+    const r=find(recipeId),s=C.defaults();
+    s.plans=[{id:'mixed',recipeId,date:C.today(),meal:r.meals[0],servings:r.base/2,side:'none',cooked:false}];
+    s.pantry=[{id:'tomato',qty:900,always:false},{id:'ex-mussels-38f8b4fd',qty:500,always:false}];
+    const restored=C.migrate(C.clone(s),R,I);
+    assert.deepEqual(restored.pantry,s.pantry);
+    for(const [id,qty] of Object.entries(amounts)) {
+      assert.equal(r.ingredients.find(i=>i.id===id).qty,qty,recipeId+':'+id);
+      const scaled=C.round(qty/2);
+      assert.equal(C.requirements(restored,R)[id],scaled);
+      assert.equal(C.shopping(restored,R).find(i=>i.id===id).remaining,scaled);
+      restored.pantry.push({id,qty:scaled*2,always:false});
+    }
+    C.finishPlan(restored,'mixed',R);
+    for(const [id,qty] of Object.entries(amounts)) assert.equal(C.stock(restored,id),C.round(qty/2));
+    assert.equal(C.stock(restored,'ex-mussels-38f8b4fd'),500);
+    if(recipeId==='sp-gfmore-microwave-garam-masala-vegetable-curry') assert.equal(C.stock(restored,'tomato'),900);
+    const done=C.migrate(C.clone(restored),R,I);
+    assert.deepEqual(done.pantry,restored.pantry);
+    assert.throws(()=>C.finishPlan(done,'mixed',R));
+    assert.match(r.ingredientGuidance,/full|servings|wraps/i);
+  }
+  const curry=find('sp-gfmore-microwave-garam-masala-vegetable-curry');
+  assert.equal(curry.ingredients.some(i=>i.id==='tomato'),false);
+  assert.equal(C.foodAllowed(curry,{...C.defaults().prefs,exclusions:['tomato']}),false);
+  assert.equal(find('gf2-easy-caramel-cake').ingredients.find(i=>i.id==='ex-caramel-sauce-dulce-de-leche-9b1951e5').qty,70);
+  assert.equal(find('sp-gfmore-spicy-tuna-wrap').ingredients.find(i=>i.id==='ex-jalapenos-67689d2d').qty,30);
+  assert.match(find('gf2-peach-raspberry-almond-crumble-cake').planningNotes,/estimated as 12g/);
+  assert.match(find('sp-gfmore-raspberry-ripple-blondies').planningNotes,/estimated as 4g/);
+  assert.equal(Math.round(190/16),12);assert.equal(Math.round(213/48),4);
+  const queue=require('../docs/catalogue/quantity-review-queue.json');
+  assert.equal(queue.entries.filter(row=>row.status==='pending').length,0);
+});
 
 test('required baking ingredients reach shopping, exclusions and once-only deductions for every corrected recipe',()=>{
  assert.equal(bakingCorrections.length,21);
@@ -78,7 +124,7 @@ test("review preserves identities and ratings with only documented ingredient co
   assert.equal(R.length, before.recipes.length);
   assert.deepEqual(Object.fromEntries(Object.entries(I).filter(([id]) => !definitionAdditions.has(id))), before.ingredients);
   for (const c of corrections) assert.deepEqual(I[c.ingredient.id],c.ingredient);
-  for(const i of herbReview.ingredients) assert.deepEqual(I[i.id],i);
+  for(const i of [...herbReview.ingredients,...mixedReview.ingredients]) assert.deepEqual(I[i.id],i);
   for (const old of before.recipes) {
     const r = find(old.id);
     assert.ok(r);

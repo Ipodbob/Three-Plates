@@ -1049,14 +1049,231 @@
     "ingredientGuidance": "Whole-egg shopping allowance: the full recipe uses 1 whole egg plus 1 extra yolk. Separate 1 egg and reserve the spare white. Adjust this split if changing portions; follow the publisher method."
   }
 ]);
+  // Publisher-verified mixed quantities; incompatible units remain separate.
+  for (const ingredient of [
+  {
+    "id": "caramel-sauce-ml",
+    "name": "Caramel sauce (drizzle)",
+    "unit": "ml",
+    "group": "Cupboard"
+  },
+  {
+    "id": "jalapeno-brine",
+    "name": "Jalapeño brine (from the jar)",
+    "unit": "ml",
+    "group": "Cupboard"
+  }
+]) root.PLATES_DATA.ingredients[ingredient.id] = ingredient;
+  requiredIngredientCorrections.push(...[
+  {
+    "recipeId": "gf2-easy-caramel-cake",
+    "source": "https://www.bbcgoodfood.com/recipes/easy-caramel-cake",
+    "items": [
+      {
+        "id": "caramel-sauce-ml",
+        "oldQty": 0,
+        "qty": 45
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 70g caramel sauce dulce de leche or caramel spread, plus 3 tbsp to serve",
+        ""
+      ]
+    ],
+    "note": "The icing uses 70g sauce and the final drizzle uses a further 3 tbsp (45ml). Keep mass and volume separate: sauce density is not assumed. Extra tin-greasing butter remains unquantified.",
+    "ingredientGuidance": "For the full cake: 70g caramel sauce for icing, plus 3 tbsp for the drizzle. Both can come from the same jar; the separate quantities do not mean two products. Scale both when changing portions."
+  },
+  {
+    "recipeId": "gf2-lebanese-poussin-spiced-aubergine-pilaf",
+    "source": "https://www.bbcgoodfood.com/recipes/lebanese-poussin-spiced-aubergine-pilaf",
+    "items": [
+      {
+        "id": "olive-oil",
+        "oldQty": 15,
+        "qty": 30
+      },
+      {
+        "id": "ex-allspice-0aad6291",
+        "oldQty": 0.25,
+        "qty": 0.5
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 1 tbsp olive oil plus a bit extra",
+        ""
+      ],
+      [
+        "Additional dusting/greasing/serving amounts are not included: ¼ tsp allspice plus 2 good pinches",
+        ""
+      ]
+    ],
+    "note": "The method uses 1 tbsp oil for aubergine and another for pilaf, so includes 30ml despite the ingredient list stating 1 tbsp. Additional skin oil remains unquantified. Allspice includes the 1/4 tsp plus two pinches, estimated at 1/8 tsp per pinch; pinches vary.",
+    "ingredientGuidance": "For two servings: 1 tbsp oil for aubergine, 1 tbsp for pilaf, plus a little for the birds. Use 1/4 tsp allspice in the pilaf and two pinches on the birds; the 1/2 tsp shopping total is approximate. Scale for your portions."
+  },
+  {
+    "recipeId": "gf2-lemon-sponge",
+    "source": "https://www.bbcgoodfood.com/recipes/lemon-sponge",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.5
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 3 large unwaxed lemons zested, plus 4-4 ½ tbsp juice",
+        ""
+      ],
+      [
+        "Not included in shopping (serving extras, optional items or equipment): lemon zest or candied peel, to serve (optional)",
+        "Optional candied-peel ingredients are included in this shopping version."
+      ]
+    ],
+    "note": "The three unwaxed lemons provide zest and the 4–4.5 tbsp icing juice; juice yield varies. Includes the method’s 1/2 tsp salt. The existing extra two lemons and 200g sugar for optional candied peel remain included.",
+    "ingredientGuidance": "For the full cake: zest three unwaxed lemons, then measure 4–4½ tbsp of their juice for the icing. The list also includes two lemons and 200g of the sugar for optional candied peel. Scale for your portions."
+  },
+  {
+    "recipeId": "gf2-peach-raspberry-almond-crumble-cake",
+    "source": "https://www.bbcgoodfood.com/recipes/peach-raspberry-almond-crumble-cake",
+    "items": [
+      {
+        "id": "sugar",
+        "oldQty": 200,
+        "qty": 212
+      },
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.125
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 200g golden caster sugar plus 1 tbsp",
+        ""
+      ]
+    ],
+    "note": "Includes the listed additional tablespoon of caster sugar, estimated as 12g from King Arthur’s 190g/cup superfine sugar reference (190/16, rounded). Total 212g; the publisher method does not allocate that extra spoon to a separate step. The method’s salt pinch is estimated at 1/8 tsp.",
+    "ingredientGuidance": "Full cake: the source lists 200g caster sugar plus 1 tbsp. Shopping estimates that extra spoon as 12g; measure the spoon when cooking. A pinch of salt is also included approximately. Scale for your portions."
+  },
+  {
+    "recipeId": "gf2-roast-cod-paella-saffron-olive-oil",
+    "source": "https://www.bbcgoodfood.com/recipes/roast-cod-paella-saffron-olive-oil",
+    "items": [
+      {
+        "id": "ex-mussels-34ebd4b6",
+        "oldQty": 0,
+        "qty": 18
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: handful cooked, shelled mussels plus 18 in their shells",
+        ""
+      ],
+      [
+        "Estimated 25g for: handful cooked, shelled mussels plus 18 in their shells",
+        "Estimated 25g for the shelled handful only; the 18 shell-on mussels are counted separately."
+      ]
+    ],
+    "note": "Includes 18 shell-on mussels in addition to the shelled handful. The existing 25g handful remains an estimate and is not a conversion of the 18 counted mussels.",
+    "ingredientGuidance": "For six servings: a handful of cooked shelled mussels, plus 18 mussels in their shells. The handful is estimated as 25g; shell-on mussels are counted separately. Follow the publisher preparation method and scale for your portions."
+  },
+  {
+    "recipeId": "sp-gfmore-microwave-garam-masala-vegetable-curry",
+    "source": "https://www.bbcgoodfood.com/recipes/microwave-garam-masala-vegetable-curry",
+    "items": [
+      {
+        "id": "ex-coriander-fabde51f",
+        "oldQty": 3,
+        "qty": 6
+      },
+      {
+        "id": "tomato-tin",
+        "oldQty": 400,
+        "qty": 400,
+        "oldId": "tomato",
+        "avoidIds": [
+          "tomato"
+        ]
+      },
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.125
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 1 tbsp coriander plus 1 tbsp chopped coriander leaves to garnish",
+        ""
+      ]
+    ],
+    "note": "Includes both tablespoons of fresh coriander (6 tsp total). The source specifies 400g tinned chopped tomatoes, replacing the incorrect fresh-tomato requirement without converting existing pantry stock. The method’s salt pinch is estimated at 1/8 tsp.",
+    "ingredientGuidance": "For two servings: use a 400g tin of chopped tomatoes and 2 tbsp chopped fresh coriander in total, reserving half for garnish. A pinch of salt is included approximately. Scale for your portions."
+  },
+  {
+    "recipeId": "sp-gfmore-raspberry-ripple-blondies",
+    "source": "https://www.bbcgoodfood.com/recipes/raspberry-ripple-blondies",
+    "items": [
+      {
+        "id": "brown-sugar",
+        "oldQty": 200,
+        "qty": 204
+      },
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.125
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 200g light brown soft sugar plus 1 tsp",
+        ""
+      ]
+    ],
+    "note": "Includes 200g brown sugar for the batter plus 1 tsp for the raspberry mixture. The extra spoon is estimated as 4g from King Arthur’s 213g/cup packed brown sugar reference (213/48, rounded), giving 204g total. Packing varies. The method’s salt pinch is estimated at 1/8 tsp.",
+    "ingredientGuidance": "Full batch: use 200g brown sugar in the batter and 1 tsp in the raspberry mixture. Shopping estimates that teaspoon as 4g; use the spoon when cooking. A pinch of salt is also included approximately. Scale for your portions."
+  },
+  {
+    "recipeId": "sp-gfmore-spicy-tuna-wrap",
+    "source": "https://www.bbcgoodfood.com/recipes/spicy-tuna-wrap",
+    "items": [
+      {
+        "id": "jalapeno-brine",
+        "oldQty": 0,
+        "qty": 30,
+        "avoidIds": [
+          "ex-jalapenos-67689d2d"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 30g jalapeños finely chopped, plus 2 tbsp of the brine",
+        ""
+      ]
+    ],
+    "note": "Includes 30ml (2 tbsp) jalapeño brine separately from the 30g peppers. Reserve the liquid from the same jar; no conversion from pepper weight to brine volume is assumed.",
+    "ingredientGuidance": "For two wraps: reserve 2 tbsp brine from the jalapeño jar as well as 30g peppers. The brine line is liquid from that jar, not an extra jar or extra peppers. Scale for your portions."
+  }
+]);
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,
     );
     if (!r) continue;
     for (const item of correction.items) {
-      const existing = r.ingredients.find((i) => i.id === item.id);
-      if (existing) existing.qty = item.qty;
+      const existing = r.ingredients.find((i) => i.id === (item.oldId || item.id));
+      if (existing) {
+        existing.id = item.id;
+        existing.qty = item.qty;
+        if (item.avoidIds) existing.avoidIds = item.avoidIds;
+      }
       else
         r.ingredients.push({
           id: item.id,

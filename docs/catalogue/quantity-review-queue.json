@@ -5,7 +5,8 @@
     {
       "recipeId": "gf2-easy-caramel-cake",
       "source": "https://www.bbcgoodfood.com/recipes/easy-caramel-cake",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "gf2-hot-cross-buns-2",
@@ -22,12 +23,14 @@
     {
       "recipeId": "gf2-lebanese-poussin-spiced-aubergine-pilaf",
       "source": "https://www.bbcgoodfood.com/recipes/lebanese-poussin-spiced-aubergine-pilaf",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "gf2-lemon-sponge",
       "source": "https://www.bbcgoodfood.com/recipes/lemon-sponge",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "gf2-new-york-cheesecake",
@@ -44,12 +47,14 @@
     {
       "recipeId": "gf2-peach-raspberry-almond-crumble-cake",
       "source": "https://www.bbcgoodfood.com/recipes/peach-raspberry-almond-crumble-cake",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "gf2-roast-cod-paella-saffron-olive-oil",
       "source": "https://www.bbcgoodfood.com/recipes/roast-cod-paella-saffron-olive-oil",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "gf2-smoked-trout-tartlets",
@@ -60,17 +65,20 @@
     {
       "recipeId": "sp-gfmore-microwave-garam-masala-vegetable-curry",
       "source": "https://www.bbcgoodfood.com/recipes/microwave-garam-masala-vegetable-curry",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "sp-gfmore-raspberry-ripple-blondies",
       "source": "https://www.bbcgoodfood.com/recipes/raspberry-ripple-blondies",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "sp-gfmore-spicy-tuna-wrap",
       "source": "https://www.bbcgoodfood.com/recipes/spicy-tuna-wrap",
-      "status": "pending"
+      "status": "corrected",
+      "decision": "Publisher verified; required amounts, estimates and preserved stock identities recorded in mixed-quantity-corrections.json."
     },
     {
       "recipeId": "sp-sally-double-chocolate-banana-bread",
