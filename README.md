@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 209 checks: 31 core regressions, 46 added domain checks,
-30 catalogue checks, 72 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 211 checks: 31 core regressions, 46 added domain checks,
+30 catalogue checks, 74 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -324,3 +324,11 @@ The pack editor puts the amount and Save first, with optional product provenance
 in an expandable section. Exact-weight mode disables the unused pack-size field
 so an invalid previous size cannot block saving. Returning to pack mode restores
 required positive-size validation. Existing product details remain saved.
+
+## Multiple open tabs
+
+Before saving, the app compares the current stored text with the last version
+that this tab read or wrote. A changed or cleared save pauses edits and offers
+Reload saved data, preventing stale tabs from replacing newer records. The
+storage event also handles full clears. This is browser-local protection, not
+cloud synchronisation or a cross-device transaction system.
