@@ -4,6 +4,14 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Remaining numeric-plus quantity candidates resolved
+
+- Verified the final eight candidates against their Good Food ingredient lists and methods. The register `mixed-quantity-corrections.json` records caramel drizzle, poussin oil/allspice, lemon icing/salt, crumble-cake extra sugar, counted mussels, curry coriander/tinned tomatoes, blondie jam sugar and jalapeño brine. The finite queue has 14 corrections and one conditional amount left unchanged, with no pending or unregistered candidates. This is not a complete catalogue accuracy claim.
+- Mass, volume and counted stock remain separate. Caramel and brine guidance explains when two requirements can come from one jar. Spoon-weight and pinch estimates are labelled. The lemon cake retains its existing optional candied-peel allowance and now says so. Curry planning uses canned tomatoes; existing fresh-tomato pantry stock is preserved.
+- Full regression suite: 267 passed (32 core plus 235 Node checks), zero failures, cancellations or skips. The Node stage took 178 seconds.
+- New regression exercises all corrected items at half portions through requirements, shopping, migration, stock deduction and duplicate-cooking rejection. It asserts unchanged weighed shellfish/fresh-tomato stock and preserved caramel/pepper quantities. Browser confirmed curry guidance in Recipe and Cooking, and corrected shopping after reload on isolated localhost:4174. The single test meal was removed via its own action, leaving the plan empty. A broad reset was cancelled following an approval-review rejection; no backup deletion was performed.
+- Review also observed a pre-existing coconut-milk-to-milk exclusion alias on the curry. This is a separate preference-mapping follow-up, not established dietary verification of all imports.
+
 ## Required yolks and visible egg usage
 
 - Source-verified extra yolks now contribute to whole-egg shopping allowances: New York cheesecake 4 eggs (3 whole + 1 yolk), next-level cookies 3 (1 whole + 2 yolks), smoked-trout tartlets 3 (2 whole + 1 yolk), and Sally cookie bars 2 (1 whole + 1 yolk).
