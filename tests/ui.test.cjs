@@ -161,3 +161,29 @@ test('recipe and allocation touch steppers update quantities and re-enable corre
  const a=app();a.q('#recipe-search').value='Pesto & pea pasta';a.submit('#search-form');a.click('[data-act="recipe"][data-id="pesto-pea-pasta"]');a.click('#recipe-portions-minus');assert.equal(a.q('#recipe-portions').value,'1');assert.equal(a.q('#recipe-portions-minus').getAttribute('aria-disabled'),'true');a.click('#recipe-portions-plus');assert.equal(a.q('#recipe-portions-minus').getAttribute('aria-disabled'),'false');a.click('#recipe-portions-plus');assert.match(a.q('#recipe-amounts').textContent,/270 g/);a.click('.sheet [data-act="plan-add"]');assert.equal(a.state().plans[0].servings,3);
  a.route('batch');a.click('#bf-time-any');a.click('[data-act="batch-add"]');a.set('#batch-portions','4');a.submit('#batch-form');a.route('plan');a.click('[data-act="batch-finish"]');a.click('#freezer-qty-minus');a.click('#eat-now-plus');assert.equal(a.q('#freezer-qty').value,'3');assert.equal(a.q('#eat-now').value,'1');assert.equal(a.q('#eat-now-minus').getAttribute('aria-disabled'),'false');a.q('#freezer-confirm').checked=true;a.q('#storage-confirm').checked=true;a.submit('#finish-batch-form');a.route('pantry');a.click('[data-act="lot-plan"]');a.set('#lot-days','3');a.set('#lot-servings','2');assert.equal(a.q('#lot-days').value,'1');assert.equal(a.q('#lot-days-plus').getAttribute('aria-disabled'),'true');a.dom.window.close();
 });
+
+test('recipe drafts survive filters, headcount and mode navigation without applying or saving each keystroke',()=>{
+ const a=app();
+ const type=(text)=>{a.q('#recipe-search').value=text;a.q('#recipe-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));};
+ const saved=a.w.localStorage.getItem('three-plates-v3');
+ type('pesto');assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved);
+ a.click('#f-method-hob');assert.equal(a.q('#recipe-search').value,'pesto');assert.equal(a.state().filters.query,'');
+ a.set('#f-servings','3');assert.equal(a.q('#recipe-search').value,'pesto');
+ a.route('batch');assert.equal(a.q('#recipe-search').value,'');type('bolognese');a.click('#bf-time-any');assert.equal(a.q('#recipe-search').value,'bolognese');
+ a.route('choose');assert.equal(a.q('#recipe-search').value,'pesto');a.submit('#search-form');assert.equal(a.state().filters.query,'pesto');assert.match(a.q('.meal-card').textContent,/Pesto/);
+ a.route('batch');assert.equal(a.q('#recipe-search').value,'bolognese');a.submit('#search-form');assert.equal(a.state().batchFilters.query,'bolognese');
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.q('#recipe-search').value,'pesto');b.route('batch');assert.equal(b.q('#recipe-search').value,'bolognese');a.dom.window.close();b.dom.window.close();
+});
+
+test('clear and reset remove drafts while a rejected save keeps text for retry',()=>{
+ const a=app();const type=text=>{a.q('#recipe-search').value=text;a.q('#recipe-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));};
+ type('unfinished');a.click('[data-act="clear-search"]');assert.equal(a.q('#recipe-search').value,'');
+ type('no such recipe abcdef');a.submit('#search-form');type('another draft');a.click('[data-act="reset-filters"]');assert.equal(a.q('#recipe-search').value,'');assert.equal(a.state().filters.query,'');
+ type('pesto');const original=a.w.Storage.prototype.setItem;a.w.Storage.prototype.setItem=()=>{throw Error('quota');};a.submit('#search-form');assert.equal(a.q('#recipe-search').value,'pesto');assert.equal(a.state().filters.query,'');
+ a.w.Storage.prototype.setItem=original;a.submit('#search-form');assert.equal(a.state().filters.query,'pesto');a.dom.window.close();
+});
+
+test('pantry recipe shortcut replaces a stale choose draft with the selected ingredient',()=>{
+ const a=app();a.q('#recipe-search').value='old draft';a.q('#recipe-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));
+ a.route('pantry');a.click('[data-act="pantry-add"]');a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');a.set('#pantry-use-soon',a.w.PlatesCore.today());a.submit('#pantry-form');a.click('[data-act="pantry-recipes"]');a.route('choose');assert.equal(a.q('#recipe-search').value,'Pasta');assert.equal(a.state().filters.query,'Pasta');a.dom.window.close();
+});

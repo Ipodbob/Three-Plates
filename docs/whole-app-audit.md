@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 2cfa0f7 (PR #11): Pages run 36503126271 succeeded, all 21 checked public assets matched v3.11.2, and live Settings displayed v3.11.2. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 81cc46a (PR #12): Pages run 36503735803 succeeded, all 21 checked public assets matched v3.11.3, and a fresh live navigation displayed v3.11.3 and the updated time filter. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -30,6 +30,8 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Released v3.11.1 removes remaining count cutoffs for custom products, meals, batches and lots. Damaged v3 records fail safely before saved data replacement. The formatted-backup limit increases from 2 MB to 20 MB, and menu copies can extend histories beyond 1,000 meals.
 
 ## Verification evidence
+- Search-draft fix: all 195 checks passed. Three connected UI regressions cover independent Choose/Batch drafts across method/headcount/navigation changes, no per-keystroke persistence, submit/reload, clear/reset, storage-failure retry and pantry shortcuts. Browser reproduced the original loss and verified pesto survives Hob selection and a Batch round trip while bolognese stays independent; Search then applies the correct text. Test filters were restored afterward.
+
 - v3.11.3 method review: six no-bake method classifications corrected against the linked publisher instructions, with visible preparation notes. Hob-cooked no-bake cookies and custard remain Hob; cold assembly with kettle water or melted butter is described explicitly. The longer-time filter now includes additional-time recipes. Browser verified mini cheesecakes under No cook, the optional crust note on both card and dialog, and lemon cheesecake under Longer / extra time + Hob. Recipe identities, source snapshots, quantities and existing plan requirements remain covered by the catalogue preservation regression.
 - Rating snapshot audit: 993 of 995 linked recipes meet 4+ stars and 5+ ratings. Two existing Workweek Lunch editorial selections have 3 and 2 ratings, with selection reasons stored and displayed. These predate the later threshold instruction; decide their discovery policy while preserving saved references. This is a stored-data audit, not a refresh of every live rating.
 
@@ -61,13 +63,12 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Scanner at 320 x 844: name, slider and save button visible without scrolling (button y=569–617). Reset confirmation and cancellation checked at 320 px without deleting data. Viewport overrides restored afterward.
 
 ## Remaining whole-goal work
-- Browser found an unsubmitted recipe search draft is lost when changing the method filter. Preserve draft text across filter changes without expensive per-keystroke rendering.
 
 - Inspect remaining dialogs and alternate states (recipe/modal number fields now use the shared touch steppers; remaining states need inspection): keyboard/focus, labels, touch targets, overflow, navigation clearance and long product names.
 - Continue remaining correction-dialog checks (partial discard/capacity restoration now verified at 320px). The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
 - Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
-- The handover's cooking aids and combined prep are released. Large-history preservation is released; history navigation and focus changes are released; no-bake filter corrections await release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- The handover's cooking aids and combined prep are released. Large-history preservation is released; history navigation and focus changes are released; no-bake filter corrections are released; search-draft preservation awaits release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate
