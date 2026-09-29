@@ -176,3 +176,10 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Browser verified the lentil salad shows one 160g can for two portions and the same one-can requirement on Shopping. Temporary meal removed after verification.
 
 - Full release validation: all 221 checks passed (31 core and 190 Node test-runner checks).
+
+## Narrow batch allocation and prepared-portion dialogs
+
+- Reproduced clipped plus buttons in the batch allocation dialog at 320px: three fixed columns were narrower than the shared stepper's minimum button widths. At mobile widths, allocation fields now use stacked label-and-stepper rows with 140px-wide controls. No calculation or persistence changes.
+- Before/after browser screenshots confirmed all minus, value and plus controls are visible. Used the narrow UI to allocate five test portions as one eaten, one refrigerated and three frozen, then corrected the frozen record to two; reloaded and verified one fridge plus two freezer portions. Booked the fridge portion through the narrow dialog without adding shopping requirements.
+- Pantry addition, portion correction and stored booking dialogs were inspected for narrow layout. Correction and booking Save actions worked; longer dialogs scroll with their close control accessible. This does not verify physical iPhone keyboard behaviour.
+- Used a separate localhost:4174 origin for fabricated cooking records and cleared those test records via the UI afterward. Initial 127.0.0.1:4174 test batch/search also removed. Prior 221-check functional baseline retained; CSS-only fix verified in browser, with git diff --check passing.
