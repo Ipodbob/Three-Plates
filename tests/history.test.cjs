@@ -157,3 +157,66 @@ test("damaged v3 food and meal records fail restoration instead of silently disa
     assert.deepEqual(bad, before);
   }
 });
+
+test("damaged current preferences fail safely instead of removing exclusions or favourites", () => {
+  for (const prefs of [
+    null,
+    [],
+    { exclusions: "milk" },
+    { exclusions: ["missing-food"] },
+    { favourites: ["missing-recipe"] },
+    { hidden: ["missing-recipe"] },
+    { cuisines: ["missing-cuisine"] },
+    { likedIngredients: ["missing-food"] },
+    { diet: "unknown" },
+    { slowCooker: "false" },
+  ]) {
+    const raw = { ...C.defaults(), prefs },
+      before = JSON.stringify(raw);
+    assert.throws(() => C.migrate(raw, R, I), /preferences/);
+    assert.equal(JSON.stringify(raw), before);
+  }
+  const s = C.defaults();
+  s.prefs.exclusions = ["rice"];
+  s.prefs.favourites = ["pesto-pea-pasta"];
+  s.prefs.hidden = ["pesto-pea-pasta"];
+  s.prefs.slowCooker = false;
+  assert.deepEqual(C.migrate(s, R, I).prefs, s.prefs);
+  assert.doesNotThrow(() => C.migrate({ version: 3 }, R, I));
+  assert.doesNotThrow(() =>
+    C.migrate(
+      { version: 1, prefs: { exclusions: ["removed-legacy-food"] } },
+      R,
+      I,
+    ),
+  );
+});
+
+test("damaged pack records cannot disappear while valid exact and packaged overrides survive", () => {
+  for (const packs of [
+    null,
+    [],
+    { Unknown: {} },
+    { Tesco: [] },
+    { Tesco: { missing: { size: 500 } } },
+    { Tesco: { rice: { size: -1 } } },
+    { Tesco: { rice: { size: "500" } } },
+  ]) {
+    const raw = { ...C.defaults(), packs },
+      before = JSON.stringify(raw);
+    assert.throws(() => C.migrate(raw, R, I), /pack records/);
+    assert.equal(JSON.stringify(raw), before);
+  }
+  const s = C.defaults();
+  s.packs = {
+    Tesco: {
+      rice: C.packRecord("rice", "Tesco", 500, I, {
+        product: "Test rice",
+        url: "https://example.com/rice",
+        verifiedOn: "2026-09-29",
+      }),
+    },
+    Aldi: { pasta: C.packRecord("pasta", "Aldi", 0, I) },
+  };
+  assert.deepEqual(C.migrate(s, R, I).packs, s.packs);
+});

@@ -188,3 +188,36 @@ test("a valid formatted backup over 2 MB can be reviewed and restored without lo
   assert.equal(a.state().plans.at(-1).id, "meal8999");
   a.dom.window.close();
 });
+
+test("damaged food preferences pause saves and leave the original saved text untouched", () => {
+  const a = app((s) => {
+    s.prefs.exclusions = ["missing-food"];
+  });
+  assert.match(a.q("main").textContent, /saving is paused/i);
+  a.q("#slow-cooker").click();
+  assert.equal(a.w.localStorage.getItem("three-plates-v3"), a.original);
+  a.dom.window.close();
+});
+
+test("restore refuses damaged preferences and packs before offering replacement", async () => {
+  for (const patch of [
+    { prefs: { exclusions: ["missing-food"] } },
+    { packs: { Tesco: { rice: { size: -1 } } } },
+  ]) {
+    const a = app((s) => {
+      s.pantry = [{ id: "rice", qty: 500, always: false }];
+    });
+    const content = JSON.stringify({ ...a.state(), ...patch });
+    Object.defineProperty(a.q("#backup-file"), "files", {
+      value: [{ size: content.length, text: async () => content }],
+    });
+    a.q("#backup-file").dispatchEvent(
+      new a.w.Event("change", { bubbles: true }),
+    );
+    await tick();
+    assert.equal(a.q("#confirm-action"), null);
+    assert.match(a.q("#toast").textContent, /Invalid/);
+    assert.equal(a.w.localStorage.getItem("three-plates-v3"), a.original);
+    a.dom.window.close();
+  }
+});
