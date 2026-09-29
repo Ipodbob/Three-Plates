@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Consolidated dialog evidence and full regression
+
+- Added docs/dialog-verification.md to distinguish success, invalid-state, cancellation, narrow-browser and physical-device evidence per dialog. Untested combinations remain explicit.
+- New connected UI regression edits and cancels nine dialogs, comparing exact saved text and verifying focus return: pantry add, recipe portions, plan portions, side search, pack size, purchase correction, batch creation, batch allocation and stored booking.
+- Full npm test completed successfully against v3.11.40 runtime plus the new regression: 32 core checks and 230 Node checks, 262 total, zero failures/cancellations/skips; Node stage 160.0 seconds. The current completion audit now references the latest deployed runtime and this result. No runtime or version change in this audit.
+
 ## Always-stocked pantry form
 
 - Browser reproduction found an invalid amount blocked native Save even when Always stocked was checked and the amount was ignored by the save handler. Amount and reminder inputs now disable for Always stocked, including when opening an existing staple. Toggling back retains draft values and restores native validation. Unit stays available because new custom ingredients still need an identity/unit.

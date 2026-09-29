@@ -1,6 +1,6 @@
 # Current completion audit
 
-Reviewed 29 September 2026 against main `7edcd9924886ff7ab01a6215a150d6eb1a9fae8c` (v3.11.34). This is a scope-and-evidence register, not a declaration that the whole product is complete. Earlier observations are retained in [whole-app-audit.md](whole-app-audit.md).
+Reviewed 29 September 2026 against main `a77db4e0c14a8053d6c0c0ec4d254108d073044a` (v3.11.40). This is a scope-and-evidence register, not a declaration that the whole product is complete. Earlier observations are retained in [whole-app-audit.md](whole-app-audit.md).
 
 ## Authority and scope
 
@@ -10,9 +10,9 @@ The goal remains comprehensive, simple, consistent and functional across Choose,
 
 ## Current delivery evidence
 
-- PR #43 merged v3.11.34 at the commit above. GitHub Pages run [36526518176](https://github.com/Ipodbob/Three-Plates/actions/runs/36526518176) succeeded for that exact commit.
-- All 21 checked public assets matched the local release, normalizing line endings. Fresh live navigation displayed v3.11.34. Hosting remains static GitHub Pages at the case-sensitive `/Three-Plates/` path.
-- Full regression run on the code commit above: **256 passed** (32 core checks plus 224 Node test-runner checks), zero failures, cancellations or skips. The Node stage took about 161 seconds. This includes the recent recipe, search and optional-menu-input corrections.
+- PR #50 merged v3.11.40 at the commit above. GitHub Pages run [36530320362](https://github.com/Ipodbob/Three-Plates/actions/runs/36530320362) succeeded for that exact commit.
+- All 21 checked public assets matched the local release, normalizing line endings. Fresh live navigation displayed v3.11.40. Hosting remains static GitHub Pages at the case-sensitive `/Three-Plates/` path.
+- Full regression run on the runtime code commit above plus the nine-dialog cancellation test accompanying this audit: **262 passed** (32 core checks plus 230 Node test-runner checks), zero failures, cancellations or skips. The Node stage took about 160 seconds. This includes all recent recipe, scanner, stored-time and always-stocked form corrections. No application code changed during this audit.
 - Browser test records use isolated localhost:4174 and are removed through Settings. User origins and production data are not reset.
 
 ## Requirement-by-requirement evidence
@@ -42,7 +42,7 @@ Test paths in this table are under `tests/`. Source decisions are under `docs/ca
 ## Remaining work with explicit exit checks
 
 1. **Imported recipe accuracy:** continue publisher verification of required quantities hidden by optional-extra wording and any suspect conversions. The finishing-ingredient review has corrected egg-and-bacon pie egg wash, scone brushing milk and crepe pan butter; it found hot-cross-bun extra milk conditional rather than mandatory. Cherry-pie almonds and citrus-cake syrup sugar/icing yogurt are now included using documented, rounded reference-weight estimates; the cherry pastry salt is included too. The finishing register has no remaining pending entries, but other imported mixed required/optional lines and suspect conversions still need screening. Screening is not proof: verify the actual page before changing a value. For each confirmed correction, record the source and exact decision, preserve IDs/stock, and test shopping/scaling/once-only deduction. Do not bulk rerun the original scratch importer: it discarded some entire required lines containing “as needed”.
-2. **Dialog coverage:** close remaining evidence gaps using an explicit matrix of normal, invalid and cancelled states for save/copy menu, pantry ingredient/link, pack/purchase correction, recipe/side selection, batch creation/allocation, stored booking/defrost/correction, backup restore and scanner fallback. Existing evidence can be reused when it covers the exact state. Check 320px overflow, visible primary action, focus return, and no mutation on cancel/failed save. Record untested combinations rather than claiming all dialogs checked.
+2. **Dialog coverage:** [dialog-verification.md](dialog-verification.md) now records evidence and gaps per dialog, including a nine-dialog exact-state/focus cancellation regression. Close remaining evidence gaps using this explicit matrix of normal, invalid and cancelled states for save/copy menu, pantry ingredient/link, pack/purchase correction, recipe/side selection, batch creation/allocation, stored booking/defrost/correction, backup restore and scanner fallback. Existing evidence can be reused when it covers the exact state. Check 320px overflow, visible primary action, focus return, and no mutation on cancel/failed save. Record untested combinations rather than claiming all dialogs checked.
 3. **Physical phones:** on the user's iPhone, open Pantry once, allow the camera, confirm several different barcodes continuously, select a half-used pack, reload, then update one item's remaining amount. Verify actual saved quantities and one recipe deduction. Also check keyboard obstruction and return from a backgrounded timer. Android/WebKit support claims require corresponding device/browser evidence; desktop mocks cannot supply it.
 4. **Final gate:** run the appropriate complete regression suite after remaining functional changes; review the requirement table again; verify the exact final Pages commit and public files. Do not mark the overall goal complete while a required check is still unverified.
 
