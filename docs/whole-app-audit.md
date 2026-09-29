@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Menu and backup cancellation
+
+- Added UI regressions for cancelling an edited menu-save draft, valid/occupied-date menu-copy drafts and a validated backup replacement preview. Exact persisted text and opener focus remain unchanged; the backup cancellation retains the original shop on reload.
+- Ten selected UI checks and all four menu-domain checks passed. Browser at 320px showed the occupied-date warning and disabled Copy without horizontal clipping; Close returned focus to Saved menus and reload preserved the original meal. Synthetic test data was cleared on localhost through Settings.
+- Updated the dialog evidence matrix to close these particular gaps. Native phone file-picker and keyboard behaviour remain unverified. No runtime/version changes; the earlier full baseline remains 262 checks, with these two additional regressions verified separately.
+
 ## Consolidated dialog evidence and full regression
 
 - Added docs/dialog-verification.md to distinguish success, invalid-state, cancellation, narrow-browser and physical-device evidence per dialog. Untested combinations remain explicit.

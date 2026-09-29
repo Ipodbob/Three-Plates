@@ -20,11 +20,15 @@ Reviewed against v3.11.40, main `a77db4e0c14a8053d6c0c0ec4d254108d073044a`, plus
 | Cooked-batch allocation | UI whole allocation and Phase 1 once-only deduction/freezer confirmation | Shared cancellation test covers eat-now/freezer draft | 320px stacked allocation controls previously checked |
 | Stored booking | UI meal/time defaults, custom time, blank validity, booking/reload; Phase 1 overbooking guards | Shared cancellation test covers meal/time/portion draft | Narrow invalid/expiry states still need browser evidence |
 | Defrost / correction / discard | Core and Phase 1 deadlines, reservations, corrections; history UI restores mistaken discard | Domain mutation guards covered; explicit draft-cancel matrix still needed | Prior browser journeys exist; error-state layouts not consolidated |
-| Save/copy menu | UI saved-week copy, hidden-input validation; menus suite rejects conflicts/preferences atomically | Explicit save/copy draft-cancel cases still needed | Earlier menu browser journey; narrow conflict state still needed |
-| Backup restore | UI round-trip, malformed JSON, stale-tab refusal; history UI large backup/damaged preferences | Replacement is confirmed; explicit Cancel after preview still needed | Native file picker and physical-phone restore not established |
+| Save/copy menu | UI saved-week copy, hidden-input validation; menus suite rejects conflicts/preferences atomically | UI test cancels save draft, valid copy draft and occupied-date copy; exact persisted text and Plan opener focus checked | 320px occupied-date warning, disabled Copy action and Close fit; cancellation returns focus to Saved menus and original meal survives reload |
+| Backup restore | UI round-trip, malformed JSON, stale-tab refusal; history UI large backup/damaged preferences | UI replacement-preview Cancel preserves exact saved text, returns focus to Restore backup and retains original shop on reload | Native file picker and physical-phone restore not established |
 | Scanner | Barcode UI product confirmation, partial packs, reload, camera denial and save failure | Skip preserves exact state; dismissal rejects late lookups and releases camera tracks | 320px and real barcode-entry checks recorded; continuous physical camera/keyboard remains unverified |
 
 `tests/history-ui.test.cjs` additionally checks focus recovery after an opener is recreated and native dialog close events. Browser checks of the actual Close button returned focus to Pantry Add/Edit. Those shared checks support the mechanism without asserting every possible dialog state has been verified.
+
+## Menu and backup follow-up
+
+Two additional UI regressions cover menu save/copy cancellation and backup replacement-preview cancellation. Ten selected UI checks and all four menu-domain checks passed. Narrow browser testing used one synthetic meal/menu on isolated localhost:4174: occupied date produced a readable warning and disabled Copy; Close returned focus to Saved menus; reload retained only the original meal. Synthetic data was cleared through Settings. The backup test supplies a mocked selected file to the app handler; it does not claim a physical native file-picker test.
 
 ## Exit rule
 
