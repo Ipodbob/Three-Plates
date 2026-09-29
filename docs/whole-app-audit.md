@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 74aa34e (PR #8): Pages run 36500344765 succeeded, all 20 checked public assets matched v3.10.0, and the live Choose page displayed v3.10.0. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 20b7729 (PR #9): Pages run 36501405285 succeeded, all 21 checked public assets matched v3.11.0, and the live Plan/prep entry displayed v3.11.0. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -25,9 +25,14 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 
 - Released v3.10.0 adds persisted ingredient and original-method checks, publisher method links, named pause/resume timers, opt-in screen wake and fallbacks. Changes use the existing atomic persistence path and never deduct stock until the existing finish action. Changed quantities require a confirmed checklist reset. Mobile shortcuts reach ingredients, method and timers, with the close control kept visible.
 
-- Branch feat/prep-checklist adds a saved, searchable combined ingredient checklist for up to 20 meals/batches, with per-recipe amounts and cooking links. Stored meals add fresh sides only. Changes invalidate affected ready checks, and finished/removed meals leave the totals. Prep checks never change pantry, cooking progress, timers or finish status.
+- Released v3.11.0 adds a saved, searchable combined ingredient checklist for up to 20 meals/batches, with per-recipe amounts and cooking links. Stored meals add fresh sides only. Changes invalidate affected ready checks, and finished/removed meals leave the totals. Prep checks never change pantry, cooking progress, timers or finish status.
+
+- Branch fix/preserve-large-histories removes remaining count cutoffs for custom products, meals, batches and lots. Damaged v3 records fail safely before saved data replacement. The formatted-backup limit increases from 2 MB to 20 MB, and menu copies can extend histories beyond 1,000 meals.
 
 ## Verification evidence
+- Large-history fix: all 186 checks passed, including eight new domain/connected UI regressions. Verified 601 custom products, 1,101 meals, 1,002 batches/lots and a formatted 9,000-meal backup above 2 MB. Connected UI proves a later preference save retains every custom stock record and damaged stock leaves the original saved text untouched.
+- Correction browser check: recorded five refrigerated portions, discarded one, then corrected back to five. The increase control stopped at capacity; cooking time/deadline stayed unchanged and the result survived reload. The correction form's stepper and date/time field were visually inspected at 320px. Isolated port-4174 records only.
+
 - Combined prep: 178 full-suite checks passed, followed by ten targeted prep checks after search/date-order polish. Browser: two- and three-portion meals combined to 450 g pasta; its ready check survived reload. At 320 px, ingredient search and expansion showed the separate 180 g / 270 g shares. Finishing the first meal changed the total to 270 g, cleared the affected ready check and displayed an explanation. Isolated port-4174 data only.
 
 - Cooking mode: full suite 166 passed; 14 targeted follow-up checks passed, including two added regressions for delayed dialog close events and expired alert cleanup (168 checks now in the suite). Real browser: two checked items and a one-minute timer survived a reload; the elapsed timer displayed Time's up on return. The 320px checklist and timer cards were visually inspected, including the sticky Close control. Changing from two to three portions required an explicit reset and then showed 270 g pasta; a new timer counted down correctly after reset. These are isolated port-4174 test records. Physical iPhone wake-lock and timer behaviour remains unverified.
@@ -52,10 +57,10 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 
 ## Remaining whole-goal work
 - Inspect remaining dialogs and alternate states (recipe/modal number fields now use the shared touch steppers; remaining states need inspection): keyboard/focus, labels, touch targets, overflow, navigation clearance and long product names.
-- Finish remaining correction-dialog checks. The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
+- Continue remaining correction-dialog checks (partial discard/capacity restoration now verified at 320px). The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
 - Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
-- The handover's cooking aids are released; combined prep is implemented on this branch and awaits release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- The handover's cooking aids and combined prep are released. Large-history fixes await release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate

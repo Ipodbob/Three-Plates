@@ -98,8 +98,6 @@
       throw Error("Choose a valid new week.");
     if (people !== null && !C.integer(people, 1, 12))
       throw Error("Choose 1–12 people, or keep saved portions.");
-    if (s.plans.length + menu.entries.length > 1000)
-      throw Error("Remove old meal records before copying more meals.");
     const plans = menu.entries.map((e) => {
       const r = recipes.find((r) => r.id === e.recipeId),
         date = C.addDays(start, e.day);
