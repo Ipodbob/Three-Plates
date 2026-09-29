@@ -1,0 +1,399 @@
+{
+  "reviewedOn": "2026-09-29",
+  "scope": "Finite triage of quantified lines in the imported not-included clause, excluding explicit optional/serving/equipment lines and water alone. Mixed water plus food remains a candidate. This heuristic is not an exhaustive ingredient audit; pending means source review required, not a confirmed defect.",
+  "corrections": [
+    {
+      "recipeId": "sp-amyjacky-instant-pot-beef-broccoli",
+      "source": "https://www.pressurecookrecipes.com/instant-pot-beef-broccoli/",
+      "items": [
+        {
+          "id": "cornflour",
+          "oldQty": 0,
+          "qty": 22.5
+        }
+      ],
+      "replace": [
+        [
+          "2 - 3 tablespoons cold water + 2 ½ tablespoons (22.5g) cornstarch",
+          "water for the thickener (not stocked)"
+        ]
+      ],
+      "note": "Includes the publisher's 22.5g cornflour for the sauce thickener. Its water is not pantry stock; unspecified seasoning remains adjustable.",
+      "ingredientGuidance": "Includes the publisher's 22.5g cornflour for the sauce thickener. Its water is not pantry stock; unspecified seasoning remains adjustable."
+    },
+    {
+      "recipeId": "sp-sally-stamped-chocolate-espresso-cookies",
+      "source": "https://sallysbakingaddiction.com/stamped-chocolate-espresso-cookies/",
+      "items": [
+        {
+          "id": "ex-unsweetened-natural-cocoa-powder-34c6cb2e",
+          "oldQty": 0,
+          "qty": 62,
+          "avoidIds": [
+            "cocoa"
+          ]
+        }
+      ],
+      "replace": [
+        [
+          "3/4 cup (62g) unsweetened natural or Dutch-process cocoa powder, plus more as needed",
+          "extra cocoa for stamping (amount not specified)"
+        ]
+      ],
+      "note": "Includes 62g cocoa powder for the cookie dough. Extra cocoa for stamping remains unquantified.",
+      "ingredientGuidance": "Includes 62g cocoa powder for the cookie dough. Extra cocoa for stamping remains unquantified."
+    },
+    {
+      "recipeId": "sp-sally-chocolate-pastry-pop-tarts",
+      "source": "https://sallysbakingaddiction.com/chocolate-pastry-pop-tarts/",
+      "items": [
+        {
+          "id": "ex-unsweetened-natural-1668438f",
+          "oldQty": 10,
+          "qty": 31,
+          "avoidIds": [
+            "cocoa"
+          ]
+        }
+      ],
+      "replace": [
+        [
+          "1/4 cup (21g) unsweetened natural or dutch-process cocoa powder, plus more as needed for rolling",
+          "extra cocoa for rolling (amount not specified)"
+        ]
+      ],
+      "note": "Includes 21g cocoa in the pastry plus 10g in the icing (31g total). Extra cocoa for rolling remains unquantified.",
+      "ingredientGuidance": "Includes 21g cocoa in the pastry plus 10g in the icing (31g total). Extra cocoa for rolling remains unquantified."
+    },
+    {
+      "recipeId": "sp-sally-classic-chocolate-cupcakes-with-vanilla-frosting",
+      "source": "https://sallysbakingaddiction.com/classic-chocolate-cupcakes-with-vanilla-frosting/",
+      "items": [
+        {
+          "id": "icing-sugar",
+          "oldQty": 0,
+          "qty": 480
+        }
+      ],
+      "replace": [
+        [
+          "4 cups (480g) confectioners' sugar, plus more as needed",
+          "extra icing sugar for consistency (amount not specified)"
+        ]
+      ],
+      "note": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified.",
+      "ingredientGuidance": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified."
+    },
+    {
+      "recipeId": "sp-sally-homemade-lemon-cupcakes-with-vanilla-frosting",
+      "source": "https://sallysbakingaddiction.com/homemade-lemon-cupcakes-with-vanilla-frosting/",
+      "items": [
+        {
+          "id": "icing-sugar",
+          "oldQty": 0,
+          "qty": 480
+        }
+      ],
+      "replace": [
+        [
+          "4 cups (480g) confectioners' sugar, plus more as needed",
+          "extra icing sugar for consistency (amount not specified)"
+        ]
+      ],
+      "note": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified.",
+      "ingredientGuidance": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified."
+    }
+  ],
+  "entries": [
+    {
+      "recipeId": "sp-amyjacky-instant-pot-beef-broccoli",
+      "source": "https://www.pressurecookrecipes.com/instant-pot-beef-broccoli/",
+      "lines": [
+        "2 - 3 tablespoons cold water + 2 ½ tablespoons (22.5g) cornstarch"
+      ],
+      "status": "corrected"
+    },
+    {
+      "recipeId": "sp-amyjacky-instant-pot-chicken-noodle-soup",
+      "source": "https://www.pressurecookrecipes.com/instant-pot-chicken-noodle-soup/",
+      "lines": [
+        "1 tablespoon (15ml) freshly squeezed lemon juice ((can add more to taste))"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-budgetbytes-slow-cooker-chicken-noodle-soup",
+      "source": "https://www.budgetbytes.com/slow-cooker-chicken-noodle-soup/",
+      "lines": [
+        "1 Tbsp salt (or to taste) ($0.10)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-budgetbytes-slow-cooker-meatball-subs",
+      "source": "https://www.budgetbytes.com/slow-cooker-meatball-subs/",
+      "lines": [
+        "1 tsp  salt (to taste, $0.03)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-gfmore-classic-potato-salad",
+      "source": "https://www.bbcgoodfood.com/recipes/classic-potato-salad",
+      "lines": [
+        "3 tbsp mayonnaise or to taste"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-bread-flour-english-muffins-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/bread-flour-english-muffins-recipe",
+      "lines": [
+        "1 1/4 to 1 1/2 teaspoons table salt, to taste"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-cinnamon-sugar-doughnut-muffins-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/cinnamon-sugar-doughnut-muffins-recipe",
+      "lines": [
+        "1 to 1 1/4 teaspoons ground nutmeg, to taste"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-classic-beer-bread-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/classic-beer-bread-recipe",
+      "lines": [
+        "1 to 4 tablespoons (14g to 50g) granulated sugar, to taste"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-cranberry-orange-brioche-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/cranberry-orange-brioche-recipe",
+      "lines": [
+        "1/8 to 1/4 teaspoon orange oil, to taste*"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-lemon-poppy-seed-muffins-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/lemon-poppy-seed-muffins-recipe",
+      "lines": [
+        "1/4 to 1/2 teaspoon lemon oil, to taste"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-panettone-muffins-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/panettone-muffins-recipe",
+      "lines": [
+        "1/8 to 1/4 teaspoon King Arthur Fiori di Sicilia, to taste"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-sour-cream-chive-potato-bread-or-rolls-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/sour-cream-chive-potato-bread-or-rolls-recipe",
+      "lines": [
+        "heaping 1/2 cup (135g) prepared mashed potatoes, leftover is fine, so long as they're not highly salted",
+        "1/4 to 1/2 cup finely chopped scallion tops or fresh or dried chives, to taste"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-kingarthur-tender-peach-scones-recipe",
+      "source": "https://www.kingarthurbaking.com/recipes/tender-peach-scones-recipe",
+      "lines": [
+        "1/4 to 3/4 teaspoon ground nutmeg, to taste*"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-lovelemons-celery-salad",
+      "source": "https://www.loveandlemons.com/celery-salad/",
+      "lines": [
+        "¼ teaspoon sea salt (plus more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-lovelemons-roasted-cauliflower",
+      "source": "https://www.loveandlemons.com/roasted-cauliflower/",
+      "lines": [
+        "2 tablespoons extra-virgin olive oil (plus more as needed)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-lovelemons-roasted-delicata-squash",
+      "source": "https://www.loveandlemons.com/roasted-delicata-squash/",
+      "lines": [
+        "Heaping ¼ teaspoon sea salt (plus more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-lovelemons-tomato-soup-recipe",
+      "source": "https://www.loveandlemons.com/tomato-soup-recipe/",
+      "lines": [
+        "1 teaspoon sea salt (plus more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-lovelemons-turkish-eggs",
+      "source": "https://www.loveandlemons.com/turkish-eggs/",
+      "lines": [
+        "¼ teaspoon sea salt (plus more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-recipetineats-marinated-bbq-vegetables",
+      "source": "https://www.recipetineats.com/marinated-bbq-vegetables/",
+      "lines": [
+        "1/2 - 1 tsp chilli flakes ((adjust spice to taste, Note 3))"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-recipetineats-vegetarian-pasta-salad",
+      "source": "https://www.recipetineats.com/vegetarian-pasta-salad/",
+      "lines": [
+        "1/2 - 1 tsp chilli flakes ((adjust spice to taste, Note 3))"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-sally-chocolate-pastry-pop-tarts",
+      "source": "https://sallysbakingaddiction.com/chocolate-pastry-pop-tarts/",
+      "lines": [
+        "1/4 cup (21g) unsweetened natural or dutch-process cocoa powder, plus more as needed for rolling"
+      ],
+      "status": "corrected"
+    },
+    {
+      "recipeId": "sp-sally-classic-chocolate-cupcakes-with-vanilla-frosting",
+      "source": "https://sallysbakingaddiction.com/classic-chocolate-cupcakes-with-vanilla-frosting/",
+      "lines": [
+        "4 cups (480g) confectioners' sugar, plus more as needed"
+      ],
+      "status": "corrected"
+    },
+    {
+      "recipeId": "sp-sally-healthy-berry-streusel-bars",
+      "source": "https://sallysbakingaddiction.com/healthy-berry-streusel-bars/",
+      "lines": [
+        "for topping: 1/2 cup (64g) sliced or chopped almonds and 1 extra Tablespoon oats"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-sally-homemade-lemon-cupcakes-with-vanilla-frosting",
+      "source": "https://sallysbakingaddiction.com/homemade-lemon-cupcakes-with-vanilla-frosting/",
+      "lines": [
+        "4 cups (480g) confectioners' sugar, plus more as needed"
+      ],
+      "status": "corrected"
+    },
+    {
+      "recipeId": "sp-sally-new-favorite-white-layer-cake",
+      "source": "https://sallysbakingaddiction.com/new-favorite-white-layer-cake/",
+      "lines": [
+        "1/8 teaspoon salt, as needed"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-sally-stamped-chocolate-espresso-cookies",
+      "source": "https://sallysbakingaddiction.com/stamped-chocolate-espresso-cookies/",
+      "lines": [
+        "3/4 cup (62g) unsweetened natural or Dutch-process cocoa powder, plus more as needed"
+      ],
+      "status": "corrected"
+    },
+    {
+      "recipeId": "sp-skinnytaste-air-fryer-breaded-chicken-breast",
+      "source": "https://www.skinnytaste.com/air-fryer-breaded-chicken-breast/",
+      "lines": [
+        "1/4 plus 1/8 teaspoon kosher salt ( and black pepper, to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-air-fryer-chicken-wings",
+      "source": "https://www.skinnytaste.com/air-fryer-chicken-wings/",
+      "lines": [
+        "1 teaspoon kosher salt (or more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-chipotle-chicken",
+      "source": "https://www.skinnytaste.com/chipotle-chicken/",
+      "lines": [
+        "1 1/4 teaspoons kosher salt (and fresh ground black pepper, to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-crock-pot-carne-guisada-latin-beef-stew",
+      "source": "https://www.skinnytaste.com/crock-pot-carne-guisada-latin-beef-stew/",
+      "lines": [
+        "1  kosher salt ( or more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-deviled-egg-salad",
+      "source": "https://www.skinnytaste.com/deviled-egg-salad/",
+      "lines": [
+        "1 teaspoon Dijon mustard (or more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-grilled-chicken-with-black-bean-mango",
+      "source": "https://www.skinnytaste.com/grilled-chicken-with-black-bean-mango/",
+      "lines": [
+        "1 teaspoon kosher salt ( and fresh cracked pepper, to taste)",
+        "1/4 teaspoon kosher salt (or more to taste )"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-healthy-baked-chicken-nuggets",
+      "source": "https://www.skinnytaste.com/healthy-baked-chicken-nuggets/",
+      "lines": [
+        "1/2 teaspoon kosher salt ( and black pepper, to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-pumpkin-spice-pancakes-with-pumpkin",
+      "source": "https://www.skinnytaste.com/pumpkin-spice-pancakes-with-pumpkin/",
+      "lines": [
+        "1 teaspoon pumpkin pie spice (or more to taste)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-turkey-sausage-patties-from-scratch",
+      "source": "https://www.skinnytaste.com/turkey-sausage-patties-from-scratch/",
+      "lines": [
+        "3/4 teaspoon kosher salt ( and black pepper to taste, divided)"
+      ],
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-skinnytaste-vietnamese-shaking-beef-bo-luc-lac",
+      "source": "https://www.skinnytaste.com/vietnamese-shaking-beef-bo-luc-lac/",
+      "lines": [
+        "4 cups watercress leaves  (or mixed baby greens)"
+      ],
+      "status": "pending"
+    }
+  ]
+}

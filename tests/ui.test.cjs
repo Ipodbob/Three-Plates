@@ -1,6 +1,19 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
 
+test('a full cupcake bake includes its required icing sugar in shopping after reload', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());a.click('#f-time-any');
+ while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');
+ a.q('#recipe-search').value='chocolate cupcakes vanilla frosting';a.submit('#search-form');
+ const id='sp-sally-classic-chocolate-cupcakes-with-vanilla-frosting';
+ a.click('[data-act="recipe"][data-id="'+id+'"]');assert.match(a.q('#sheet').textContent,/480g icing sugar/);
+ a.click('#sheet [data-act="close"]');a.click('[data-act="plan-add"][data-id="'+id+'"]');a.route('shop');
+ assert.match(a.q('[data-act="bought"][data-id="icing-sugar"]').closest('.shopping-row').textContent,/480 g/);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});t.after(()=>b.dom.window.close());b.route('shop');
+ assert.equal(b.state().plans[0].recipeId,id);assert.deepEqual(b.state().pantry,[]);
+ assert.match(b.q('[data-act="bought"][data-id="icing-sugar"]').closest('.shopping-row').textContent,/480 g/);
+});
+
 test('invalid defrost time retains its draft and corrected completion survives reload without changing stock', (t) => {
  const setup=app(), C=setup.w.PlatesCore, R=setup.w.PLATES_DATA.recipes, s=C.defaults(), now=Date.now();
  s.batches=[{id:'defrost-audit',recipeId:'prep-chilli',servings:2,date:C.today(),cooked:false}];
