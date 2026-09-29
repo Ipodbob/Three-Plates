@@ -208,3 +208,48 @@ test("reviewed animal ingredients exclude eleven recipes from vegetarian and veg
     assert.equal(C.foodAllowed(r, s.prefs), true, id);
   }
 });
+
+test("fish and seafood exclusions cover every reviewed variant without stock substitution", () => {
+  const s = C.defaults();
+  s.prefs.exclusions = ["salmon", "tuna", "prawns"];
+  const audit = require("../docs/catalogue/seafood-preferences.json");
+  assert.equal(audit.members.length, 74);
+  for (const item of audit.members) {
+    assert.ok(I[item.id]);
+    for (const r of R.filter((r) =>
+      r.ingredients.some((i) => i.id === item.id),
+    ))
+      assert.equal(C.foodAllowed(r, s.prefs), false, r.id + " " + item.id);
+  }
+  const excluded = C.preferenceIds(s.prefs.exclusions);
+  assert.equal(excluded.has("ex-oyster-mushrooms-f1251a90"), false);
+  assert.equal(excluded.has("chicken"), false);
+  const raw = "ex-raw-shrimp-a2bb72e4";
+  s.pantry = [{ id: "prawns", qty: 500, always: false }];
+  assert.equal(C.stock(s, raw), 0);
+  const before = JSON.stringify(s);
+  C.foodAllowed(find("sp-skinnytaste-shrimp-piccata-foil-packets"), s.prefs);
+  assert.equal(JSON.stringify(s), before);
+  assert.deepEqual(C.migrate(s, R, I).prefs.exclusions, s.prefs.exclusions);
+});
+
+test("specific seafood preferences cover their own forms without excluding unrelated seafood", () => {
+  const s = C.defaults();
+  assert.equal(
+    C.foodAllowed(find("sp-skinnytaste-shrimp-piccata-foil-packets"), {
+      ...s.prefs,
+      exclusions: ["prawns"],
+    }),
+    false,
+  );
+  const salmon = C.preferenceIds(["salmon"]);
+  assert.equal(salmon.has("ex-smoked-salmon-3bdb2bdf"), true);
+  assert.equal(salmon.has("ex-sea-scallops-36ef9847"), false);
+  assert.equal(
+    C.foodAllowed(
+      find("sp-skinnytaste-scallops-grapefruit-arugula-and-spinach"),
+      { ...s.prefs, exclusions: ["salmon"] },
+    ),
+    true,
+  );
+});

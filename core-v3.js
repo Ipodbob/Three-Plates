@@ -708,13 +708,21 @@
       String(d.getDate()).padStart(2, "0"),
     ].join("-");
   }
+  function preferenceIds(ids) {
+    const expanded = new Set(ids);
+    for (const family of root.PLATES_DATA?.preferenceFamilies || [])
+      if (family.anchors.every((id) => ids.includes(id)))
+        for (const id of family.members) expanded.add(id);
+    return expanded;
+  }
   function foodAllowed(r, p) {
+    const excluded = preferenceIds(p.exclusions);
     return (
       !!r &&
       !r.ingredients.some(
         (i) =>
-          p.exclusions.includes(i.id) ||
-          (i.avoidIds || []).some((id) => p.exclusions.includes(id)),
+          excluded.has(i.id) ||
+          (i.avoidIds || []).some((id) => excluded.has(id)),
       ) &&
       !(p.diet === "vegetarian" && r.vegetarianSuitable === false) &&
       !(p.diet === "vegetarian" && !["vegan", "vegetarian"].includes(r.kind)) &&
@@ -897,6 +905,7 @@
     meals,
     dateLocal,
     foodAllowed,
+    preferenceIds,
     thawPlan,
     discardLot,
     round,

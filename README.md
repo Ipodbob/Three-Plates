@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 203 checks: 31 core regressions, 46 added domain checks,
-27 catalogue checks, 69 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 206 checks: 31 core regressions, 46 added domain checks,
+29 catalogue checks, 70 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -275,12 +275,20 @@ and vegan discovery. Source links and reasons are recorded in the classification
 review; recipe quantities are unchanged. This is not a complete allergy audit.
 The Skip to content link focuses the current page without changing its route.
 
+Fish & seafood exclusions use 74 explicitly listed catalogue ingredient variants,
+including stocks and sauces, while excluding oyster mushrooms from the family.
+Existing saved salmon/tuna/prawn group selections gain this coverage without a
+state rewrite. Salmon and prawn exclusions also cover their reviewed variants.
+Settings shows the broad exclusion as one removable chip. These relationships
+apply only to preference matching; they never combine raw/cooked stock or units.
+The reviewed mapping is in `docs/catalogue/seafood-preferences.json`.
+
 ## Verification and release status
 
-The latest verified release is v3.11.6 at `ff72a0d` (PR #15): Pages run
-36505398611 succeeded, all 21 checked public assets matched, and a fresh live
-navigation displayed v3.11.6. The current v3.11.7 diet classification and skip-link
-changes await release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
+The latest verified release is v3.11.7 at `3f305d4` (PR #16): Pages run
+36506074752 succeeded, all 21 checked public assets matched, and a fresh live
+navigation displayed v3.11.7. The current v3.11.8 seafood preference coverage
+awaits release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
 
 The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:
 all six destinations fit without horizontal overflow or fields leaving the viewport.
