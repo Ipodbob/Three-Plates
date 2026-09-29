@@ -187,3 +187,8 @@ test('pantry recipe shortcut replaces a stale choose draft with the selected ing
  const a=app();a.q('#recipe-search').value='old draft';a.q('#recipe-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));
  a.route('pantry');a.click('[data-act="pantry-add"]');a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');a.set('#pantry-use-soon',a.w.PlatesCore.today());a.submit('#pantry-form');a.click('[data-act="pantry-recipes"]');a.route('choose');assert.equal(a.q('#recipe-search').value,'Pasta');assert.equal(a.state().filters.query,'Pasta');a.dom.window.close();
 });
+
+test('low-count publisher recipes leave discovery while saved plans remain readable and keep shopping',()=>{
+ const a=app();a.click('#f-time-any');a.q('#recipe-search').value='Creamy White Bean Soup';a.submit('#search-form');assert.equal(a.q('[data-act="recipe"][data-id="curated-workweeklunch-white-bean-soup"]'),null);
+ const state=a.state();state.plans=[{id:'legacy-rating',recipeId:'curated-workweeklunch-white-bean-soup',date:a.w.PlatesCore.today(),meal:'Dinner',servings:3,cooked:false}];const b=app({'three-plates-v3':JSON.stringify(state)});b.route('plan');b.click('[data-act="recipe"]');assert.match(b.q('#sheet').textContent,/Kept for saved recipes/);assert.match(b.q('#sheet').textContent,/2 ratings/);assert.equal(b.state().plans[0].recipeId,'curated-workweeklunch-white-bean-soup');b.click('[data-act="close"]');b.route('shop');assert.ok(b.q('.shopping-row'));a.dom.window.close();b.dom.window.close();
+});

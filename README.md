@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 195 checks: 31 core regressions, 44 added domain checks,
-25 catalogue checks, 65 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 197 checks: 31 core regressions, 44 added domain checks,
+26 catalogue checks, 66 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -255,11 +255,19 @@ and saves the text. Clear/reset, backup restore and pantry recipe shortcuts
 replace drafts deliberately. Failed saves retain drafts for retry. Drafts are
 not persisted on every keystroke or restored after a full page reload.
 
+Publisher recipes offered in Choose/Batch suggestions and search must have a
+stored rating of at least 4/5 and at least five ratings. Currently 993 qualify.
+Two earlier Workweek Lunch selections (three and two ratings) remain in the
+catalogue for saved plans, menus and favourites; quantities and identifiers are
+unchanged. Their recipe views explain why they are no longer in discovery.
+The 45 original examples remain explicitly labelled unrated. Stored ratings
+are snapshots, not a live feed.
+
 ## Verification and release status
 
-The latest verified release is v3.11.3 at `81cc46a` (PR #12): Pages run
-36503735803 succeeded, all 21 checked public assets matched, and a fresh live
-navigation displayed v3.11.3. The current v3.11.4 search-draft changes await
+The latest verified release is v3.11.4 at `8db7994` (PR #13): Pages run
+36504302487 succeeded, all 21 checked public assets matched, and a fresh live
+navigation displayed v3.11.4. The current v3.11.5 publisher-rating policy awaits
 release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
 
 The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:

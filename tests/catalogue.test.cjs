@@ -99,3 +99,11 @@ test('rated batch recipes retain conservative freezing and valid portion account
  const s=C.defaults(),r=R.find(r=>r.id==='gf-big-batch-bolognese');s.batches=[{id:'rated-batch',recipeId:r.id,date:C.today(),servings:6,cooked:false}];assert.equal(C.requirements(s,R)['beef-mince'],750);assert.equal(r.batch.type,'base');for(const r of rated.filter(r=>r.batch)){assert.equal(r.batch.freezer,null);assert.equal(r.batch.qualityMonths,null);assert.ok(r.batch.storageProvenance.url);}
  assert.equal(C.migrate(JSON.parse(JSON.stringify(s)),R,I).batches[0].recipeId,r.id);
 });
+
+test('publisher discovery requires four stars and five ratings while preserving original examples',()=>{
+ assert.equal(C.discoveryEligible({}),true);
+ for(const [rating,ratingCount,expected] of [[4,5,true],[5,100,true],[3.99,500,false],[4.9,4,false],[5,5.5,false],[6,10,false],[NaN,10,false],[4,NaN,false]])assert.equal(C.discoveryEligible({source:{rating,ratingCount}}),expected);
+ const published=R.filter(r=>r.source);assert.equal(published.filter(C.discoveryEligible).length,993);
+ const rejected=published.filter(r=>!C.discoveryEligible(r));assert.deepEqual(rejected.map(r=>r.id).sort(),['curated-workweeklunch-egg-roll-in-a-bowl','curated-workweeklunch-white-bean-soup']);
+ for(const r of rejected){const s=C.defaults();assert.equal(C.matching(r,{...s.filters,meal:r.meals[0],time:'any',method:'any',query:r.name},s,R,I),false);s.plans=[{id:'legacy',recipeId:r.id,date:C.today(),meal:r.meals[0],servings:3,cooked:false}];const restored=C.migrate(s,R,I);assert.equal(restored.plans.length,1);assert.deepEqual(C.requirements(restored,R),C.requirements(s,R));}
+});

@@ -794,7 +794,19 @@
     l.portions = 0;
     s.plans = s.plans.filter((p) => p.cooked || p.lotId !== id);
   }
+  function discoveryEligible(r) {
+    if (!r.source) return true; // Original examples remain explicitly labelled unrated.
+    const { rating, ratingCount } = r.source;
+    return (
+      Number.isFinite(rating) &&
+      rating >= 4 &&
+      rating <= 5 &&
+      Number.isInteger(ratingCount) &&
+      ratingCount >= 5
+    );
+  }
   function matching(r, f, s, recipes, ingredients) {
+    if (!discoveryEligible(r)) return false;
     if (!permitted(r, s.prefs) || !r.meals.includes(f.meal)) return false;
     if (
       (f.time === "15" && (r.total > 15 || r.additionalTime)) ||
@@ -927,6 +939,7 @@
     changeStorage,
     permitted,
     matching,
+    discoveryEligible,
     suggestBatchSize,
   };
   root.PlatesCore = api;
