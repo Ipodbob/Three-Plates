@@ -1368,7 +1368,7 @@
       });
   }
   function ingredientList(r, n) {
-    return C.scaled(r, n)
+    return (r.ingredientGuidance ? `<p class="helper ingredient-guidance">${e(r.ingredientGuidance)}</p>` : "") + C.scaled(r, n)
       .map(
         (i) =>
           `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,

@@ -89,6 +89,7 @@
     function group(r, prefix, items, name) {
       groups.push({
         name,
+        ...(r?.ingredientGuidance ? { ingredientGuidance: r.ingredientGuidance } : {}),
         ...(r?.unmeasuredIngredients?.length
           ? { unmeasured: r.unmeasuredIngredients }
           : {}),

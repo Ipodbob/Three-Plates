@@ -189,6 +189,19 @@ test('backup replacement preview can be cancelled without replacing any saved da
  const b=app({'three-plates-v3':before});t.after(()=>b.dom.window.close());assert.equal(b.state().shop,'Tesco');
 });
 
+test('extra-yolk egg allowance explains the split in recipe and cooking without expanding source notes', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());a.click('#f-time-any');
+ while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');
+ a.q('#recipe-search').value='chocolate chip cookie bars';a.submit('#search-form');
+ a.click('[data-act="recipe"][data-id="sp-sally-soft-chewy-chocolate-chip-cookie-bars"]');
+ assert.equal(a.q('#recipe-source-notes').open,false);assert.match(a.q('#recipe-amounts .ingredient-guidance').textContent,/1 whole egg plus 1 extra yolk/);
+ assert.match(a.q('#recipe-amounts').textContent,/2 eggs/);a.set('#recipe-portions','8');assert.match(a.q('#recipe-amounts').textContent,/1 egg/);
+ assert.match(a.q('#recipe-amounts .ingredient-guidance').textContent,/full recipe/);
+ a.click('#recipe-actions [data-act="plan-add"]');a.route('shop');assert.match(a.q('[data-act="bought"][data-id="eggs"]').closest('.shopping-row').textContent,/1 egg/);
+ a.route('plan');a.click('[data-act="cooking"]');assert.match(a.q('#cooking-panel .ingredient-guidance').textContent,/reserve the spare white/);
+ assert.equal(a.state().pantry.length,0);
+});
+
 function app(seed={},failStorage=false){
  const dom=new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'),{url:'http://localhost/Three-Plates/',runScripts:'outside-only'}),w=dom.window;
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};

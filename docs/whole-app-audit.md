@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Required yolks and visible egg usage
+
+- Source-verified extra yolks now contribute to whole-egg shopping allowances: New York cheesecake 4 eggs (3 whole + 1 yolk), next-level cookies 3 (1 whole + 2 yolks), smoked-trout tartlets 3 (2 whole + 1 yolk), and Sally cookie bars 2 (1 whole + 1 yolk).
+- A visible ingredient-guidance paragraph in Recipe and Cooking explains the full-recipe split, spare whites and scaling. It is outside collapsed source notes. Cooking deducts opened whole eggs once; no spare whites are automatically credited to stock. Only affected recipes gain guidance metadata; unaffected cooking signatures retain their previous shape.
+- All 43 catalogue/cooking checks passed, plus three focused recipe UI checks. The new UI regression verifies the visible split, scaled allowance, shopping and cooking guidance. Browser confirmed the full cookie-bar recipe and cooking checklist show the split without expanding notes; isolated data was cleared via Settings. The finite queue now has eight pending candidates.
+
 ## Finite quantity review queue and source weights
 
 - Added a read-only candidate screen and a 15-entry source-review queue for numeric-plus amounts still marked omitted. It records two source-confirmed corrections, one previously verified conditional addition and 12 pending decisions. The script detects unregistered matches; zero unregistered entries is coverage of this heuristic, not proof of complete recipe accuracy.
