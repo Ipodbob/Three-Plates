@@ -275,3 +275,15 @@ test('broad meat exclusions cover reviewed imported cuts and stocks without chan
  assert.equal(pork.has('ex-graham-cracker-crumbs-e70a0fa5'),false);
  const s=C.defaults();s.pantry=[{id:'chicken',qty:500,always:false}];assert.equal(C.stock(s,'ex-ground-chicken-06bee616'),0);
 });
+
+test('favourite ingredient families rank imported cuts but never override food exclusions',()=>{
+ const s=C.defaults();const ids=['chicken','chicken-thigh'];s.prefs.likedIngredients=ids;
+ const ground=R.find(r=>r.ingredients.some(i=>i.id==='ex-ground-chicken-06bee616'));
+ assert.ok(ground);const base={...s,prefs:{...s.prefs,likedIngredients:[]}};
+ assert.ok(C.choiceWeight(ground,s,false)>C.choiceWeight(ground,base,false));
+ assert.ok(C.choiceWeight(ground,s,true)>C.choiceWeight(ground,base,true));
+ const vegan={id:'vegan-test',cuisine:'any',kind:'vegan',ingredients:[{id:'ex-vegan-chicken-pieces-d9355e4b',qty:100}]};
+ assert.equal(C.choiceWeight(vegan,s,false),C.choiceWeight(vegan,base,false));
+ s.prefs.exclusions=ids;assert.equal(C.foodAllowed(ground,s.prefs),false);
+ assert.deepEqual(s.prefs.likedIngredients,ids);assert.deepEqual(C.migrate(s,R,I).prefs.likedIngredients,ids);
+});

@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 211 checks: 31 core regressions, 46 added domain checks,
-30 catalogue checks, 74 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 213 checks: 31 core regressions, 46 added domain checks,
+31 catalogue checks, 75 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -332,3 +332,8 @@ that this tab read or wrote. A changed or cleared save pauses edits and offers
 Reload saved data, preventing stale tabs from replacing newer records. The
 storage event also handles full clears. This is browser-local protection, not
 cloud synchronisation or a cross-device transaction system.
+
+Favourite ingredient groups use the same reviewed ingredient families when
+ranking fresh meals and batches. A broad favourite remains one removable chip;
+food exclusions still filter recipes before ranking. No recipe is guaranteed
+to appear solely because it contains a favourite ingredient.
