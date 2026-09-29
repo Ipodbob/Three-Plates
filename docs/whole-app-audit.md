@@ -221,3 +221,16 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Further screening found mixed herb/serving lines in the seafood roast, pork casserole, ratatouille, Thai fried rice, courgette soup and no-cook fajitas. These need publisher checks and defensible units before changing quantities. This release does not claim that all catalogue omission notes or ingredient amounts have been verified.
 
 - Validation: full suite passed 228 checks (32 core and 196 Node checks) before the final noodle-salad method correction. All 21 catalogue checks passed after that correction. Browser verified the final method and quantities.
+
+
+## Required bunches, leaves and sprigs
+
+- Verified all six mixed herb/serving lines against publisher ingredients and methods. Restored parsley in the seafood roast, basil in ratatouille, coriander in Thai fried rice and no-cook fajitas, spring onions in courgette soup, and the specified bay/sage/thyme bundle in pork casserole. Source decisions and definitions are in docs/catalogue/herb-ingredient-corrections.json.
+- Bunches use counted stock identities, separate from gram-based herbs. The casserole uses two bay leaves, three sage leaves and four thyme sprigs per four servings. No assumed bunch weight or leaf-to-gram conversion is introduced. Existing measured stock and completed meals remain unchanged; uncompleted plans acquire the required counts.
+- Shared amounts now label these counts as bunches, leaves or sprigs across recipe, shopping, pantry and cooking. Generic count labels correctly use item for a single item. Browser checked a two-person rice recipe, a whole-bunch purchase and a 320px pantry layout; controls and quantity remain visible.
+- Courgette soup also requires freshly grated nutmeg without a stated measurement. The recipe now explicitly identifies it as required but unquantified in automatic shopping/deductions. This is a remaining limitation for unmeasured seasonings, not a fabricated exact amount or a claim that the ingredient is optional.
+- Initial connected test used the default 30-minute filter, which correctly excluded this additional-time recipe. Using Any time allowed the intended herb workflow; the updated test passed. This was a test setup correction, not a production filter change.
+
+- Browser finished the synthetic meal and confirmed 0.5 bunch remains after reload. The isolated localhost test stock, purchase history and meal were cleared through Settings afterward.
+
+- Final validation: all 231 checks passed (32 core plus 199 Node test-runner checks), including the end-to-end bunch purchase/cook/reload test and all catalogue preservation checks.

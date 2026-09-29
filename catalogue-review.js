@@ -170,6 +170,173 @@
       note: "Includes two tablespoons of olive oil (30ml) for cooking the full recipe. Extra serving oil remains optional.",
     },
   ];
+  // Counted herb evidence: docs/catalogue/herb-ingredient-corrections.json.
+  const herbIngredients = [
+    {
+      id: "parsley-small-bunch",
+      name: "Fresh parsley (small bunch)",
+      unit: "each",
+      group: "Fruit & veg",
+    },
+    {
+      id: "basil-small-bunch",
+      name: "Fresh basil (small bunch)",
+      unit: "each",
+      group: "Fruit & veg",
+    },
+    {
+      id: "coriander-small-bunch",
+      name: "Fresh coriander (small bunch)",
+      unit: "each",
+      group: "Fruit & veg",
+    },
+    {
+      id: "spring-onion-bunch",
+      name: "Spring onions (bunch)",
+      unit: "each",
+      group: "Fruit & veg",
+    },
+    {
+      id: "sage-leaf",
+      name: "Fresh sage leaves",
+      unit: "each",
+      group: "Fruit & veg",
+    },
+  ];
+  for (const item of herbIngredients)
+    root.PLATES_DATA.ingredients[item.id] = item;
+  requiredIngredientCorrections.push(
+    ...[
+      {
+        recipeId: "gf2-one-pan-seafood-roast-smoky-garlic-butter",
+        source:
+          "https://www.bbcgoodfood.com/recipes/one-pan-seafood-roast-smoky-garlic-butter",
+        items: [
+          {
+            id: "parsley-small-bunch",
+            oldQty: 0,
+            qty: 1,
+            avoidIds: ["parsley"],
+          },
+        ],
+        replace: [
+          [
+            "small bunch parsley chopped, plus a little to serve",
+            "extra parsley to serve",
+          ],
+        ],
+        note: "One small bunch of parsley is included for the garlic butter; garnish is extra. Bunches remain separate from weighed herb stock; no gram conversion is assumed.",
+      },
+      {
+        recipeId: "gf2-slow-cooker-pork-casserole",
+        source:
+          "https://www.bbcgoodfood.com/recipes/slow-cooker-pork-casserole",
+        items: [
+          {
+            id: "bay",
+            oldQty: 0,
+            qty: 2,
+          },
+          {
+            id: "sage-leaf",
+            oldQty: 0,
+            qty: 3,
+            avoidIds: ["ex-sage-264fda70", "ex-sage-babdcfce"],
+          },
+          {
+            id: "thyme",
+            oldQty: 0,
+            qty: 4,
+          },
+        ],
+        replace: [
+          [
+            "bundle of woody herbs (bouquet garni) – we used 2 bay leaves, 3 sage leaves and 4 thyme sprigs, plus a few thyme leaves to serve",
+            "extra thyme leaves to serve",
+          ],
+        ],
+        note: "Includes the publisher's herb bundle: two bay leaves, three sage leaves and four thyme sprigs for four servings. Bunches remain separate from weighed herb stock; no gram conversion is assumed.",
+      },
+      {
+        recipeId: "gf2-slow-cooker-ratatouille",
+        source: "https://www.bbcgoodfood.com/recipes/slow-cooker-ratatouille",
+        items: [
+          {
+            id: "basil-small-bunch",
+            oldQty: 0,
+            qty: 1,
+            avoidIds: ["basil"],
+          },
+        ],
+        replace: [
+          [
+            "small bunch of basil roughly chopped, plus a few extra leaves to serve",
+            "extra basil leaves to serve",
+          ],
+        ],
+        note: "Includes one small bunch of basil for the cooked sauce; garnish is extra. Bunches remain separate from weighed herb stock; no gram conversion is assumed.",
+      },
+      {
+        recipeId: "gf2-thai-fried-rice-prawns-peas",
+        source:
+          "https://www.bbcgoodfood.com/recipes/thai-fried-rice-prawns-peas",
+        items: [
+          {
+            id: "coriander-small-bunch",
+            oldQty: 0,
+            qty: 1,
+            avoidIds: ["fresh-coriander"],
+          },
+        ],
+        replace: [
+          [
+            "small bunch coriander roughly chopped, plus a few leaves to serve",
+            "extra coriander leaves to serve",
+          ],
+        ],
+        note: "Includes one small bunch of coriander stirred through the rice; garnish is extra. Bunches remain separate from weighed herb stock; no gram conversion is assumed.",
+      },
+      {
+        recipeId: "sp-gfmore-courgette-potato-cheddar-soup",
+        source:
+          "https://www.bbcgoodfood.com/recipes/courgette-potato-cheddar-soup",
+        items: [
+          {
+            id: "spring-onion-bunch",
+            oldQty: 0,
+            qty: 1,
+            avoidIds: ["spring-onion", "ex-spring-onions-6a259c37"],
+          },
+        ],
+        replace: [
+          [
+            "bunch spring onion sliced - save 1 for serving, if eating straight away; good grating fresh nutmeg plus extra to serve",
+            "extra nutmeg to serve",
+          ],
+        ],
+        note: "Includes one bunch of spring onions; reserve one onion from that bunch for serving if desired. Freshly grated nutmeg is also required in the soup, but the publisher gives no measured amount: check it before shopping; it is not quantified in automatic shopping or stock deductions. Bunches remain separate from weighed herb stock; no gram conversion is assumed.",
+      },
+      {
+        recipeId: "sp-gfmore-no-cook-veggie-fajitas",
+        source: "https://www.bbcgoodfood.com/recipes/no-cook-veggie-fajitas",
+        items: [
+          {
+            id: "coriander-small-bunch",
+            oldQty: 0,
+            qty: 1,
+            avoidIds: ["fresh-coriander"],
+          },
+        ],
+        replace: [
+          [
+            "small bunch coriander chopped, plus extra, shredded, to serve",
+            "extra coriander to serve",
+          ],
+        ],
+        note: "Includes one small bunch of coriander split between the filling and avocado; garnish is extra. Bunches remain separate from weighed herb stock; no gram conversion is assumed.",
+      },
+    ],
+  );
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,
@@ -539,7 +706,8 @@
     "gf2-cheesy-black-bean-quesadillas": { kind: "vegetarian", emoji: "🫓" },
     "sp-gfmore-chicken-mango-noodle-salad": {
       method: "no-cook",
-      methodNote: "Soak the rice noodles in boiling water, then drain and rinse. Use ready-cooked roast chicken; the publisher method does not cook raw chicken.",
+      methodNote:
+        "Soak the rice noodles in boiling water, then drain and rinse. Use ready-cooked roast chicken; the publisher method does not cook raw chicken.",
     },
     "sp-gfmore-no-cook-chicken-couscous": {
       method: "no-cook",
