@@ -1,6 +1,73 @@
 /* Reviewed catalogue metadata; evidence in docs/catalogue/classification-review.json. */
 (function (root) {
   "use strict";
+  const fishIngredientCorrections = [
+    {
+      recipeId: "sp-gfmore-lentil-tuna-salad",
+      ingredient: {
+        id: "tuna-water-160g-can",
+        name: "Tuna in water (160g can, drain before use)",
+        unit: "each",
+        group: "Cupboard",
+      },
+      qty: 2,
+      avoidIds: ["tuna"],
+      source: "https://www.bbcgoodfood.com/recipes/lentil-tuna-salad",
+      omittedText:
+        "2 x 160g cans tuna steaks in spring water, drained and flaked",
+    },
+    {
+      recipeId: "sp-skinnytaste-sardine-salad",
+      ingredient: {
+        id: "sardines-water-4-4oz-tin",
+        name: "Sardines in water (4.4oz / 125g tin, drain before use)",
+        unit: "each",
+        group: "Cupboard",
+      },
+      qty: 1,
+      avoidIds: [],
+      source: "https://www.skinnytaste.com/sardine-salad/",
+      omittedText:
+        "1 4.4-ounce tin  no-salt-added sardines in water (drained (such as Wild Planet) )",
+    },
+    {
+      recipeId: "sp-skinnytaste-tuna-and-white-bean-salad",
+      ingredient: {
+        id: "tuna-water-3oz-packet",
+        name: "Tuna in water (3oz / 85g packet, drain before use)",
+        unit: "each",
+        group: "Cupboard",
+      },
+      qty: 2,
+      avoidIds: ["tuna"],
+      source: "https://www.skinnytaste.com/tuna-and-white-bean-salad/",
+      omittedText: "2 3-ounce  packets tuna in water (drained)",
+    },
+  ];
+  for (const correction of fishIngredientCorrections) {
+    const r = root.PLATES_DATA.recipes.find(
+      (r) => r.id === correction.recipeId,
+    );
+    if (!r) continue;
+    const item = correction.ingredient;
+    root.PLATES_DATA.ingredients[item.id] = item;
+    if (!r.ingredients.some((i) => i.id === item.id))
+      r.ingredients.push({
+        id: item.id,
+        qty: correction.qty,
+        avoidIds: correction.avoidIds,
+      });
+    const prefix =
+      "Not included in shopping (serving extras, optional items or equipment): ";
+    r.planningNotes = r.planningNotes
+      .replace(correction.omittedText + "; ", "")
+      .replace(prefix + correction.omittedText, "");
+    const note =
+      "Catalogue correction: fish is included in shopping as the publisher's tin/packet count, not drained grams. Check the stated pack size; existing uncooked plans now include this requirement.";
+    if (!r.planningNotes.includes(note))
+      r.planningNotes = (r.planningNotes.trim() + " " + note).trim();
+  }
+  root.PLATES_DATA.unspecifiedFishIngredients = ["ex-dashi-a03a1e85"];
   // Reviewed preference aliases only; original recipe/stock records stay intact.
   root.PLATES_DATA.ingredientPreferenceAliases = {
     "ex-ground-black-peppercorn-8bda9b84": ["black-pepper"],
@@ -200,7 +267,12 @@
     },
     {
       anchors: ["salmon", "tuna", "prawns"],
+      fish: true,
       members: [
+        "tuna-water-160g-can",
+        "sardines-water-4-4oz-tin",
+        "tuna-water-3oz-packet",
+        "ex-eomuk-a86f582c",
         "salmon",
         "tuna",
         "prawns",
@@ -333,6 +405,10 @@
     "ex-pepperoni-slices-d83045ab",
   ];
   const patches = {
+    "gf2-miso-soup": {
+      methodNote:
+        "Dashi can contain fish. This listing keeps a fish classification unless a verified plant-based stock is used.",
+    },
     "gf2-cheesy-black-bean-quesadillas": { kind: "vegetarian", emoji: "🫓" },
     "sp-gfmore-no-cook-chicken-couscous": {
       method: "no-cook",

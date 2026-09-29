@@ -727,6 +727,15 @@
       for (const id of root.PLATES_DATA.unspecifiedMeatIngredients || [])
         excluded.add(id);
     }
+    if (
+      (root.PLATES_DATA?.preferenceFamilies || []).some(
+        (family) =>
+          family.fish &&
+          family.anchors.every((id) => p.exclusions.includes(id)),
+      )
+    )
+      for (const id of root.PLATES_DATA.unspecifiedFishIngredients || [])
+        excluded.add(id);
     return (
       !!r &&
       !r.ingredients.some(
