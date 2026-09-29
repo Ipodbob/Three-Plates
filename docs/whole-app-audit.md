@@ -2,6 +2,15 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Baking ingredients and full-bake classification
+
+- Checked publisher lists and methods for 21 recipes and restored 24 measured ingredient amounts. Eighteen Sally recipes had required flour omitted because the same line allowed extra flour as needed. Existing starter and topping amounts are summed with the restored dough quantities. Two galettes regain measured buttermilk; other corrections include measured brushing milk/buttermilk, brioche egg wash and macaroni topping butter. Exact records and source links are in docs/catalogue/baking-ingredient-corrections.json.
+- Six related classification corrections make sweet bakes discoverable under Baking/Dessert, preserve full-bake yields, classify dinner rolls as a side and keep unbaked rough-puff dough as a searchable component. Saved recipe identities, pantry balances, source ratings, completed records and storage formats remain unchanged. Existing uncooked plans acquire corrected requirements.
+- The original scratch importer discarded whole lines containing optional/as-needed wording. Do not reuse that importer unchecked. The new regression guards against these numeric flour omissions; this review does not establish that every remaining optional-extra or conversion note is correct. Unspecified handling extras remain unquantified.
+- Browser verified the full 16-piece blondie bake shows 291g flour in both recipe and Shopping and retains the requirement after reload. Synthetic localhost test data was cleared through Settings; other origins were untouched. Physical phone validation remains outstanding.
+
+- Validation: all 251 full-suite checks passed (32 core plus 219 Node checks), including scanner, shopping, migration, cooking, prepared portions and the new baking regressions. An initial UI assertion selected a different publisher's same-named pastry; it was corrected to target the intended recipe before this clean run.
+
 ## Reviewed guidance in batch dialogs
 
 - A catalogue audit found four batch notes still embedded their pre-correction omission claims: pork casserole, ratatouille, courgette soup and pasta e fagioli. The reviewed planning notes were already correct and their quantities already included the restored ingredients. Catalogue review now replaces the embedded original text while retaining the surrounding batch instructions. No new ingredient amounts, source ratings or storage guidance are introduced.
