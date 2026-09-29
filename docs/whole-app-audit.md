@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Scanner detection, skip and save feedback
+
+- Continuous-camera Skip reused a next-item message starting Saved even though it never committed stock. The next-item transition now receives the actual save outcome; skipping says Skipped. Nothing was saved, while successful confirmation says Saved. Detection also now says Will be added as a separate product instead of Saved as its own product before confirmation.
+- All 30 scanner/unit/relay checks passed. The camera regression failed with the misleading pre-fix message, then verified skip preserves the exact saved text and saved count, leaves the stream running, accepts the next scan and saves exactly once. Confirmation and cancellation use separate callbacks so a click event cannot be mistaken for a successful save flag.
+- Browser used a real Open Food Facts Nutella lookup via barcode entry, verified the new pre-confirmation text, skipped it and reloaded an unchanged empty pantry. No synthetic stock or matches were saved. Physical iPhone continuous-camera behaviour remains unverified; the camera lifecycle check here uses the existing mocked stream.
+
 ## Required topping estimates and pastry salt
 
 - Resolved both pending finishing-ingredient reviews. Cherry pie now includes an estimated 11g for its additional two tablespoons of ground almonds (61g total), plus the exact 0.25 tsp salt in the method. Citrus cake includes estimated 24g syrup sugar (224g total) and 28g icing yogurt (103g total).

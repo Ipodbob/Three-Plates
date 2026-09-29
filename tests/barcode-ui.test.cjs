@@ -232,6 +232,8 @@ test("stale lookup result cannot reopen a dismissed scanner", async () => {
 test("detected product has a visible save action without recipe matching and survives reload", async () => {
   const a = app();
   await lookup(a);
+  assert.match(a.q("#scan-selection").textContent, /Will be added/);
+  assert.doesNotMatch(a.q("#scan-selection").textContent, /^Saved/);
   assert.ok(a.q("#scan-save"));
   assert.equal(a.q("#scan-amount").hidden, false);
   a.click("#scan-save");
@@ -298,10 +300,12 @@ test("update mode sets absolute stock left and empty removes only that item", as
   a.dom.window.close();
 });
 test("camera starts once and continues after confirmation without another permission request", async () => {
+  let now = Date.now();
   let callback,
     starts = 0,
     stops = 0;
   const a = app({}, (w) => {
+    w.Date.now = () => now;
     Object.defineProperty(w.navigator, "mediaDevices", {
       value: {
         getUserMedia: async () => {
@@ -323,7 +327,18 @@ test("camera starts once and continues after confirmation without another permis
   await tick();
   callback({ getText: () => code });
   await tick();
+  const before = a.w.localStorage.getItem("three-plates-v3");
+  a.click("#scan-skip");
+  assert.match(a.q("#scan-status").textContent, /Skipped/);
+  assert.doesNotMatch(a.q("#scan-status").textContent, /^Saved/);
+  assert.equal(a.w.localStorage.getItem("three-plates-v3"), before);
+  assert.equal(a.q("#scan-session").textContent, "");
+  assert.equal(starts, 1); assert.equal(stops, 0);
+  now += 5000;
+  callback(null); callback({ getText: () => code }); await tick();
   a.click("#scan-save");
+  assert.match(a.q("#scan-status").textContent, /^Saved/);
+  assert.match(a.q("#scan-session").textContent, /1 saved/);
   assert.equal(starts, 1);
   callback({ getText: () => code });
   await tick();
