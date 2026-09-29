@@ -2648,4 +2648,3 @@
   if (migrated)
     toast("Your existing pantry, preferences and plan have been upgraded.");
 })();
-
