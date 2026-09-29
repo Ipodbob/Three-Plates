@@ -1486,6 +1486,114 @@
     ],
     "note": "Includes 64g sliced almonds and an extra tablespoon of oats for the topping. Plans 218g oats total: 213g plus an estimated 5g, rounded from the publisher's 213g per 2.5 cups. Almond butter is a plant ingredient; the listed coconut-oil option is used.",
     "ingredientGuidance": "Includes 64g sliced almonds and an extra tablespoon of oats for the topping. Plans 218g oats total: 213g plus an estimated 5g, rounded from the publisher's 213g per 2.5 cups. Almond butter is a plant ingredient; the listed coconut-oil option is used."
+  },
+  {
+    "recipeId": "sp-skinnytaste-pumpkin-spice-pancakes-with-pumpkin",
+    "source": "https://www.skinnytaste.com/pumpkin-spice-pancakes-with-pumpkin/",
+    "items": [
+      {
+        "id": "ex-pumpkin-pie-spice-7e1a1fd5",
+        "oldQty": 0,
+        "qty": 1
+      }
+    ],
+    "replace": [
+      [
+        "1 teaspoon pumpkin pie spice (or more to taste)",
+        "extra pumpkin pie spice to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes 1 teaspoon of pumpkin pie spice. The existing 15ml oil total includes 10ml in the batter plus a labelled 5ml planning allowance for spraying the pan.",
+    "ingredientGuidance": "Includes 1 teaspoon of pumpkin pie spice. The existing 15ml oil total includes 10ml in the batter plus a labelled 5ml planning allowance for spraying the pan."
+  },
+  {
+    "recipeId": "sp-skinnytaste-crock-pot-carne-guisada-latin-beef-stew",
+    "source": "https://www.skinnytaste.com/crock-pot-carne-guisada-latin-beef-stew/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 1
+      }
+    ],
+    "replace": [
+      [
+        "1  kosher salt ( or more to taste)",
+        "initial pinch and extra salt to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes 1 teaspoon of salt from the method: three quarters for the beef and one quarter for the slow cooker. The initial pinch and further seasoning to taste remain unquantified.",
+    "ingredientGuidance": "Includes 1 teaspoon of salt from the method: three quarters for the beef and one quarter for the slow cooker. The initial pinch and further seasoning to taste remain unquantified."
+  },
+  {
+    "recipeId": "sp-budgetbytes-slow-cooker-chicken-noodle-soup",
+    "source": "https://www.budgetbytes.com/slow-cooker-chicken-noodle-soup/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 3
+      }
+    ],
+    "replace": [
+      [
+        "1 Tbsp salt (or to taste) ($0.10)",
+        "further salt to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes the listed 1 tablespoon of salt (3 teaspoons) for planning. The publisher recommends adding it gradually to taste.",
+    "ingredientGuidance": "Includes the listed 1 tablespoon of salt (3 teaspoons) for planning. The publisher recommends adding it gradually to taste."
+  },
+  {
+    "recipeId": "sp-budgetbytes-slow-cooker-meatball-subs",
+    "source": "https://www.budgetbytes.com/slow-cooker-meatball-subs/",
+    "items": [
+      {
+        "id": "salt",
+        "oldQty": 0.25,
+        "qty": 1.25
+      }
+    ],
+    "replace": [
+      [
+        "1 tsp  salt (to taste, $0.03)",
+        "further salt to taste (amount not specified)"
+      ]
+    ],
+    "note": "Includes 1 teaspoon of salt in the sauce plus a quarter teaspoon in the meatballs (1.25 teaspoons total). Optional sauce sugar remains optional.",
+    "ingredientGuidance": "Includes 1 teaspoon of salt in the sauce plus a quarter teaspoon in the meatballs (1.25 teaspoons total). Optional sauce sugar remains optional."
+  },
+  {
+    "recipeId": "sp-amyjacky-instant-pot-chicken-noodle-soup",
+    "source": "https://www.pressurecookrecipes.com/instant-pot-chicken-noodle-soup/",
+    "items": [
+      {
+        "id": "ex-unsalted-chicken-stock-e334b367",
+        "oldQty": 1440,
+        "qty": 1500
+      },
+      {
+        "id": "carrot",
+        "oldQty": 240,
+        "qty": 220
+      }
+    ],
+    "replace": [
+      [
+        "1 tablespoon (15ml) freshly squeezed lemon juice ((can add more to taste))",
+        "optional lemon juice to finish"
+      ],
+      [
+        "US cup estimated as 240ml: 6 cups (1.5L) unsalted chicken stock",
+        "Publisher metric quantity: 1.5L unsalted chicken stock"
+      ],
+      [
+        "Planning conversion: 3 (220g) carrots (, chopped) → 240g Carrots",
+        "Publisher metric quantity: 220g carrots"
+      ]
+    ],
+    "note": "Includes 1500ml unsalted chicken stock and 220g carrots, using the publisher’s explicit metric quantities. Lemon juice is an optional finishing addition and is not included in shopping.",
+    "ingredientGuidance": "Includes 1500ml unsalted chicken stock and 220g carrots, using the publisher’s explicit metric quantities. Lemon juice is an optional finishing addition and is not included in shopping."
   }
 ]);
   for (const correction of requiredIngredientCorrections) {

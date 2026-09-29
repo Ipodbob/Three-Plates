@@ -171,6 +171,8 @@ test("batch guidance includes reviewed planning notes instead of stale omission 
   assert.deepEqual(affected.map(r => r.id).sort(), [
     'gf2-slow-cooker-pork-casserole', 'gf2-slow-cooker-ratatouille',
     'sp-gfmore-courgette-potato-cheddar-soup', 'sp-gfmore-pasta-e-fagioli',
+    'sp-amyjacky-instant-pot-chicken-noodle-soup', 'sp-budgetbytes-slow-cooker-chicken-noodle-soup',
+    'sp-budgetbytes-slow-cooker-meatball-subs', 'sp-skinnytaste-crock-pot-carne-guisada-latin-beef-stew',
   ].sort());
   for (const r of affected) assert.ok(r.batch.note.includes(r.planningNotes), r.id);
 });
@@ -674,4 +676,39 @@ test('potato bread and berry toppings scale without consuming incompatible pantr
  assert.match(berry.ingredientGuidance,/estimated 5g/);
  assert.equal(Math.round(213/(2.5*16)),5);
  assert.equal(C.foodAllowed(find(cases[0][0]),{...C.defaults().prefs,exclusions:['potato']}),false);
+});
+
+
+test('reviewed seasonings and explicit soup weights scale, reload and deduct once',()=>{
+ const cases=[
+  ['sp-skinnytaste-pumpkin-spice-pancakes-with-pumpkin',{'ex-pumpkin-pie-spice-7e1a1fd5':1,'veg-oil':15}],
+  ['sp-skinnytaste-crock-pot-carne-guisada-latin-beef-stew',{'salt':1}],
+  ['sp-budgetbytes-slow-cooker-chicken-noodle-soup',{'salt':3}],
+  ['sp-budgetbytes-slow-cooker-meatball-subs',{'salt':1.25}],
+  ['sp-amyjacky-instant-pot-chicken-noodle-soup',{'ex-unsalted-chicken-stock-e334b367':1500,'carrot':220}],
+ ];
+ for(const [recipeId,amounts] of cases){
+  const r=find(recipeId),s=C.defaults();
+  s.plans=[{id:'review',recipeId,date:C.today(),meal:r.meals[0],servings:r.base/2,side:'none',cooked:false}];
+  s.pantry=[{id:'rice',qty:321,always:false}];
+  const restored=C.migrate(C.clone(s),R,I);assert.deepEqual(restored.pantry,s.pantry);
+  for(const [id,qty]of Object.entries(amounts)){
+   assert.equal(C.requirements(restored,R)[id],qty/2);
+   assert.equal(C.shopping(restored,R).find(i=>i.id===id).remaining,qty/2);
+   restored.pantry.push({id,qty,always:false});
+  }
+  C.finishPlan(restored,'review',R);
+  for(const [id,qty]of Object.entries(amounts))assert.equal(C.stock(restored,id),qty/2);
+  assert.equal(C.stock(restored,'rice'),321);
+  const done=C.migrate(C.clone(restored),R,I);assert.deepEqual(done.pantry,restored.pantry);
+  assert.throws(()=>C.finishPlan(done,'review',R));
+ }
+ const soup=find('sp-amyjacky-instant-pot-chicken-noodle-soup');
+ assert.equal(soup.ingredients.some(i=>/lemon/.test(i.id)),false);
+ assert.doesNotMatch(soup.planningNotes,/240g Carrots|US cup estimated as 240ml/);
+ assert.match(soup.ingredientGuidance,/optional/);
+ const cake=find('sp-sally-new-favorite-white-layer-cake');
+ assert.equal(cake.ingredients.find(i=>i.id==='salt').qty,1);
+ assert.equal(omittedReview.entries.find(e=>e.recipeId===cake.id).status,'reviewed-conditional');
+ assert.match(omittedReview.entries.find(e=>e.recipeId===cake.id).decision,/only if/);
 });
