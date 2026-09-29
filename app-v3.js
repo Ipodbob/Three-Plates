@@ -848,10 +848,9 @@
   function finishedHistory(done) {
     const previous = document.getElementById("finished-history");
     const open = previous ? previous.open : !!finishedQuery;
-    const matches = done.filter((p) =>
-      C.text(
-        `${recipe(p.recipeId).name} ${p.date} ${day(p.date)} ${p.meal}`,
-      ).includes(C.text(finishedQuery)),
+    const dates = finishedQuery.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
+    const matches = done.filter((p) => dates.every((d) => d === p.date) &&
+      C.searchMatches(`${recipe(p.recipeId).name} ${p.date} ${day(p.date)} ${p.meal}`, finishedQuery),
     );
     const visible = matches.slice(0, finishedCount);
     return `<details id="finished-history" class="details-box" ${open ? "open" : ""}><summary>Finished meals (${done.length})</summary><form id="finished-search-form" class="recipe-search"><label class="sr-only" for="finished-search">Search finished meals</label><input id="finished-search" type="search" maxlength="100" placeholder="Recipe, date or meal" value="${e(finishedQuery)}"><button class="icon-btn" type="submit" aria-label="Search finished meals">${icon("search")}</button>${finishedQuery ? btn("Clear", "finished-clear", "", "ghost") : ""}</form><p class="helper">Newest first. All records remain saved.</p>${visible.map((p) => `<section class="finished-record" tabindex="-1" data-history-id="${e(p.id)}" aria-label="${e(day(p.date) + " " + p.date.slice(0, 4) + " " + p.meal + " · " + recipe(p.recipeId).name)}"><p class="plan-date">${e(day(p.date))} ${e(p.date.slice(0, 4))}</p>${planCard(p)}</section>`).join("") || '<p class="helper">No finished meals match this search.</p>'}<p role="status">Showing ${visible.length} of ${matches.length} finished meals</p>${visible.length < matches.length ? btn("Show older meals", "finished-more") : ""}</details>`;
@@ -862,7 +861,7 @@
     if (edit || !state.prep.selected.length) {
       modal(
         "Choose meals to prepare",
-        `<p class="helper">Choose up to 20 meals or batches. Ingredients are combined for gathering, with each recipe's share shown separately.</p>${!options.length ? "<p>No unfinished meals or batches. Add some to Plan first.</p>" : `<form id="prep-select-form"><label for="prep-search">Find a meal or date</label><input id="prep-search" class="text-input" type="search" placeholder="Recipe name, date or meal"><p id="prep-selection-count" role="status"></p><div class="prep-options">${options.map((x) => `<label class="cook-check prep-choice" data-date="${e(x.record.date)}"><input type="checkbox" name="prep-ref" value="${e(x.ref)}" ${state.prep.selected.includes(x.ref) ? "checked" : ""}><span><strong>${e(x.recipe.name)}</strong><small>${e(day(x.record.date))} · ${x.kind === "batch" ? "Batch" : e(x.record.meal)} · ${x.record.servings} portions${x.record.kind === "stored" ? " · Fresh side only" : ""}</small></span></label>`).join("")}</div><button class="button wide section-space" id="prep-build" type="submit">Build checklist</button></form>`}`,
+        `<p class="helper">Choose up to 20 meals or batches. Ingredients are combined for gathering, with each recipe's share shown separately.</p>${!options.length ? "<p>No unfinished meals or batches. Add some to Plan first.</p>" : `<form id="prep-select-form"><label for="prep-search">Find a meal or date</label><input id="prep-search" class="text-input" type="search" placeholder="Recipe name, date or meal"><button id="prep-search-clear" class="button ghost" type="button" hidden>Clear search</button><p id="prep-selection-count" role="status"></p><p id="prep-no-meals" class="helper" hidden>No meals match. Clear the search to see all available meals.</p><div class="prep-options">${options.map((x) => `<label class="cook-check prep-choice" data-date="${e(x.record.date)}"><input type="checkbox" name="prep-ref" value="${e(x.ref)}" ${state.prep.selected.includes(x.ref) ? "checked" : ""}><span><strong>${e(x.recipe.name)}</strong><small>${e(day(x.record.date))} · ${x.kind === "batch" ? "Batch" : e(x.record.meal)} · ${x.record.servings} portions${x.record.kind === "stored" ? " · Fresh side only" : ""}</small></span></label>`).join("")}</div><button class="button wide section-space" id="prep-build" type="submit">Build checklist</button></form>`}`,
       );
       const form = document.getElementById("prep-select-form");
       if (!form) return;
@@ -872,21 +871,27 @@
         );
       const update = () => {
         const n = selected().length;
+        const hidden = [...form.querySelectorAll('[name="prep-ref"]:checked')].filter((x) => x.closest(".prep-choice").hidden).length;
         document.getElementById("prep-selection-count").textContent =
-          `${n} selected · Up to 20`;
+          `${n} selected · Up to 20${hidden ? ` · ${hidden} hidden by search` : ""}`;
         document.getElementById("prep-build").disabled = n === 0 || n > 20;
       };
       form.addEventListener("change", (ev) => {
         ev.stopPropagation();
         update();
       });
-      document.getElementById("prep-search").oninput = (ev) => {
-        const q = ev.target.value.trim().toLowerCase();
-        for (const row of form.querySelectorAll(".prep-choice"))
-          row.hidden = !(row.textContent + " " + row.dataset.date)
-            .toLowerCase()
-            .includes(q);
+      const search = document.getElementById("prep-search"), clear = document.getElementById("prep-search-clear");
+      const filter = () => {
+        const q = search.value.trim(), dates = q.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
+        const rows = [...form.querySelectorAll(".prep-choice")];
+        for (const row of rows)
+          row.hidden = !dates.every((d) => d === row.dataset.date) || !C.searchMatches(row.textContent + " " + row.dataset.date, q);
+        clear.hidden = !q;
+        document.getElementById("prep-no-meals").hidden = rows.some((row) => !row.hidden);
+        update();
       };
+      search.oninput = filter;
+      clear.onclick = () => { search.value = ""; filter(); search.focus(); };
       form.onsubmit = (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -921,7 +926,7 @@
       const q = ev.target.value.trim().toLowerCase();
       const rows = [...document.querySelectorAll("#prep-panel .prep-item")];
       rows.forEach((row) => {
-        row.hidden = !row.dataset.prepSearch.includes(q);
+        row.hidden = !C.searchMatches(row.dataset.prepSearch, q);
       });
       document.getElementById("prep-no-matches").hidden =
         !q || rows.some((row) => !row.hidden);
@@ -1148,7 +1153,7 @@
   function pantryPage() {
     const prepared = state.lots.filter((l) => l.portions > 0),
       stock = state.pantry
-        .filter((p) => C.text(ing(p.id).name).includes(C.text(pantryQuery)))
+        .filter((p) => C.searchMatches(ing(p.id).name, pantryQuery))
         .sort((a, b) => ing(a.id).name.localeCompare(ing(b.id).name));
     return (
       head(

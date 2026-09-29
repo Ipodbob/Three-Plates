@@ -147,3 +147,29 @@ test("meal search hides irrelevant choices while preserving selected recipes", (
   assert.deepEqual(a.state().prep.selected, ["plan:p1"]);
   a.dom.window.close();
 });
+
+test('prep search matches reordered words and exposes selected meals outside the results', () => {
+ const a=app(); a.click('[data-act="prep"]'); a.click('[value="plan:p1"]');
+ const search=(value)=>{a.q('#prep-search').value=value;a.q('#prep-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));};
+ search('pasta pesto 2026-09-30');
+ assert.equal(a.q('[value="plan:p2"]').closest('label').hidden,false);
+ assert.equal(a.q('[value="plan:p1"]').closest('label').hidden,true);
+ assert.match(a.q('#prep-selection-count').textContent,/1 selected.*1 hidden by search/);
+ assert.equal(a.q('#prep-search-clear').hidden,false);
+ search('nothing matches'); assert.equal(a.q('#prep-no-meals').hidden,false);
+ a.click('#prep-search-clear'); assert.equal(a.q('#prep-search').value,'');
+ assert.equal(a.w.document.activeElement.id,'prep-search');
+ assert.equal(a.q('[value="plan:p1"]').checked,true);
+ assert.equal(a.q('[value="plan:p1"]').closest('label').hidden,false);
+ a.submit(); assert.deepEqual(a.state().prep.selected,['plan:p1']);
+ a.dom.window.close();
+});
+
+test('prep ingredient search accepts reordered terms without losing ready checks',()=>{
+ const a=app();choose(a);a.click('[data-prep-id="peas"]');
+ a.q('#prep-ingredient-search').value='peas frozen';a.q('#prep-ingredient-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));
+ assert.equal(a.q('[data-prep-id="peas"]').closest('.prep-item').hidden,false);
+ assert.equal(a.q('[data-prep-id="pasta"]').closest('.prep-item').hidden,true);
+ assert.equal(a.q('[data-prep-id="peas"]').checked,true);assert.equal(a.q('#prep-no-matches').hidden,true);
+ const saved=a.state();a.dom.window.close();const b=app(saved);b.click('[data-act="prep"]');assert.equal(b.q('[data-prep-id="peas"]').checked,true);b.dom.window.close();
+});

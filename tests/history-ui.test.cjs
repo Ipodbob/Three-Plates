@@ -323,3 +323,10 @@ test("restore refuses damaged preferences and packs before offering replacement"
     a.dom.window.close();
   }
 });
+
+test('finished meal search combines reordered recipe terms with an exact date',()=>{
+ const a=app(meals);route(a,'plan');const saved=a.w.localStorage.getItem('three-plates-v3');
+ a.q('#finished-search').value='pasta pesto 2025-01-01';a.q('#finished-search-form').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));
+ assert.equal(a.w.document.querySelectorAll('.finished-record').length,1);assert.equal(a.q('.finished-record').dataset.historyId,'meal0');
+ assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved);a.dom.window.close();
+});
