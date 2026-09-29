@@ -2,6 +2,13 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Purchases covered by later pantry additions
+
+- Found a saved purchase became invisible and uneditable when a later pantry addition covered the recipe requirement: it left To buy but was not treated as a purchase from a changed plan. Bought extras now shows every pending purchase outside To buy, including both covered ingredients and removed plans. Active shopping rows remain single entries, and no amounts or history are rewritten by rendering.
+- Connected regressions cover adding 200g existing pasta after recording a 500g purchase, correcting the purchase to 450g, reloading, transferring to 650g stock and cooking 180g once to leave 470g. Removed-plan purchases remain editable down to zero without adding stock. The visibility regression failed before the fix.
+- Browser confirmed the 500g extra stays visible, 450g correction survives reload and transfer produces 650g. The correction dialog was inspected at 320px; its input, Save and Close controls fit. Synthetic localhost records were cleared through Settings afterward; other origins were untouched.
+- Full validation passed all 242 checks (32 core plus 210 Node test-runner checks), including scanner, migration, catalogue preservation, shopping, stored portions, cooking and prep regressions.
+
 ## Cooking timer keyboard continuity
 
 - Reproduced lost focus when Pause/Resume replaced the timer controls. Controls now retain focus on the same timer after a successful change; removing a timer selects the next remaining Remove control (or previous at the end), and removing the last returns to the timer-name field. Rebuilding timers does not move focus from elsewhere in the dialog.
