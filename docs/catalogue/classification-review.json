@@ -869,5 +869,35 @@
     "patch": {
       "kind": "fish"
     }
+  },
+  {
+    "id": "sp-gfmore-no-cook-chicken-couscous",
+    "url": "https://www.bbcgoodfood.com/recipes/no-cook-chicken-couscous",
+    "reviewedOn": "2026-09-29",
+    "reason": "Uses ready-cooked chicken and boiling-hot stock; a kettle or another way to heat the stock is needed.",
+    "patch": {
+      "method": "no-cook",
+      "methodNote": "Uses ready-cooked chicken and boiling-hot stock; a kettle or another way to heat the stock is needed."
+    }
+  },
+  {
+    "id": "gf2-quick-sushi-bowl",
+    "url": "https://www.bbcgoodfood.com/recipes/quick-sushi-bowl",
+    "reviewedOn": "2026-09-29",
+    "reason": "Cook the rice following its pack instructions. Uses ready-cooked salmon.",
+    "patch": {
+      "method": "hob",
+      "methodNote": "Cook the rice following its pack instructions. Uses ready-cooked salmon."
+    }
+  },
+  {
+    "id": "gf2-cheesy-black-bean-quesadillas",
+    "url": "https://www.bbcgoodfood.com/recipes/cheesy-black-bean-quesadillas",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher marks Vegetarian and ingredients contain beans, cheese, vegetables and wraps. Fish slice is equipment, not an ingredient.",
+    "patch": {
+      "kind": "vegetarian",
+      "emoji": "🫓"
+    }
   }
 ]

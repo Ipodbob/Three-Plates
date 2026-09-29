@@ -336,3 +336,26 @@ test('vegetable pepper preferences do not exclude reviewed peppercorns or pepper
  assert.ok(restored>20);
  const s=C.defaults();s.pantry=[{id:'pepper',qty:2,always:false}];assert.equal(C.stock(s,'black-pepper'),0);
 });
+
+test('assembly meals distinguish hot stock from cooking rice and preserve cooked meat identities',()=>{
+ const s=C.defaults();
+ for(const [id,expected,wrong] of [['sp-gfmore-no-cook-chicken-couscous','no-cook','hob'],['gf2-quick-sushi-bowl','hob','no-cook']]){
+  const r=find(id);const f={...s.filters,meal:'Lunch',time:'any',method:expected};
+  assert.equal(C.matching(r,f,s,R,I),true,id);
+  assert.equal(C.matching(r,{...f,method:wrong},s,R,I),false,id);
+  assert.ok(r.methodNote);
+ }
+ const couscous=find('sp-gfmore-no-cook-chicken-couscous');
+ assert.match(couscous.methodNote,/ready-cooked chicken/);assert.match(couscous.methodNote,/hot stock/);
+ assert.ok(couscous.ingredients.some(i=>i.id==='ex-cooked-chicken-fillets-9a1490a2'));
+ s.pantry=[{id:'chicken',qty:200,always:false}];assert.equal(C.stock(s,'ex-cooked-chicken-fillets-9a1490a2'),0);
+ assert.match(find('gf2-quick-sushi-bowl').methodNote,/Cook the rice/);
+ assert.equal(find('sp-gfmore-slow-cooked-pork-cider-sage-hotpot').method,'oven-hob');
+});
+
+test('vegetarian quesadillas are not classified by fish-slice equipment',()=>{
+ const r=find('gf2-cheesy-black-bean-quesadillas');
+ assert.equal(r.kind,'vegetarian');assert.equal(r.emoji,'🫓');
+ assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet:'vegetarian'}),true);
+ assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet:'vegan'}),false);
+});
