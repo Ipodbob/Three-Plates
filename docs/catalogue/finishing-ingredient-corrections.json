@@ -104,6 +104,24 @@
         ]
       ],
       "note": "Includes 200g caster sugar in the cake plus 2 tbsp in the syrup, estimated as 24g (224g total), and 75g yogurt in the cake plus 2 tbsp in the icing, estimated as 28g (103g total). Estimates use King Arthur Baking's caster-sugar and yogurt references of 190g and 227g per cup, divided by 16 tablespoons and rounded to whole grams. Product density varies: use the publisher's spoon measures when cooking."
+    },
+    {
+      "recipeId": "gf2-baileys-cheesecake",
+      "source": "https://www.bbcgoodfood.com/recipes/baileys-cheesecake",
+      "items": [
+        {
+          "id": "ex-powdered-gelatine-a81e7eb5",
+          "oldQty": 1,
+          "qty": 2
+        }
+      ],
+      "replace": [
+        [
+          "Additional dusting/greasing/serving amounts are not included: 11g pack powdered gelatine plus 1 tsp",
+          "The additional measured gelatine is included."
+        ]
+      ],
+      "note": "Includes 11g gelatine plus 1 tsp for the cheesecake, and a further heaped tsp for the coffee jelly. Shopping keeps 11g and an approximate 2 tsp as separate measured amounts; the heaped spoon is counted nominally. Follow the publisher spoon measures when cooking. Gram and teaspoon pantry stock are not automatically interchangeable."
     }
   ],
   "unchanged": [

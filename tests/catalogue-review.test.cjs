@@ -520,6 +520,20 @@ test('measured finishing ingredients scale into shopping and deduct once without
  assert.equal(find('gf2-hot-cross-buns-2').ingredients.find(i=>i.id==='milk').qty,300);
 });
 
+test('cheesecake gelatine keeps gram and spoon stock separate and chocolate topping uses its stated estimate',()=>{
+ const r=find('gf2-baileys-cheesecake'),g='ex-powdered-gelatine-cd260258',tsp='ex-powdered-gelatine-a81e7eb5';
+ const s=C.defaults();s.plans=[{id:'gelatine',recipeId:r.id,date:C.today(),meal:'Dessert',servings:5,side:'none',cooked:false}];
+ s.pantry=[{id:g,qty:22,always:false}];
+ assert.equal(C.requirements(s,R)[g],5.5);assert.equal(C.requirements(s,R)[tsp],1);
+ assert.equal(C.shopping(s,R).find(i=>i.id===tsp).remaining,1);
+ s.pantry.push({id:tsp,qty:4,always:false});const restored=C.migrate(C.clone(s),R,I);assert.deepEqual(restored.pantry,s.pantry);
+ C.finishPlan(restored,'gelatine',R);assert.equal(C.stock(restored,g),16.5);assert.equal(C.stock(restored,tsp),3);
+ const done=C.migrate(C.clone(restored),R,I);assert.deepEqual(done.pantry,restored.pantry);assert.throws(()=>C.finishPlan(done,'gelatine',R));
+ assert.match(r.planningNotes,/heaped spoon is counted nominally/);
+ const b=find('sp-sally-white-chocolate-snickerdoodle-blondies');assert.equal(b.ingredients.find(i=>i.id==='ex-white-chocolate-morsels-9c7d30dc').qty,180+Math.round(180/16));
+ assert.match(b.planningNotes,/191g total/);assert.doesNotMatch(b.planningNotes,/amounts are not included: 180g white chocolate/);
+});
+
 test('measured topping estimates include every component and preserve gram stock identities',()=>{
  const expected=[['gf2-cherry-pie',{ 'ground-almonds':61,salt:0.25}],['gf2-citrus-almond-yogurt-cake',{sugar:224,yoghurt:103}]];
  for(const [recipeId,totals] of expected){const r=find(recipeId),s=C.defaults();s.plans=[{id:'topping',recipeId,date:C.today(),meal:r.meals[0],servings:r.base,side:'none',cooked:false}];
