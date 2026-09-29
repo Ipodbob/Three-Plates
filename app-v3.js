@@ -89,6 +89,9 @@
   let route = location.hash.slice(1) || "choose",
     pantryTab = "ingredients",
     pantryQuery = "",
+    finishedQuery = "",
+    finishedCount = 20,
+    dialogReturn = null,
     searchWindow = { key: "", count: 12 },
     shown = { choose: [], batch: [] },
     seen = { choose: [], batch: [] },
@@ -316,10 +319,44 @@
       .getElementById("settings-link")
       .setAttribute("aria-current", route === "you" ? "page" : "false");
   }
+  function rememberFocus(node) {
+    if (!node || node === document.body || node === document.documentElement)
+      return null;
+    return {
+      node,
+      id: node.id,
+      action: node.dataset?.act,
+      data: { ...node.dataset },
+      href: node.getAttribute("href"),
+      tag: node.tagName,
+    };
+  }
+  function restoreFocus(saved, fallback = false) {
+    if (!saved) return;
+    let node = saved.node.isConnected
+      ? saved.node
+      : saved.id
+        ? document.getElementById(saved.id)
+        : null;
+    if (!node && saved.action)
+      node = [...document.querySelectorAll("[data-act]")].find(
+        (x) =>
+          x.tagName === saved.tag &&
+          Object.entries(saved.data).every(
+            ([key, value]) => x.dataset[key] === value,
+          ),
+      );
+    if (!node && saved.href)
+      node = [...document.querySelectorAll("a[href]")].find(
+        (x) => x.getAttribute("href") === saved.href,
+      );
+    if (node && !node.closest("[hidden]")) node.focus({ preventScroll: true });
+    else if (fallback) main.focus({ preventScroll: true });
+  }
   function render() {
     if (!["choose", "batch", "plan", "shop", "pantry", "you"].includes(route))
       route = "choose";
-    const focusId = document.activeElement?.id;
+    const focused = rememberFocus(document.activeElement);
     const pages = {
       choose: choosePage,
       batch: choosePage,
@@ -333,8 +370,7 @@
         ? `<div class="notice storage-warning">${e(storageError)} <a href="#you">Settings</a></div>`
         : "") + pages[route]();
     nav();
-    if (focusId)
-      document.getElementById(focusId)?.focus({ preventScroll: true });
+    restoreFocus(focused, true);
   }
   function currentFilters(batch) {
     return batch
@@ -726,7 +762,13 @@
             a.date.localeCompare(b.date) ||
             a.serveTime.localeCompare(b.serveTime),
         ),
-      done = state.plans.filter((p) => p.cooked),
+      done = state.plans
+        .filter((p) => p.cooked)
+        .sort(
+          (a, b) =>
+            b.date.localeCompare(a.date) ||
+            b.serveTime.localeCompare(a.serveTime),
+        ),
       batches = state.batches.filter((b) => !b.cooked);
     let last = "";
     return (
@@ -751,8 +793,19 @@
               "No meals scheduled yet",
               "Add a fresh meal, or cook a batch and schedule its stored portions.",
             )
-      }${done.length ? `<details class="details-box"><summary>Finished meals (${done.length})</summary>${done.map(planCard).join("")}</details>` : ""}`
+      }${done.length ? finishedHistory(done) : ""}`
     );
+  }
+  function finishedHistory(done) {
+    const previous = document.getElementById("finished-history");
+    const open = previous ? previous.open : !!finishedQuery;
+    const matches = done.filter((p) =>
+      C.text(
+        `${recipe(p.recipeId).name} ${p.date} ${day(p.date)} ${p.meal}`,
+      ).includes(C.text(finishedQuery)),
+    );
+    const visible = matches.slice(0, finishedCount);
+    return `<details id="finished-history" class="details-box" ${open ? "open" : ""}><summary>Finished meals (${done.length})</summary><form id="finished-search-form" class="recipe-search"><label class="sr-only" for="finished-search">Search finished meals</label><input id="finished-search" type="search" maxlength="100" placeholder="Recipe, date or meal" value="${e(finishedQuery)}"><button class="icon-btn" type="submit" aria-label="Search finished meals">${icon("search")}</button>${finishedQuery ? btn("Clear", "finished-clear", "", "ghost") : ""}</form><p class="helper">Newest first. All records remain saved.</p>${visible.map((p) => `<section class="finished-record" tabindex="-1" data-history-id="${e(p.id)}" aria-label="${e(day(p.date) + " " + p.date.slice(0, 4) + " " + p.meal + " · " + recipe(p.recipeId).name)}"><p class="plan-date">${e(day(p.date))} ${e(p.date.slice(0, 4))}</p>${planCard(p)}</section>`).join("") || '<p class="helper">No finished meals match this search.</p>'}<p role="status">Showing ${visible.length} of ${matches.length} finished meals</p>${visible.length < matches.length ? btn("Show older meals", "finished-more") : ""}</details>`;
   }
   function prepModal(edit = false) {
     const options = C.prepOptions(state, R),
@@ -1145,14 +1198,22 @@
       )}</div><label class="check-label"><input id="slow-cooker" type="checkbox" ${state.prefs.slowCooker ? "checked" : ""}> I have a slow cooker</label><p class="helper">Only controls the appliance, not oven or hob slow cooking. Food filters are not a validated allergy checker; check ingredients and labels.</p></section>${preferenceSection("exclusions", "Foods you avoid")}${preferenceSection("likedIngredients", "Favourite ingredients")}${cuisineSection()}</div><div class="stack"><section class="panel"><h2 class="section-title">Saved & hidden recipes</h2><details class="details-box"><summary>Favourite recipes (${state.prefs.favourites.length})</summary>${state.prefs.favourites.map((id) => `<div class="favourite-row">${btn(e(recipe(id).name), "recipe", id, "ghost")}${btn("Unsave", "favourite", id, "ghost")}</div>`).join("") || '<p class="helper">Tap a recipe heart to save it.</p>'}</details><details class="details-box"><summary>Hidden recipes (${state.prefs.hidden.length})</summary>${state.prefs.hidden.map((id) => `<div class="favourite-row"><span>${e(recipe(id).name)}</span>${btn("Restore", "unhide", id, "ghost")}</div>`).join("") || '<p class="helper">Refreshing choices never hides a recipe permanently.</p>'}</details></section><section class="panel"><h2 class="section-title">Back up your data</h2><p class="helper">Pantry, batches, portions, shopping and preferences stay in this browser. Clearing browser data removes them. Export a backup regularly; there is no account or cloud sync.</p><div class="action-wrap">${btn("Export backup", "export")}${btn("Restore backup", "import")}</div><input type="file" id="backup-file" accept="application/json,.json" hidden><p class="helper">Version 1 backups are supported. The original v1 browser data is left untouched during upgrade.</p></section><section class="panel"><h2 class="section-title">About this version</h2><p class="helper">v3 · Batch planning, portion tracking, pack estimates and recipe search. 995 linked publisher recipes cover everyday meals, meal prep, desserts and baking. Selection considers technique, variety, clear quantities and publisher evidence alongside ratings, checked 28 September 2026. Original examples remain available and are marked unrated. Publisher methods open on their website; planning estimates are labelled. Timings are estimates. Scaling portions does not scale cooking time or guarantee appliance capacity.</p><details class="details-box"><summary>Storage guidance</summary>${storageGuide()}</details><button class="text-btn" data-act="reset">Delete all local app data</button></section></div></div>`
     );
   }
+  sheet.addEventListener("close", () => {
+    if (sheet.open) return;
+    restoreFocus(dialogReturn, true);
+    dialogReturn = null;
+  });
   function close() {
     cookingCleanup?.();
     cookingCleanup = null;
     scannerCleanup?.();
     scannerCleanup = null;
     sheet.close();
+    restoreFocus(dialogReturn, true);
+    dialogReturn = null;
   }
   function modal(title, body) {
+    if (!sheet.open) dialogReturn = rememberFocus(document.activeElement);
     cookingCleanup?.();
     cookingCleanup = null;
     scannerCleanup?.();
@@ -1160,6 +1221,7 @@
     sheet.innerHTML = `<div class="sheet-top"><button class="icon-btn sheet-close" data-act="close" aria-label="Close">${icon("close")}</button><h2 id="sheet-title">${title}</h2></div><div class="sheet-content">${body}</div>`;
     if (!sheet.open) sheet.showModal();
     sheet.scrollTop = 0;
+    sheet.querySelector('[data-act="close"]')?.focus();
   }
   function confirmAction(title, message, label, run) {
     modal(
@@ -1580,6 +1642,20 @@
       id = b.dataset.id,
       batch = route === "batch",
       key = batch ? "batch" : "choose";
+    if (act === "finished-more") {
+      const previous = document.querySelectorAll(".finished-record").length;
+      finishedCount += 20;
+      render();
+      document.querySelectorAll(".finished-record")[previous]?.focus();
+      return;
+    }
+    if (act === "finished-clear") {
+      finishedQuery = "";
+      finishedCount = 20;
+      render();
+      document.getElementById("finished-search")?.focus();
+      return;
+    }
     if (act === "prep" || act === "prep-select") {
       prepModal(act === "prep-select");
       return;
@@ -2115,6 +2191,16 @@
     const form = ev.target;
     if (!form.matches("form")) return;
     ev.preventDefault();
+    if (form.id === "finished-search-form") {
+      finishedQuery = document
+        .getElementById("finished-search")
+        .value.trim()
+        .slice(0, 100);
+      finishedCount = 20;
+      render();
+      document.getElementById("finished-search")?.focus();
+      return;
+    }
     if (form.id === "pantry-search-form") {
       pantryQuery = document
         .getElementById("pantry-search")
