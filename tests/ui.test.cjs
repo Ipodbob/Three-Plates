@@ -149,7 +149,7 @@ test('reviewed sides stay searchable without occupying automatic dinner choices'
 
 test('recipe side picker previews amounts, saves to the meal and shopping, and survives reload',()=>{
  const a=app();a.q('#recipe-search').value='Pesto & pea pasta';a.submit('#search-form');a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');a.route('plan');a.click('[data-act="plan-side"]');assert.equal(a.w.document.querySelectorAll('.side-option').length,8);a.click('#side-more');assert.equal(a.w.document.querySelectorAll('.side-option').length,16);
- a.q('#side-search').value='radishes';a.q('#side-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));assert.equal(a.w.document.querySelectorAll('.side-option').length,1);assert.match(a.q('#side-results').textContent,/Ingredients for 2 portions/);assert.match(a.q('#side-results').textContent,/Skinnytaste/);const stock=JSON.stringify(a.state().pantry);a.click('[data-act="side-choice"][data-id="recipe:sp-skinnytaste-air-fryer-radishes"]');assert.equal(a.state().plans[0].side,'recipe:sp-skinnytaste-air-fryer-radishes');assert.equal(JSON.stringify(a.state().pantry),stock);
+ a.q('#side-search').value='radishes air fryer';a.q('#side-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));assert.equal(a.w.document.querySelectorAll('.side-option').length,1);assert.match(a.q('#side-results').textContent,/Ingredients for 2 portions/);assert.match(a.q('#side-results').textContent,/Skinnytaste/);const stock=JSON.stringify(a.state().pantry);a.click('[data-act="side-choice"][data-id="recipe:sp-skinnytaste-air-fryer-radishes"]');assert.equal(a.state().plans[0].side,'recipe:sp-skinnytaste-air-fryer-radishes');assert.equal(JSON.stringify(a.state().pantry),stock);
  const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('plan');assert.match(b.q('main').textContent,/Air Fryer Radishes added separately/);b.click('[data-context="plan"]');assert.match(b.q('.sheet').textContent,/Fresh side.*Air Fryer Radishes/);assert.ok(b.q('.sheet a[href="https://www.skinnytaste.com/air-fryer-radishes/"]'));b.click('.sheet [data-act="close"]');b.route('shop');assert.match(b.q('main').textContent,/radishes/i);b.route('plan');b.click('[data-act="plan-side"]');b.click('[data-act="side-choice"][data-id="none"]');assert.equal(b.state().plans[0].side,'none');a.dom.window.close();b.dom.window.close();
 });
 
@@ -246,3 +246,13 @@ test('pantry and preference pickers distinguish repeated names by readable units
  a.route('you');a.set('#pref-exclusions','Milk (ml)');a.submit('.pref-form[data-key="exclusions"]');assert.deepEqual(a.state().prefs.exclusions,['milk']);
  const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().pantry[0].id,'ex-milk-1c47d6ee');assert.equal(b.state().pantry[0].qty,75);a.dom.window.close();b.dom.window.close();
 });
+
+ test('Multiword recipe search works across fresh and batch modes and survives reload',()=>{
+  const a=app();a.q('#recipe-search').value='pasta pea pesto';a.submit('#search-form');
+  assert.ok(a.q('[data-act="plan-add"][data-id="pesto-pea-pasta"]'));
+  a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');assert.equal(a.state().plans[0].recipeId,'pesto-pea-pasta');
+  a.route('batch');a.click('#bf-time-any');a.q('#recipe-search').value='sauce beef bolognese';a.submit('#search-form');
+  assert.ok(a.q('[data-act="batch-add"][data-id="prep-bolognese"]'));
+  const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('batch');assert.equal(b.q('#recipe-search').value,'sauce beef bolognese');assert.ok(b.q('[data-act="batch-add"][data-id="prep-bolognese"]'));
+  a.dom.window.close();b.dom.window.close();
+ });

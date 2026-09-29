@@ -9,6 +9,18 @@
       .toLowerCase()
       .normalize("NFKD")
       .replace(/[\u0300-\u036f]/g, "");
+  function searchMatches(value, query) {
+    const normalize = (v) =>
+      text(v)
+        .replace(/&/g, " and ")
+        .replace(/[^\p{L}\p{N}]+/gu, " ")
+        .trim();
+    const words = normalize(query).split(/\s+/).filter(Boolean);
+    const terms =
+      words.length > 1 ? words.filter((word) => word !== "and") : words;
+    const haystack = normalize(value);
+    return terms.every((term) => haystack.includes(term));
+  }
   function ingredientLabel(i) {
     const unit = i.unit === "each" ? "items" : i.unit;
     const barcode = /^custom-barcode-(\d+)$/.exec(i.id);
@@ -23,7 +35,8 @@
     const raw = String(value || "").trim();
     const labelled = choices.filter((i) => ingredientLabel(i) === raw);
     if (labelled.length) return labelled.length === 1 ? labelled[0] : undefined;
-    const ambiguousName = choices.filter(i => text(i.name) === text(raw)).length > 1;
+    const ambiguousName =
+      choices.filter((i) => text(i.name) === text(raw)).length > 1;
     const legacy = choices.filter(
       (i) => (!ambiguousName && i.id === raw) || `${i.name} [${i.id}]` === raw,
     );
@@ -883,7 +896,7 @@
     const q = text(f.query);
     if (
       q &&
-      !text(
+      !searchMatches(
         [
           r.name,
           r.cuisine,
@@ -910,7 +923,8 @@
           r.source?.publisher,
           ...r.ingredients.map((i) => ingredients[i.id]?.name),
         ].join(" "),
-      ).includes(q)
+        q,
+      )
     )
       return false;
     if (f.mode === "only") {
@@ -954,6 +968,7 @@
     dateLocal,
     foodAllowed,
     ingredientLabel,
+    searchMatches,
     resolveIngredient,
     preferenceIds,
     thawPlan,

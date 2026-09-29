@@ -711,7 +711,7 @@
           r.dishRole === "side" &&
           !r.baking &&
           C.sideAllowed("recipe:" + r.id, state.prefs, R) &&
-          C.text(
+          C.searchMatches(
             [
               r.name,
               method(r),
@@ -719,7 +719,8 @@
               ...(r.tags || []),
               ...r.ingredients.map((i) => ing(i.id).name),
             ].join(" "),
-          ).includes(query),
+            query,
+          ),
       );
       document.getElementById("side-results").innerHTML =
         '<p role="status">' +
