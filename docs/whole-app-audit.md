@@ -4,6 +4,13 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Finite quantity review queue and source weights
+
+- Added a read-only candidate screen and a 15-entry source-review queue for numeric-plus amounts still marked omitted. It records two source-confirmed corrections, one previously verified conditional addition and 12 pending decisions. The script detects unregistered matches; zero unregistered entries is coverage of this heuristic, not proof of complete recipe accuracy.
+- Good Food hot/spicy sweet potatoes now use the publisher's approximate 500g per potato, two potatoes (1000g total), replacing the generic 400g estimate. The two thyme sprigs required in the parcels are included separately from the existing measured leaves.
+- Sally double-chocolate banana bread includes 135g chocolate in the batter plus the publisher's explicit 22g topping (157g total). Hot water remains outside shopping, with a reminder to follow the method.
+- All 27 catalogue checks passed; the existing migration/shopping/once-only-deduction test now exercises all three changed quantities. Browser verified scaled amounts and the full six-portion sweet-potato recipe with its separate leaves/sprigs and revised notes. Isolated preferences were cleared. Other pending sources have not been automatically corrected.
+
 ## Required gelatine and chocolate topping
 
 - Publisher verification identified a missing 1 tsp gelatine in Good Food Baileys cheesecake, in addition to its separate 11g quantity and heaped tsp for the jelly. The spoon identity now totals a nominal 2 tsp, with the heaped approximation explicit. Gram and spoon stock remain separate; no inferred density conversion is added.
