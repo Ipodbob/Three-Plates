@@ -789,6 +789,62 @@
     "note": "Includes up to 100ml milk for the dough plus 15ml for glazing (115ml total). Add dough milk gradually as the publisher instructs."
   }
 ]);
+  requiredIngredientCorrections.push(...[
+  {
+    "recipeId": "gf2-egg-bacon-pie",
+    "source": "https://www.bbcgoodfood.com/recipes/egg-bacon-pie",
+    "items": [
+      {
+        "id": "eggs",
+        "oldQty": 4,
+        "qty": 5
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 4 eggs beaten, plus 1 egg beaten separately for glazing",
+        "Measured egg wash is included."
+      ]
+    ],
+    "note": "Includes four eggs in the filling and one separate egg for glazing (five eggs for the full pie)."
+  },
+  {
+    "recipeId": "sp-sally-ham-cheese-scones",
+    "source": "https://sallysbakingaddiction.com/ham-cheese-scones/",
+    "items": [
+      {
+        "id": "ex-cold-buttermilk-e5557548",
+        "oldQty": 160,
+        "qty": 175
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 160ml cold buttermilk, plus 1 tbsp for brushing",
+        "Measured brushing buttermilk is included."
+      ]
+    ],
+    "note": "Includes 160ml buttermilk in the dough plus 15ml for brushing (175ml total). Any further dough adjustment remains separate; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-make-crepes",
+    "source": "https://sallysbakingaddiction.com/make-crepes/",
+    "items": [
+      {
+        "id": "butter",
+        "oldQty": 43,
+        "qty": 99
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 43g unsalted butter, plus 3-4 more tbsp for the pan",
+        "Measured pan butter is included."
+      ]
+    ],
+    "note": "Includes 43g butter in the batter plus up to 56g for the pan (99g total), using the upper end of the publisher's 43–56g pan allowance. This is a planning allowance; actual pan use can vary."
+  }
+]);
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,
