@@ -235,3 +235,14 @@ test('favourite ingredient groups stay compact and remove independently of exclu
  const a=app();a.route('you');a.set('#pref-likedIngredients','Chicken — all cuts');a.submit('.pref-form[data-key="likedIngredients"]');a.set('#pref-exclusions','Garlic cloves');a.submit('.pref-form[data-key="exclusions"]');
  const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('you');assert.equal(b.w.document.querySelectorAll('[data-act="pref-remove"][data-key="likedIngredients"]').length,1);b.click('[data-act="pref-remove"][data-key="likedIngredients"][data-id="group-chicken"]');assert.deepEqual(b.state().prefs.likedIngredients,[]);assert.deepEqual(b.state().prefs.exclusions,['garlic']);a.dom.window.close();b.dom.window.close();
 });
+
+test('pantry and preference pickers distinguish repeated names by readable units',()=>{
+ const a=app();a.route('pantry');a.click('[data-act="pantry-add"]');
+ const options=[...a.w.document.querySelectorAll('#ingredient-options option')].map(o=>o.value);
+ assert.ok(options.includes('Milk (g)'));assert.ok(options.includes('Milk (ml)'));assert.ok(options.every(o=>!o.includes('[ex-')));
+ a.set('#pantry-name','Milk');a.set('#pantry-qty','100');a.submit('#pantry-form');assert.equal(a.state()?.pantry.length||0,0);assert.match(a.q('#toast').textContent,/right unit/);
+ a.set('#pantry-name','Milk (g)');a.set('#pantry-qty','100');a.submit('#pantry-form');assert.equal(a.state().pantry[0].id,'ex-milk-1c47d6ee');
+ a.click('[data-act="pantry-edit"]');assert.equal(a.q('#pantry-name').value,'Milk (g)');a.set('#pantry-qty','75');a.submit('#pantry-form');assert.equal(a.state().pantry[0].qty,75);
+ a.route('you');a.set('#pref-exclusions','Milk (ml)');a.submit('.pref-form[data-key="exclusions"]');assert.deepEqual(a.state().prefs.exclusions,['milk']);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().pantry[0].id,'ex-milk-1c47d6ee');assert.equal(b.state().pantry[0].qty,75);a.dom.window.close();b.dom.window.close();
+});

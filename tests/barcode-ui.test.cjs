@@ -309,3 +309,13 @@ test("camera starts once and continues after confirmation without another permis
   a.dom.window.close();
 });
 test('forgetting barcode matches requires explicit confirmation and never changes pantry stock',async()=>{const a=app();await lookup(a);a.click('#scan-save');const before=JSON.stringify(a.state().pantry);a.click('#scan-forget');assert.ok(a.state().barcodeMatches[code]);a.click('#scan-forget-no');assert.ok(a.state().barcodeMatches[code]);a.click('#scan-forget');a.click('#scan-forget-yes');assert.deepEqual(a.state().barcodeMatches,{});assert.equal(JSON.stringify(a.state().pantry),before);a.dom.window.close();});
+
+test('scanner ingredient picker uses readable units and saves the selected identity',async()=>{
+ const a=app();await lookup(a);
+ const list=[...a.w.document.querySelectorAll('#scan-options option')].map(o=>o.value);
+ assert.ok(list.includes('Milk (ml)'));assert.ok(list.includes('Pasta (g)'));assert.ok(list.every(x=>!x.includes('[ex-')));
+ const input=a.q('#scan-ingredient');input.value='Milk (ml)';input.dispatchEvent(new a.w.Event('change',{bubbles:true}));
+ assert.equal(input.value,'Milk (ml)');assert.equal(a.q('#scan-unit').value,'ml');
+ a.q('#scan-qty').value='200';a.q('#scan-qty').dispatchEvent(new a.w.Event('input',{bubbles:true}));a.click('#scan-save');
+ assert.equal(a.state().pantry[0].id,'milk');assert.equal(a.state().pantry[0].qty,200);a.dom.window.close();
+});

@@ -183,3 +183,11 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Before/after browser screenshots confirmed all minus, value and plus controls are visible. Used the narrow UI to allocate five test portions as one eaten, one refrigerated and three frozen, then corrected the frozen record to two; reloaded and verified one fridge plus two freezer portions. Booked the fridge portion through the narrow dialog without adding shopping requirements.
 - Pantry addition, portion correction and stored booking dialogs were inspected for narrow layout. Correction and booking Save actions worked; longer dialogs scroll with their close control accessible. This does not verify physical iPhone keyboard behaviour.
 - Used a separate localhost:4174 origin for fabricated cooking records and cleared those test records via the UI afterward. Initial 127.0.0.1:4174 test batch/search also removed. Prior 221-check functional baseline retained; CSS-only fix verified in browser, with git diff --check passing.
+
+## Readable ingredient pickers
+
+- Replaced internal IDs in preference, recipe-link and scanner suggestions with ingredient names and explicit units. Pantry suggestions now use the same labels, so entries such as Milk (ml) and Milk (g) can be selected independently. Saved preference chips also show units. Barcode-specific products show their actual barcode; manually named products are labelled My pantry.
+- Exact selected labels resolve before accent-insensitive search; ambiguous bare names do not silently choose the first catalogue entry or create another pantry item. Legacy ID inputs remain accepted internally for compatibility. Ingredient IDs and saved stock units are unchanged.
+- Catalogue regression checks every label round-trip, including accented variants and same-name custom products. Connected tests cover unit-specific pantry creation/edit/reload, preference selection and scanner saving. Browser verified Milk (g) saves 125g, edits to 75g and survives reload; temporary stock removed.
+
+- Validation: full run passed 224 checks. After the final ambiguity guard and chip-label adjustment, all 19 catalogue checks and 17 focused pantry/preference/scanner UI checks passed. Browser confirmed readable unit-labelled suggestions, edit/reload persistence and selected preference labels; test stock/preferences cleared.
