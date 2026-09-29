@@ -2,6 +2,13 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Consistent pantry, history and prep searches
+
+- Pantry, finished meals, prep selection and prep ingredient searches now use the same accent/punctuation-tolerant, order-independent word matching as Choose. Finished-meal and prep-selection searches retain exact YYYY-MM-DD matching so date components cannot match a different day. Search never changes quantities or saved selections.
+- Prep selection reports how many selected meals are hidden by the current query, provides Clear search with focus returned to the field, and explains empty results. The existing Build checklist action still includes all selected meals, including the explicitly reported hidden ones.
+- Reproduced both reordered recipe/date failures before the fix. All 29 focused checks passed: 27 prep/domain/history checks plus both pantry-search UI checks. Prior full baseline is 251; this localized presentation change does not claim a new full-suite run.
+- Browser verified reordered recipe/date matching, retained hidden selection, Clear search and the 320px empty state with visible selection status and Build checklist. All synthetic localhost records were cleared through Settings afterward. Physical phone testing remains outstanding.
+
 ## Baking ingredients and full-bake classification
 
 - Checked publisher lists and methods for 21 recipes and restored 24 measured ingredient amounts. Eighteen Sally recipes had required flour omitted because the same line allowed extra flour as needed. Existing starter and topping amounts are summed with the restored dough quantities. Two galettes regain measured buttermilk; other corrections include measured brushing milk/buttermilk, brioche egg wash and macaroni topping butter. Exact records and source links are in docs/catalogue/baking-ingredient-corrections.json.

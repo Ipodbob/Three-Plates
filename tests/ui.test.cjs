@@ -349,3 +349,10 @@ test('always-stocked unknown amounts agree across coverage, no-shopping and copi
  let text='';Object.defineProperty(b.w.navigator,'clipboard',{value:{writeText:async t=>{text=t;}}});b.click('[data-act="copy-list"]');await new Promise(r=>setImmediate(r));assert.match(text,/ASSUMED STOCKED — CHECK RECIPE AMOUNT: Fresh nutmeg/);
  assert.equal(b.state().pantry.find(i=>i.id==='ex-fresh-nutmeg-8f09666c').always,true);a.dom.window.close();b.dom.window.close();
 });
+
+test('pantry search accepts reordered product words and preserves stock after clearing',()=>{
+ const a=app({'three-plates-v3':JSON.stringify({version:3,pantry:[{id:'peas',qty:400},{id:'pasta',qty:200}]})});
+ a.route('pantry');const before=JSON.stringify(a.state().pantry);a.q('#pantry-search').value='peas frozen';a.submit('#pantry-search-form');
+ assert.equal(a.w.document.querySelectorAll('.pantry-item').length,1);assert.match(a.q('.pantry-item').textContent,/Frozen peas/);
+ a.click('[data-act="pantry-search-clear"]');assert.equal(a.w.document.querySelectorAll('.pantry-item').length,2);assert.equal(JSON.stringify(a.state().pantry),before);a.dom.window.close();
+});
