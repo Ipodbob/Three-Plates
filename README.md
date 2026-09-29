@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 215 checks: 31 core regressions, 46 added domain checks,
-33 catalogue checks, 75 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 216 checks: 31 core regressions, 46 added domain checks,
+34 catalogue checks, 75 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 

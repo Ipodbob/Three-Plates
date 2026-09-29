@@ -315,6 +315,9 @@
     "ex-pepperoni-slices-d83045ab",
   ];
   const patches = {
+    "gf2-greek-style-roast-fish": { kind: "fish" },
+    "sp-gfmore-peppered-mackerel-pink-pickled-onion-salad": { kind: "fish" },
+
     "sp-gfmore-philly-cheesesteak": { kind: "meat" },
     "sp-recipetineats-beef-rice-noodles": { kind: "meat" },
     "sp-recipetineats-beef-steak-marinade": { kind: "meat", dishRole: "main", meals: ["Lunch", "Dinner"] },

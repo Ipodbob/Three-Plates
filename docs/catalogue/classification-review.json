@@ -851,5 +851,23 @@
     "patch": {
       "kind": "meat"
     }
+  },
+  {
+    "id": "gf2-greek-style-roast-fish",
+    "url": "https://www.bbcgoodfood.com/recipes/greek-style-roast-fish",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher ingredients explicitly include pollock or smoked mackerel; not vegetarian. Existing portions and dish role preserved.",
+    "patch": {
+      "kind": "fish"
+    }
+  },
+  {
+    "id": "sp-gfmore-peppered-mackerel-pink-pickled-onion-salad",
+    "url": "https://www.bbcgoodfood.com/recipes/peppered-mackerel-pink-pickled-onion-salad",
+    "reviewedOn": "2026-09-29",
+    "reason": "Publisher ingredients explicitly include pollock or smoked mackerel; not vegetarian. Existing portions and dish role preserved.",
+    "patch": {
+      "kind": "fish"
+    }
   }
 ]
