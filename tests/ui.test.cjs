@@ -211,3 +211,13 @@ test('broad meat exclusions remain single removable chips after reload',()=>{
  for(const id of ['group-chicken','group-beef','group-pork'])b.click('[data-act="pref-remove"][data-id="'+id+'"]');
  assert.deepEqual(b.state().prefs.exclusions,['garlic']);a.dom.window.close();b.dom.window.close();
 });
+
+test('exact-weight pack editor ignores unused size and restores pack validation when toggled',()=>{
+ const a=app();a.q('#recipe-search').value='Pesto & pea pasta';a.submit('#search-form');a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');a.route('shop');a.click('[data-act="pack-edit"][data-id="pasta"]');
+ a.set('#pack-size','0');assert.equal(a.q('#pack-form').checkValidity(),false);
+ a.click('#pack-exact');assert.equal(a.q('#pack-size').disabled,true);assert.equal(a.q('#pack-form').checkValidity(),true);a.submit('#pack-form');
+ assert.equal(a.state().packs.none.pasta.size,0);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('shop');b.click('[data-act="pack-edit"][data-id="pasta"]');assert.equal(b.q('#pack-size').disabled,true);
+ b.click('#pack-exact');assert.equal(b.q('#pack-size').disabled,false);assert.equal(b.q('#pack-size').required,true);b.set('#pack-size','750');b.set('#pack-product','Test pasta');b.set('#pack-url','https://example.com/pasta');b.submit('#pack-form');
+ assert.equal(b.state().packs.none.pasta.size,750);b.click('[data-act="pack-edit"][data-id="pasta"]');assert.equal(b.q('#pack-product').value,'Test pasta');assert.equal(b.q('#pack-url').value,'https://example.com/pasta');a.dom.window.close();b.dom.window.close();
+});
