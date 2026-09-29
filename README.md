@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 201 checks: 31 core regressions, 46 added domain checks,
-26 catalogue checks, 68 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 203 checks: 31 core regressions, 46 added domain checks,
+27 catalogue checks, 69 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -269,11 +269,17 @@ and retains the original text for recovery. Valid exclusions, favourites, diets,
 equipment preferences, pack sizes and exact-weight overrides survive restore;
 version-1 compatibility and omitted legacy optional fields are retained.
 
+Eleven reviewed recipes containing steak, cured meat, seafood, lard or gelatin
+now use the appropriate meat/fish classification, excluding them from vegetarian
+and vegan discovery. Source links and reasons are recorded in the classification
+review; recipe quantities are unchanged. This is not a complete allergy audit.
+The Skip to content link focuses the current page without changing its route.
+
 ## Verification and release status
 
-The latest verified release is v3.11.5 at `8c12446` (PR #14): Pages run
-36504855625 succeeded, all 21 checked public assets matched, and a fresh live
-navigation displayed v3.11.5. The current v3.11.6 preference and pack validation
+The latest verified release is v3.11.6 at `ff72a0d` (PR #15): Pages run
+36505398611 succeeded, all 21 checked public assets matched, and a fresh live
+navigation displayed v3.11.6. The current v3.11.7 diet classification and skip-link
 changes await release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
 
 The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:
