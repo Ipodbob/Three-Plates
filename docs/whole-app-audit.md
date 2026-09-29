@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Required topping estimates and pastry salt
+
+- Resolved both pending finishing-ingredient reviews. Cherry pie now includes an estimated 11g for its additional two tablespoons of ground almonds (61g total), plus the exact 0.25 tsp salt in the method. Citrus cake includes estimated 24g syrup sugar (224g total) and 28g icing yogurt (103g total).
+- Publisher methods establish that these are required components. The King Arthur Baking weight chart supplies reference cup weights for almond meal, caster sugar and yogurt; two tablespoons are estimated using 16 tablespoons per reference cup, rounded to whole grams. These are labelled planning estimates, not exact density conversions or instructions to replace the publisher's spoon measures. No global stock-unit equivalence is introduced. Source links, arithmetic and decisions are recorded in the finishing-ingredient register.
+- All 26 catalogue checks passed, covering source/identity preservation, every new amount, scaling, shopping, migration, and once-only stock deduction. The earlier full baseline remains 256 checks. Browser verified cake totals and the density explanation in Source & quantity notes, then confirmed both totals in Shopping after reload. Test bake and preferences were cleared on isolated localhost.
+
 ## Compact recipe view and accessible primary actions
 
 - Recipe method and planning actions now appear beside the portion controls, before the ingredient list. On narrow screens they fill the available width; source methods still open at the publisher. Existing-plan views expose the method without offering a duplicate planning action.
