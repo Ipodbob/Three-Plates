@@ -564,7 +564,7 @@
         }
       };
     };
-    function nextScan() {
+    function nextScan(saved = false) {
       current = null;
       selected = null;
       reviewing = false;
@@ -572,10 +572,10 @@
       q("#scan-result").innerHTML = "";
       q("#scan-capture").hidden = false;
       q("#barcode-number").value = "";
-      status("Ready for the next item.");
+      status(saved ? "Saved. Ready for the next item." : "Skipped. Nothing was saved. Ready for the next item.");
       dialog.scrollTop = 0;
       if (cameraSession && stream)
-        status("Saved. Move the item away, then scan the next barcode.");
+        status(`${saved ? "Saved." : "Skipped. Nothing was saved."} Move the item away, then scan the next barcode.`);
       else if (cameraSession) q("#scan-camera").click();
       else q("#barcode-number").focus();
     }
@@ -726,7 +726,7 @@
               : "No saved pantry match. Choose an existing item below."
             : i
               ? `Adds to ${i.name}.`
-              : "Saved as its own product. Link it to recipes in Edit if needed.";
+              : "Will be added as a separate product. Link to recipes in Edit if needed.";
         q("#scan-existing").textContent = old?.always
           ? "Always-stocked item: edit it in Pantry before measuring amounts."
           : mode === "use"
@@ -784,7 +784,7 @@
         q("#scan-edit").open = true;
         update();
       };
-      q("#scan-skip").onclick = nextScan;
+      q("#scan-skip").onclick = () => nextScan(false);
       q("#scan-confirm-form").addEventListener(
         "invalid",
         () => {
@@ -824,7 +824,7 @@
           savedCount++;
           q("#scan-session").textContent =
             `✓ ${savedCount} saved · ${name || p.name || "Item"}`;
-          nextScan();
+          nextScan(true);
         } else {
           submitted = false;
           q("#scan-error").textContent =
