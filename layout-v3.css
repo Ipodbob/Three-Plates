@@ -1140,3 +1140,14 @@
 .three-v3 #recipe-actions .button {
   flex: 1 1 220px;
 }
+
+.three-v3 .dialog-feedback {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #c9a86a;
+  border-radius: 12px;
+  background: #fff4df;
+  color: #503b1b;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}

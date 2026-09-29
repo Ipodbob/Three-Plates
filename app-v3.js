@@ -256,12 +256,27 @@
         "lot-count": "recorded portions",
       }[id] || "portions",
     );
-  function toast(t) {
+  function toast(t, isError = false) {
     const el = document.getElementById("toast");
     el.textContent = t;
     el.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove("show"), 5500);
+    // Native modal dialogs make the page toast inert and paint above it.
+    // Keep feedback with the user's draft until they correct or close it.
+    const feedback = sheet.open && sheet.querySelector("#sheet-feedback");
+    if (feedback) {
+      feedback.setAttribute("role", isError ? "alert" : "status");
+      feedback.textContent = t;
+      feedback.hidden = false;
+      if (isError) {
+        // Cooking controls save in place; preserve the active timer/checklist
+        // control when saving fails, while exposing the alert above it.
+        if (!sheet.querySelector("#cooking-panel")?.contains(document.activeElement))
+          feedback.focus();
+        sheet.scrollTop = 0;
+      }
+    }
   }
   function changedElsewhere(saved) {
     originalBackup = saved || "";
@@ -271,14 +286,14 @@
   }
   function persist() {
     if (blocked) {
-      toast(storageError);
+      toast(storageError, true);
       return;
     }
     try {
       const current = localStorage.getItem(KEY);
       if (current !== lastSaved) {
         changedElsewhere(current);
-        toast(storageError);
+        toast(storageError, true);
         return false;
       }
       const serialized = JSON.stringify(state);
@@ -289,13 +304,13 @@
     } catch (err) {
       storageError =
         "This browser cannot save changes. Export a backup in Settings.";
-      toast(storageError);
+      toast(storageError, true);
     }
   }
   // All state transitions are atomic: a failed validation leaves the previous state intact.
   function change(fn, notice = "", reset = false, requireSaved = true) {
     if (blocked) {
-      toast(storageError);
+      toast(storageError, true);
       return false;
     }
     const before = C.clone(state),
@@ -304,6 +319,11 @@
       fn();
       const saved = persist();
       if (requireSaved && !saved) throw Error(storageError);
+      const feedback = sheet.querySelector("#sheet-feedback");
+      if (saved && feedback) {
+        feedback.hidden = true;
+        feedback.textContent = "";
+      }
       if (reset) clearChoices();
       render();
       if (notice) toast(notice);
@@ -312,7 +332,7 @@
       state = before;
       searchDrafts = beforeDrafts;
       if (storageError) render();
-      toast(err.message || "Could not save that change.");
+      toast(err.message || "Could not save that change.", true);
       return false;
     }
   }
@@ -1268,7 +1288,7 @@
     cookingCleanup = null;
     scannerCleanup?.();
     scannerCleanup = null;
-    sheet.innerHTML = `<div class="sheet-top"><button class="icon-btn sheet-close" data-act="close" aria-label="Close">${icon("close")}</button><h2 id="sheet-title">${title}</h2></div><div class="sheet-content">${body}</div>`;
+    sheet.innerHTML = `<div class="sheet-top"><button class="icon-btn sheet-close" data-act="close" aria-label="Close">${icon("close")}</button><h2 id="sheet-title">${title}</h2></div><div class="sheet-content"><p id="sheet-feedback" class="dialog-feedback" role="status" aria-atomic="true" tabindex="-1" hidden></p>${body}</div>`;
     if (!sheet.open) sheet.showModal();
     sheet.scrollTop = 0;
     sheet.querySelector('[data-act="close"]')?.focus();
