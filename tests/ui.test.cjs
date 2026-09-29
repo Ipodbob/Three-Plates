@@ -356,3 +356,16 @@ test('pantry search accepts reordered product words and preserves stock after cl
  assert.equal(a.w.document.querySelectorAll('.pantry-item').length,1);assert.match(a.q('.pantry-item').textContent,/Frozen peas/);
  a.click('[data-act="pantry-search-clear"]');assert.equal(a.w.document.querySelectorAll('.pantry-item').length,2);assert.equal(JSON.stringify(a.state().pantry),before);a.dom.window.close();
 });
+
+test('turning off menu portion adjustment excludes its hidden invalid input from validation',()=>{
+ const a=app();a.q('#recipe-search').value='pesto pea pasta';a.submit('#search-form');a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');a.route('plan');a.click('[data-act="menus"]');a.click('[data-act="menu-save"]');a.q('#menu-name').value='Keep my portions';a.submit('#menu-save-form');a.click('[data-act="menu-use"]');
+ const adjust=a.q('#menu-adjust'),people=a.q('#menu-people'),form=a.q('#menu-use-form');
+ assert.equal(people.disabled,true);assert.equal(form.checkValidity(),true);
+ for(const invalid of ['', '13', '1.5']){
+  adjust.checked=true;adjust.dispatchEvent(new a.w.Event('change',{bubbles:true}));assert.equal(people.disabled,false);
+  people.value=invalid;people.dispatchEvent(new a.w.Event('change',{bubbles:true}));assert.equal(form.checkValidity(),false);
+  adjust.checked=false;adjust.dispatchEvent(new a.w.Event('change',{bubbles:true}));assert.equal(people.disabled,true);assert.equal(form.checkValidity(),true);assert.equal(a.q('#menu-apply').disabled,false);
+ }
+ const before=a.state();a.q('#menu-apply').click();const saved=a.state();assert.equal(saved.plans.length,2);assert.equal(saved.plans[1].servings,before.plans[0].servings);assert.deepEqual(saved.pantry,before.pantry);a.dom.window.close();
+ const b=app({'three-plates-v3':JSON.stringify(saved)});assert.equal(b.state().plans.length,2);assert.equal(b.state().plans[1].servings,2);b.dom.window.close();
+});
