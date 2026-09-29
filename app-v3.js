@@ -104,6 +104,8 @@
     searchDrafts = { choose: null, batch: null },
     finishedQuery = "",
     finishedCount = 20,
+    purchaseQuery = "",
+    purchaseCount = 20,
     dialogReturn = null,
     searchWindow = { key: "", count: 12 },
     shown = { choose: [], batch: [] },
@@ -1071,34 +1073,19 @@
   }
   function purchaseHistory() {
     const rows = (state.purchaseHistory || []).slice().reverse();
-    return rows.length
-      ? '<details class="panel section-space"><summary>Purchase history (' +
-          rows.length +
-          ")</summary>" +
-          rows
-            .map(
-              (p) =>
-                '<p class="helper">' +
-                e(ing(p.ingredientId).name) +
-                " · " +
-                amount(p.ingredientId, p.qty) +
-                " · " +
-                e(p.retailer === "none" ? "No preference" : p.retailer) +
-                " · " +
-                e(p.status) +
-                "<br>" +
-                e(stamp(p.purchasedAt)) +
-                (p.pack
-                  ? " · Pack: " +
-                    amount(p.ingredientId, p.pack.size) +
-                    " · " +
-                    e(p.pack.provenance)
-                  : " · Exact / manually entered amount") +
-                "</p>",
-            )
-            .join("") +
-          "</details>"
-      : "";
+    if (!rows.length) return "";
+    const status = (p) => ({pending: "Waiting for pantry", stocked: "Added to pantry", corrected: "Replaced by correction"})[p.status],
+      retailer = (p) => p.retailer === "none" ? "No preference" : p.retailer,
+      purchaseDate = (p) => C.dateLocal(new Date(p.purchasedAt).getTime()),
+      dates = purchaseQuery.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [],
+      matches = rows.filter((p) => dates.every((d) => d === purchaseDate(p)) && C.searchMatches(
+        `${ing(p.ingredientId).name} ${retailer(p)} ${purchaseDate(p)} ${stamp(p.purchasedAt)} ${p.status} ${status(p)} ${p.pack?.product || ""}`,
+        purchaseQuery,
+      )),
+      visible = matches.slice(0, purchaseCount),
+      previous = document.getElementById("purchase-history"),
+      open = previous ? previous.open : !!purchaseQuery;
+    return `<details id="purchase-history" class="panel section-space" ${open ? "open" : ""}><summary>Purchase history (${rows.length})</summary><form id="purchase-search-form" class="recipe-search"><label class="sr-only" for="purchase-search">Search purchase history</label><input id="purchase-search" type="search" maxlength="100" placeholder="Ingredient, shop, date or status" value="${e(purchaseQuery)}"><button class="icon-btn" type="submit" aria-label="Search purchase history">${icon("search")}</button>${purchaseQuery ? btn("Clear", "purchase-clear", "", "ghost") : ""}</form><p class="helper">Latest records first. Search a date as YYYY-MM-DD. All purchases remain saved.</p>${visible.map((p) => `<p class="helper purchase-record" tabindex="-1" data-purchase-id="${e(p.id)}">${e(ing(p.ingredientId).name)} · ${amount(p.ingredientId, p.qty)} · ${e(retailer(p))} · ${e(status(p))}<br>${e(stamp(p.purchasedAt))} · ${e(purchaseDate(p).slice(0, 4))}${p.pack ? " · Pack: " + amount(p.ingredientId, p.pack.size) + " · " + e(p.pack.provenance) : " · Exact / manually entered amount"}</p>`).join("") || '<p class="helper">No purchases match this search.</p>'}<p role="status">Showing ${visible.length} of ${matches.length} purchases</p>${visible.length < matches.length ? btn("Show older purchases", "purchase-more") : ""}</details>`;
   }
   function lotCorrectionModal(id, discard) {
     const l = state.lots.find((x) => x.id === id);
@@ -1711,6 +1698,20 @@
       id = b.dataset.id,
       batch = route === "batch",
       key = batch ? "batch" : "choose";
+    if (act === "purchase-more") {
+      const previous = document.querySelectorAll(".purchase-record").length;
+      purchaseCount += 20;
+      render();
+      document.querySelectorAll(".purchase-record")[previous]?.focus();
+      return;
+    }
+    if (act === "purchase-clear") {
+      purchaseQuery = "";
+      purchaseCount = 20;
+      render();
+      document.getElementById("purchase-search")?.focus();
+      return;
+    }
     if (act === "finished-more") {
       const previous = document.querySelectorAll(".finished-record").length;
       finishedCount += 20;
@@ -2282,6 +2283,13 @@
     const form = ev.target;
     if (!form.matches("form")) return;
     ev.preventDefault();
+    if (form.id === "purchase-search-form") {
+      purchaseQuery = document.getElementById("purchase-search").value.trim().slice(0, 100);
+      purchaseCount = 20;
+      render();
+      document.getElementById("purchase-search")?.focus();
+      return;
+    }
     if (form.id === "finished-search-form") {
       finishedQuery = document
         .getElementById("finished-search")

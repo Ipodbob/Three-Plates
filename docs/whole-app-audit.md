@@ -2,6 +2,13 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Searchable purchase history
+
+- Purchase history previously rendered every saved entry inside its collapsed section. It now uses the same progressive history pattern as finished meals: twenty recent records initially, Show older purchases, search and Clear, with focus maintained after filtering and loading. Every saved record remains available; browsing does not persist changes or trim history.
+- Search covers ingredient, shop, local calendar date, status and saved product name. YYYY-MM-DD matches an exact local date; rendered entries include the year. Status labels explain Waiting for pantry, Added to pantry and Replaced by correction while retaining their existing stored values.
+- All 40 relevant checks passed (36 history/storage/phase tests plus four connected shopping/batch flows). New checks exercise 1,101 purchases, an old record outside the initial page, shop/date/status search, empty results, clearing, the last partial page, focus and unchanged saved text. The prior full-suite baseline is 242 passing checks; this presentation change did not alter domain arithmetic or storage formats.
+- Browser verified correction search, clearing and status change after transfer. Search and Clear controls fit at 320px. All fabricated localhost purchases, stock and plans were cleared through Settings afterward. This remains distinct from physical iPhone testing.
+
 ## Purchases covered by later pantry additions
 
 - Found a saved purchase became invisible and uneditable when a later pantry addition covered the recipe requirement: it left To buy but was not treated as a purchase from a changed plan. Bought extras now shows every pending purchase outside To buy, including both covered ingredients and removed plans. Active shopping rows remain single entries, and no amounts or history are rewritten by rendering.

@@ -46,6 +46,54 @@ function app(seed) {
   };
 }
 const tick = () => new Promise((r) => setImmediate(r));
+function purchases(s, C, count = 1101) {
+  for (let n = 0; n < count; n++) s.purchaseHistory.push({
+    id: 'purchase' + n, ingredientId: 'pasta', qty: 500, unit: 'g',
+    retailer: n === 0 ? 'Aldi' : 'Tesco', pack: null,
+    purchasedAt: C.addDays('2020-01-01', n) + 'T12:00:00.000Z',
+    status: n === 0 ? 'corrected' : 'stocked',
+  });
+}
+test('purchase history pages all saved records without changing stock or persistence', (t) => {
+  const a = app(purchases); t.after(() => a.dom.window.close()); route(a, 'shop');
+  const saved = a.w.localStorage.getItem('three-plates-v3');
+  assert.equal(a.w.document.querySelectorAll('.purchase-record').length, 20);
+  assert.equal(a.q('.purchase-record').dataset.purchaseId, 'purchase1100');
+  a.q('#purchase-history').open = true;
+  a.q('[data-act="purchase-more"]').click();
+  assert.equal(a.w.document.querySelectorAll('.purchase-record').length, 40);
+  assert.equal(a.w.document.activeElement.dataset.purchaseId, 'purchase1080');
+  assert.equal(a.q('#purchase-history').open, true);
+  assert.equal(a.w.localStorage.getItem('three-plates-v3'), saved);
+});
+test('purchase search reaches older records by shop, date, ingredient and status', (t) => {
+  const a = app(purchases); t.after(() => a.dom.window.close()); route(a, 'shop');
+  a.q('#purchase-history').open = true;
+  const saved = a.w.localStorage.getItem('three-plates-v3');
+  for (const query of ['Aldi pasta', '2020-01-01', 'Replaced by correction']) {
+    a.q('#purchase-search').value = query;
+    a.q('#purchase-search-form').dispatchEvent(new a.w.Event('submit', {bubbles:true,cancelable:true}));
+    assert.equal(a.w.document.querySelectorAll('.purchase-record').length, 1);
+    assert.equal(a.q('.purchase-record').dataset.purchaseId, 'purchase0');
+    assert.equal(a.w.document.activeElement.id, 'purchase-search');
+  }
+  a.q('#purchase-search').value = 'no matching purchase';
+  a.q('#purchase-search-form').dispatchEvent(new a.w.Event('submit', {bubbles:true,cancelable:true}));
+  assert.match(a.q('#purchase-history').textContent, /No purchases match/);
+  a.q('[data-act="purchase-clear"]').click();
+  assert.equal(a.w.document.querySelectorAll('.purchase-record').length, 20);
+  assert.equal(a.w.document.activeElement.id, 'purchase-search');
+  assert.equal(a.w.localStorage.getItem('three-plates-v3'), saved);
+});
+test('the last purchase page removes its load button and preserves focus on the first added record', (t) => {
+  const a = app((s, C) => purchases(s, C, 45)); t.after(() => a.dom.window.close()); route(a, 'shop');
+  a.q('#purchase-history').open = true;
+  a.q('[data-act="purchase-more"]').click();
+  a.q('[data-act="purchase-more"]').click();
+  assert.equal(a.w.document.querySelectorAll('.purchase-record').length, 45);
+  assert.equal(a.q('[data-act="purchase-more"]'), null);
+  assert.equal(a.w.document.activeElement.dataset.purchaseId, 'purchase4');
+});
 function route(a, name) {
   a.w.location.hash = name;
   a.w.dispatchEvent(new a.w.HashChangeEvent("hashchange"));
