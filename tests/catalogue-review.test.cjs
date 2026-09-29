@@ -19,14 +19,27 @@ const C = require("../menus.js"),
 const find = (id) => R.find((r) => r.id === id);
 const corrections = require("../docs/catalogue/fish-ingredient-corrections.json").corrections;
 const additions = new Set(corrections.map(c => c.ingredient.id));
-test("review preserves saved identities, ratings and original quantities with only reviewed missing ingredients added", () => {
+const requiredCorrections = require("../docs/catalogue/required-ingredient-corrections.json").corrections;
+function correctedReference(old) {
+  const r = JSON.parse(JSON.stringify(old));
+  const correction = requiredCorrections.find(c => c.recipeId === old.id);
+  for (const item of correction?.items || []) {
+    const existing = r.ingredients.find(i => i.id === item.id);
+    assert.equal(existing?.qty || 0, item.oldQty, old.id + ':' + item.id);
+    if (existing) existing.qty = item.qty;
+    else r.ingredients.push({id:item.id,qty:item.qty,...(item.avoidIds ? {avoidIds:item.avoidIds} : {})});
+  }
+  return r;
+}
+const correctedRecipes = before.recipes.map(correctedReference);
+test("review preserves identities and ratings with only documented ingredient corrections", () => {
   assert.equal(R.length, before.recipes.length);
   assert.deepEqual(Object.fromEntries(Object.entries(I).filter(([id]) => !additions.has(id))), before.ingredients);
   for (const c of corrections) assert.deepEqual(I[c.ingredient.id],c.ingredient);
   for (const old of before.recipes) {
     const r = find(old.id);
     assert.ok(r);
-    assert.deepEqual(r.ingredients.filter(i => !additions.has(i.id)), old.ingredients, old.id);
+    assert.deepEqual(r.ingredients.filter(i => !additions.has(i.id)), correctedReference(old).ingredients, old.id);
     assert.deepEqual(r.ingredients.filter(i => additions.has(i.id)), corrections.filter(c => c.recipeId === old.id).map(c => ({id:c.ingredient.id,qty:c.qty,avoidIds:c.avoidIds})),old.id);
     assert.deepEqual(r.source, old.source, old.id);
     assert.deepEqual(r.batch, old.batch, old.id);
@@ -47,7 +60,7 @@ test("review preserves saved identities, ratings and original quantities with on
     assert.equal(migrated.plans[0].servings, s.plans[0].servings, old.id);
     assert.deepEqual(
       Object.fromEntries(Object.entries(C.requirements(migrated, R)).filter(([id]) => !additions.has(id))),
-      C.requirements(s, before.recipes),
+      C.requirements(s, correctedRecipes),
       old.id,
     );
   }
@@ -403,4 +416,26 @@ test('readable ingredient labels uniquely resolve the catalogue and reject ambig
  assert.equal(C.resolveIngredient('Milk [milk]',values).id,'milk');
  const customs=[{id:'custom-barcode-12345678',name:'Milk',unit:'ml'},{id:'custom-barcode-23456789',name:'Milk',unit:'ml'},{id:'custom-milk',name:'Milk',unit:'ml'}];
  for(const i of customs)assert.equal(C.resolveIngredient(C.ingredientLabel(i),values.concat(customs)).id,i.id);
+});
+
+test('required flour, citrus, honey and cooking oil remain in shopping and deduct only once',()=>{
+ const expected=[['gf2-next-level-carrot-cake','ex-rye-flour-d9f0eba1',50],['gf2-chicken-gyros','lemon',1.5],['sp-gfmore-chicken-mango-noodle-salad','lime',2],['sp-gfmore-chicken-mango-noodle-salad','honey',20],['sp-gfmore-spinach-falafel-hummus-bowl','lemon',1],['sp-gfmore-pasta-e-fagioli','olive-oil',30]];
+ for(const [recipeId,id,qty] of expected){
+  const r=find(recipeId);assert.equal(r.ingredients.find(i=>i.id===id).qty,qty);assert.equal(r.ingredients.filter(i=>i.id===id).length,1);
+  const s=C.defaults();s.pantry=[{id,qty:qty*2,always:false}];s.plans=[{id:'existing',recipeId,date:C.today(),meal:r.meals[0],servings:r.base,side:'none',cooked:false}];
+  const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.deepEqual(restored.pantry,s.pantry);assert.equal(C.requirements(restored,R)[id],qty);
+  const empty=C.clone(restored);empty.pantry=[];assert.equal(C.shopping(empty,R).find(i=>i.id===id).need,qty);
+  C.finishPlan(restored,'existing',R);assert.equal(C.stock(restored,id),qty);
+  const cooked=C.migrate(JSON.parse(JSON.stringify(restored)),R,I);assert.deepEqual(cooked.pantry,restored.pantry);assert.deepEqual(C.requirements(cooked,R),{});assert.throws(()=>C.finishPlan(cooked,'existing',R));assert.equal(C.stock(cooked,id),qty);
+  assert.match(r.planningNotes,/Existing uncooked plans include these corrected amounts/);
+ }
+ assert.equal(find('gf2-next-level-carrot-cake').ingredients.find(i=>i.id==='self-raising-flour').qty,150);
+ assert.equal(C.foodAllowed(find('gf2-next-level-carrot-cake'),{...C.defaults().prefs,exclusions:['ex-rye-flour-d9f0eba1']}),false);
+});
+
+test('chicken noodle salad uses kettle-soaked noodles and ready-cooked chicken',()=>{
+ const r=find('sp-gfmore-chicken-mango-noodle-salad'),s=C.defaults(),f={...s.filters,meal:'Dinner',time:'any',method:'no-cook'};
+ assert.equal(C.matching(r,f,s,R,I),true);assert.equal(C.matching(r,{...f,method:'hob'},s,R,I),false);
+ assert.match(r.methodNote,/boiling water/);assert.match(r.methodNote,/ready-cooked roast chicken/);
+ assert.ok(r.ingredients.some(i=>i.id==='ex-leftover-roast-chicken-shredded-81a82462'));
 });

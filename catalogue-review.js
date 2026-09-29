@@ -67,6 +67,133 @@
     if (!r.planningNotes.includes(note))
       r.planningNotes = (r.planningNotes.trim() + " " + note).trim();
   }
+  // Evidence: docs/catalogue/required-ingredient-corrections.json.
+  const requiredIngredientCorrections = [
+    {
+      recipeId: "gf2-next-level-carrot-cake",
+      source: "https://www.bbcgoodfood.com/recipes/next-level-carrot-cake",
+      items: [
+        {
+          id: "ex-rye-flour-d9f0eba1",
+          oldQty: 0,
+          qty: 50,
+          avoidIds: ["flour"],
+        },
+      ],
+      replace: [
+        [
+          "; 50g rye or spelt flour (optional – use a total of 200g self-raising flour if you prefer)",
+          "",
+        ],
+      ],
+      note: "Includes 150g self-raising flour and 50g rye flour for the full cake. The publisher also offers 200g self-raising flour instead of that combination; this shopping list uses rye.",
+    },
+    {
+      recipeId: "gf2-chicken-gyros",
+      source: "https://www.bbcgoodfood.com/recipes/chicken-gyros",
+      items: [
+        {
+          id: "lemon",
+          oldQty: 0.5,
+          qty: 1.5,
+        },
+      ],
+      replace: [
+        [
+          "zest and juice 1 lemon plus 1 lemon cut into wedges to serve",
+          "1 lemon cut into wedges to serve",
+        ],
+      ],
+      note: "Includes one lemon for the marinade plus half a lemon for the tzatziki per four servings. The extra serving lemon is not included.",
+    },
+    {
+      recipeId: "sp-gfmore-chicken-mango-noodle-salad",
+      source: "https://www.bbcgoodfood.com/recipes/chicken-mango-noodle-salad",
+      items: [
+        {
+          id: "lime",
+          oldQty: 0,
+          qty: 2,
+        },
+        {
+          id: "honey",
+          oldQty: 15,
+          qty: 20,
+        },
+      ],
+      replace: [
+        [
+          "2 limes juiced, plus wedges to serve (optional)",
+          "extra lime wedges to serve (optional)",
+        ],
+        [
+          "Additional dusting/greasing/serving amounts are not included: 1 tbsp honey plus 1 tsp",
+          "",
+        ],
+      ],
+      note: "Includes two limes for the dressing and the full tablespoon plus teaspoon of honey (20ml) per four servings. Extra serving wedges are optional.",
+    },
+    {
+      recipeId: "sp-gfmore-spinach-falafel-hummus-bowl",
+      source: "https://www.bbcgoodfood.com/recipes/spinach-falafel-hummus-bowl",
+      items: [
+        {
+          id: "lemon",
+          oldQty: 0,
+          qty: 1,
+        },
+      ],
+      replace: [
+        [
+          "1 lemon juiced, plus extra to serve (optional)",
+          "extra lemon to serve (optional)",
+        ],
+      ],
+      note: "Includes one lemon for the hummus per four servings; extra lemon for serving is optional.",
+    },
+    {
+      recipeId: "sp-gfmore-pasta-e-fagioli",
+      source: "https://www.bbcgoodfood.com/recipes/pasta-e-fagioli",
+      items: [
+        {
+          id: "olive-oil",
+          oldQty: 0,
+          qty: 30,
+        },
+      ],
+      replace: [
+        [
+          "2 tbsp extra virgin olive oil plus extra to serve (optional)",
+          "extra olive oil to serve (optional)",
+        ],
+      ],
+      note: "Includes two tablespoons of olive oil (30ml) for cooking the full recipe. Extra serving oil remains optional.",
+    },
+  ];
+  for (const correction of requiredIngredientCorrections) {
+    const r = root.PLATES_DATA.recipes.find(
+      (r) => r.id === correction.recipeId,
+    );
+    if (!r) continue;
+    for (const item of correction.items) {
+      const existing = r.ingredients.find((i) => i.id === item.id);
+      if (existing) existing.qty = item.qty;
+      else
+        r.ingredients.push({
+          id: item.id,
+          qty: item.qty,
+          ...(item.avoidIds ? { avoidIds: item.avoidIds } : {}),
+        });
+    }
+    for (const [oldText, newText] of correction.replace)
+      r.planningNotes = r.planningNotes.replace(oldText, newText);
+    const note =
+      "Catalogue correction: " +
+      correction.note +
+      " Existing uncooked plans include these corrected amounts.";
+    if (!r.planningNotes.includes(note))
+      r.planningNotes = (r.planningNotes.trim() + " " + note).trim();
+  }
   root.PLATES_DATA.unspecifiedFishIngredients = ["ex-dashi-a03a1e85"];
   // Reviewed preference aliases only; original recipe/stock records stay intact.
   root.PLATES_DATA.ingredientPreferenceAliases = {
@@ -410,6 +537,10 @@
         "Dashi can contain fish. This listing keeps a fish classification unless a verified plant-based stock is used.",
     },
     "gf2-cheesy-black-bean-quesadillas": { kind: "vegetarian", emoji: "🫓" },
+    "sp-gfmore-chicken-mango-noodle-salad": {
+      method: "no-cook",
+      methodNote: "Soak the rice noodles in boiling water, then drain and rinse. Use ready-cooked roast chicken; the publisher method does not cook raw chicken.",
+    },
     "sp-gfmore-no-cook-chicken-couscous": {
       method: "no-cook",
       methodNote:
