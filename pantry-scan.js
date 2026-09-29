@@ -621,7 +621,7 @@
       let expected = 0,
         submitted = false;
       q("#scan-result").innerHTML =
-        `<form id="scan-confirm-form" class="scan-card"><div class="scan-product"><span class="scan-product-icon" aria-hidden="true">▥</span><div><h3>${esc(p.name || "Unknown product")}</h3><p>${esc(p.brand || "")} ${esc(p.size || "")}</p></div></div><p id="scan-selection" class="helper"></p><div id="scan-amount"><label for="scan-fraction">${mode === "use" ? "Total stock left" : "How much is left in each pack?"} <output id="scan-percent">100%</output></label><input id="scan-fraction" type="range" min="${mode === "use" ? 0 : 0.05}" max="1" step="0.05" value="1"><div class="scan-presets">${(mode ===
+        `<form id="scan-confirm-form" class="scan-card"><div class="scan-product"><span class="scan-product-icon" aria-hidden="true">▥</span><div><h3 id="scan-product-title" tabindex="-1">${esc(p.name || "Unknown product")}</h3><p>${esc(p.brand || "")} ${esc(p.size || "")}</p></div></div><p id="scan-selection" class="helper"></p><div id="scan-amount"><label for="scan-fraction">${mode === "use" ? "Total stock left" : "How much is left in each pack?"} <output id="scan-percent">100%</output></label><input id="scan-fraction" type="range" min="${mode === "use" ? 0 : 0.05}" max="1" step="0.05" value="1"><div class="scan-presets">${(mode ===
         "use"
           ? [
               [0, "Empty"],
@@ -842,6 +842,7 @@
               : "",
       );
       dialog.scrollTop = 0;
+      q("#scan-product-title").focus({ preventScroll: true });
     }
     q("#scan-camera").click();
     return dispose;
