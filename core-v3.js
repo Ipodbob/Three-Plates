@@ -799,7 +799,7 @@
     if (
       (f.time === "15" && (r.total > 15 || r.additionalTime)) ||
       (f.time === "30" && (r.total > 30 || r.additionalTime)) ||
-      (f.time === "long" && r.total <= 30) ||
+      (f.time === "long" && r.total <= 30 && !r.additionalTime) ||
       (f.time === "slow" && !r.slow)
     )
       return false;
