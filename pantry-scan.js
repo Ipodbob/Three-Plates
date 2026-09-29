@@ -373,6 +373,7 @@
       mode = "add",
       savedCount = 0,
       cameraSession = false,
+      photoMode = false,
       reviewing = false,
       previousCode = "",
       needsClear = false;
@@ -440,6 +441,7 @@
     }
     q("#scan-camera").onclick = async () => {
       cameraSession = true;
+      photoMode = false;
       reviewing = false;
       stop();
       controller?.abort();
@@ -490,7 +492,9 @@
         else controls = c;
       } catch (e) {
         if (alive && token === epoch) {
+          const restoreFocus = [q("#scan-stop"), q("#scan-camera")].includes(document.activeElement);
           stop();
+          if (restoreFocus) q("#scan-camera").focus();
           status(
             e.name === "NotAllowedError"
               ? "Camera permission was denied. Use a barcode photo or allow camera access in Safari/browser settings."
@@ -503,12 +507,16 @@
       cameraSession = false;
       stop();
       status("Camera paused.");
+      q("#scan-camera").focus();
     };
     q("#scan-photo-open").onclick = () => {
       cameraSession = false;
+      photoMode = true;
       q("#scan-photo").click();
     };
     q("#scan-photo").onchange = async (ev) => {
+      cameraSession = false;
+      photoMode = true;
       stop();
       controller?.abort();
       const token = epoch,
@@ -539,6 +547,7 @@
       ev.preventDefault();
       ev.stopPropagation();
       cameraSession = false;
+      photoMode = false;
       found(q("#barcode-number").value);
     };
     q("#scan-forget").onclick = () => {
@@ -574,10 +583,17 @@
       q("#barcode-number").value = "";
       status(saved ? "Saved. Ready for the next item." : "Skipped. Nothing was saved. Ready for the next item.");
       dialog.scrollTop = 0;
-      if (cameraSession && stream)
+      if (cameraSession && stream) {
         status(`${saved ? "Saved." : "Skipped. Nothing was saved."} Move the item away, then scan the next barcode.`);
-      else if (cameraSession) q("#scan-camera").click();
-      else q("#barcode-number").focus();
+        q("#scan-stop").focus();
+      } else if (cameraSession) {
+        q("#scan-camera").click();
+        q(q("#scan-stop").hidden ? "#scan-camera" : "#scan-stop").focus();
+      } else if (photoMode) q("#scan-photo-open").focus();
+      else {
+        q("#barcode-number").closest("details").open = true;
+        q("#barcode-number").focus();
+      }
     }
     q("#scan-done").onclick = () => {
       dispose();
