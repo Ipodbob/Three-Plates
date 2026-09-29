@@ -717,6 +717,16 @@
   }
   function foodAllowed(r, p) {
     const excluded = preferenceIds(p.exclusions);
+    if (
+      (root.PLATES_DATA?.preferenceFamilies || []).some(
+        (family) =>
+          family.meat &&
+          family.anchors.every((id) => p.exclusions.includes(id)),
+      )
+    ) {
+      for (const id of root.PLATES_DATA.unspecifiedMeatIngredients || [])
+        excluded.add(id);
+    }
     return (
       !!r &&
       !r.ingredients.some(

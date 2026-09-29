@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 213 checks: 31 core regressions, 46 added domain checks,
-31 catalogue checks, 75 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 215 checks: 31 core regressions, 46 added domain checks,
+33 catalogue checks, 75 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -337,3 +337,8 @@ Favourite ingredient groups use the same reviewed ingredient families when
 ranking fresh meals and batches. A broad favourite remains one removable chip;
 food exclusions still filter recipes before ranking. No recipe is guaranteed
 to appear solely because it contains a favourite ingredient.
+
+The [sausage review](docs/catalogue/sausage-review.json) adds ten sourced pork
+variants and explicitly records eight ingredients with unspecified or variable
+meat. Broad chicken, beef and pork exclusions omit those uncertain recipes.
+Uncertainty does not boost favourite ranking or merge pantry stock.

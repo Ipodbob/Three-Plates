@@ -1,0 +1,184 @@
+{
+  "reviewed": "2026-09-29",
+  "knownPork": [
+    {
+      "id": "chorizo",
+      "name": "Chorizo",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "kielbasa",
+      "name": "Kielbasa sausage",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-chorizo-ring-85c95a26",
+      "name": "Chorizo ring",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-cooking-chorizo-skin-removed-and-99182caa",
+      "name": "Cooking chorizo skin removed and",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-cooking-chorizo-66599d7f",
+      "name": "Cooking chorizo",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-ring-chorizo-18dcf07b",
+      "name": "Ring chorizo",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-raw-chorizo-715bceaa",
+      "name": "Raw chorizo",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-italian-sausage-892a77ed",
+      "name": "Italian sausage",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-country-sausage-65efbbea",
+      "name": "Country sausage",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-chorizo-sausage-3d8e0058",
+      "name": "Chorizo sausage",
+      "unit": "g",
+      "group": "Meat & fish"
+    }
+  ],
+  "unspecifiedMeat": [
+    {
+      "id": "ex-good-quality-sausages-277dbc67",
+      "name": "Good-quality sausages (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-sausages-of-your-choice-ef7dba6f",
+      "name": "Sausages of your choice (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-sausagemeat-6605e123",
+      "name": "Sausagemeat",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-ground-sausage-a22abf31",
+      "name": "Ground sausage",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-smoked-sausage-9e67d273",
+      "name": "Smoked sausage",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-sausages-skins-removed-ec022881",
+      "name": "Sausages skins removed (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-uncooked-mild-italian-sausage-20a5f2b4",
+      "name": "Uncooked mild italian sausage",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-pepperoni-slices-d83045ab",
+      "name": "Pepperoni slices",
+      "unit": "g",
+      "group": "Fruit & veg"
+    }
+  ],
+  "policy": "Reviewed pork mappings affect exclusions and favourites. Unspecified meat affects broad meat exclusions only, not favourites or stock substitutions.",
+  "sources": [
+    {
+      "url": "https://www.bbcgoodfood.com/glossary/chorizo-glossary",
+      "basis": "Publisher defines chorizo as pork sausage."
+    },
+    {
+      "url": "https://www.budgetbytes.com/sheet-pan-kielbasa-potatoes-and-green-beans/",
+      "basis": "Publisher categorises the default kielbasa recipe under Pork Recipes; substitutions remain possible."
+    },
+    {
+      "url": "https://www.budgetbytes.com/slow-cooker-meatball-subs/",
+      "basis": "Publisher identifies ground pork and fennel as the Italian sausage replacement."
+    },
+    {
+      "url": "https://www.budgetbytes.com/sausage-and-egg-breakfast-quesadillas/",
+      "basis": "Publisher categorises default country sausage recipe under Pork Recipes."
+    }
+  ],
+  "uncertainRecipes": [
+    {
+      "ingredient": "ex-good-quality-sausages-277dbc67",
+      "recipe": "gf2-air-fryer-meatballs",
+      "url": "https://www.bbcgoodfood.com/recipes/air-fryer-meatballs",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    },
+    {
+      "ingredient": "ex-sausages-of-your-choice-ef7dba6f",
+      "recipe": "gf2-air-fryer-sausages",
+      "url": "https://www.bbcgoodfood.com/recipes/air-fryer-sausages",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    },
+    {
+      "ingredient": "ex-sausagemeat-6605e123",
+      "recipe": "gf2-super-sausage-rolls",
+      "url": "https://www.bbcgoodfood.com/recipes/super-sausage-rolls",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    },
+    {
+      "ingredient": "ex-ground-sausage-a22abf31",
+      "recipe": "sp-budgetbytes-sausage-and-cheese-hand-pies",
+      "url": "https://www.budgetbytes.com/sausage-and-cheese-hand-pies/",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    },
+    {
+      "ingredient": "ex-smoked-sausage-9e67d273",
+      "recipe": "sp-budgetbytes-slow-cooker-jambalaya",
+      "url": "https://www.budgetbytes.com/slow-cooker-jambalaya/",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    },
+    {
+      "ingredient": "ex-sausages-skins-removed-ec022881",
+      "recipe": "sp-gfmore-sausage-kale-minestrone",
+      "url": "https://www.bbcgoodfood.com/recipes/sausage-kale-minestrone",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    },
+    {
+      "ingredient": "ex-uncooked-mild-italian-sausage-20a5f2b4",
+      "recipe": "sp-sally-make-ahead-cornbread-stuffing",
+      "url": "https://sallysbakingaddiction.com/make-ahead-cornbread-stuffing/",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    },
+    {
+      "ingredient": "ex-pepperoni-slices-d83045ab",
+      "recipe": "sp-sally-my-favorite-pepperoni-pizza-dip",
+      "url": "https://sallysbakingaddiction.com/my-favorite-pepperoni-pizza-dip/",
+      "reason": "Species unspecified or variable; no species inferred for favourite ranking."
+    }
+  ]
+}
