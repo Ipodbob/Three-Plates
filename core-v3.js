@@ -9,6 +9,31 @@
       .toLowerCase()
       .normalize("NFKD")
       .replace(/[\u0300-\u036f]/g, "");
+  function ingredientLabel(i) {
+    const unit = i.unit === "each" ? "items" : i.unit;
+    const barcode = /^custom-barcode-(\d+)$/.exec(i.id);
+    const suffix = barcode
+      ? " · Barcode " + barcode[1]
+      : i.id.startsWith("custom-")
+        ? " · My pantry"
+        : "";
+    return i.name + (unit ? " (" + unit + ")" : "") + suffix;
+  }
+  function resolveIngredient(value, choices) {
+    const raw = String(value || "").trim();
+    const labelled = choices.filter((i) => ingredientLabel(i) === raw);
+    if (labelled.length) return labelled.length === 1 ? labelled[0] : undefined;
+    const ambiguousName = choices.filter(i => text(i.name) === text(raw)).length > 1;
+    const legacy = choices.filter(
+      (i) => (!ambiguousName && i.id === raw) || `${i.name} [${i.id}]` === raw,
+    );
+    if (legacy.length) return legacy.length === 1 ? legacy[0] : undefined;
+    const input = text(raw);
+    const labels = choices.filter((i) => text(ingredientLabel(i)) === input);
+    if (labels.length) return labels.length === 1 ? labels[0] : undefined;
+    const names = choices.filter((i) => text(i.name) === input);
+    return names.length === 1 ? names[0] : undefined;
+  }
   const idOK = (x) =>
     typeof x === "string" &&
     /^[a-zA-Z0-9_-]{1,80}$/.test(x) &&
@@ -928,6 +953,8 @@
     meals,
     dateLocal,
     foodAllowed,
+    ingredientLabel,
+    resolveIngredient,
     preferenceIds,
     thawPlan,
     discardLot,

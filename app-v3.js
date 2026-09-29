@@ -255,7 +255,8 @@
   }
   function changedElsewhere(saved) {
     originalBackup = saved || "";
-    storageError = "This app changed in another tab. Reload to use the latest saved data; saving is paused to avoid overwriting it.";
+    storageError =
+      "This app changed in another tab. Reload to use the latest saved data; saving is paused to avoid overwriting it.";
     blocked = true;
   }
   function persist() {
@@ -1200,7 +1201,7 @@
       ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
       ...Object.values(I).sort((a, b) => a.name.localeCompare(b.name)),
     ];
-    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label><input id="pref-${key}" type="search" list="pref-options-${key}" placeholder="Search ingredients" autocomplete="off" required><datalist id="pref-options-${key}">${options.map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${selected.map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(groups[id]?.name || ing(id)?.name)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
+    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label><input id="pref-${key}" type="search" list="pref-options-${key}" placeholder="Search ingredients" autocomplete="off" required><datalist id="pref-options-${key}">${options.map((i) => `<option value="${e(C.ingredientLabel(i))}"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${selected.map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(groups[id]?.name || C.ingredientLabel(ing(id)))} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
   }
   function cuisineSection() {
     const choices = [...new Set(R.map((r) => r.cuisine))].sort();
@@ -1468,20 +1469,14 @@
         I,
       )
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`)
+        .map((i) => `<option value="${e(C.ingredientLabel(i))}"></option>`)
         .join(
           "",
         )}</datalist><label for="link-qty">Usable amount of this product <span id="link-unit"></span></label><input id="link-qty" class="text-input" type="number" min="0.001" max="10000000" step="any" inputmode="decimal" required><p id="link-preview" class="helper">Choose an ingredient to see the combined stock.</p><label class="check-label"><input id="link-confirm" type="checkbox" required>This product matches the ingredient and usable amount shown.</label><p class="helper">For tins use drained weight where needed. A sauce or ready meal is not equivalent to one of its ingredients. This combines existing stock and updates remembered barcodes; it does not record a purchase.</p><button class="button wide" type="submit">Link and combine stock</button></form>`,
     );
     const input = document.getElementById("link-target"),
       qty = document.getElementById("link-qty");
-    const target = () =>
-      Object.values(I).find(
-        (i) =>
-          i.id === input.value ||
-          i.name === input.value ||
-          `${i.name} [${i.id}]` === input.value,
-      );
+    const target = () => C.resolveIngredient(input.value, Object.values(I));
     const preview = () => {
       const i = target();
       document.getElementById("link-unit").textContent = i
@@ -1525,17 +1520,18 @@
       `<form id="pantry-form" data-id="${p?.id || ""}">${field(
         "Ingredient",
         "pantry-name",
-        `<input id="pantry-name" type="text" maxlength="80" list="ingredient-options" placeholder="e.g. Rice (dry)" value="${e(i?.name || "")}" required><datalist id="ingredient-options">${Object.values(
+        `<input id="pantry-name" type="text" maxlength="200" list="ingredient-options" placeholder="e.g. Rice (dry)" value="${e(i ? C.ingredientLabel(i) : "")}" required><datalist id="ingredient-options">${Object.values(
           ingredients(),
         )
           .sort((a, b) => a.name.localeCompare(b.name))
-          .map((i) => `<option value="${e(i.name)}"></option>`)
+          .map((i) => `<option value="${e(C.ingredientLabel(i))}"></option>`)
           .join("")}</datalist>`,
       )}<div class="form-grid two section-space">${field("Amount available", "pantry-qty", `<input id="pantry-qty" type="number" inputmode="decimal" min="0" max="1000000" step="any" value="${p?.qty || 0}" required>`)}${field("Unit", "pantry-unit", select("pantry-unit", Object.keys(C.units), i?.unit || "g"))}</div><label class="check-label"><input type="checkbox" id="pantry-always" ${p?.always ? "checked" : ""}>Always stocked — assume enough</label>${field("Use soon reminder (optional)", "pantry-use-soon", `<input id="pantry-use-soon" type="date" min="2020-01-01" max="2100-12-31" value="${e(p?.useSoon || "")}" aria-describedby="use-soon-help">`)}<p id="use-soon-help" class="helper">A reminder for this ingredient, not an expiry date. Leave blank for no reminder. When combining packs, keep the earliest reminder. Not used for Always stocked items.</p><p class="helper">Pick a suggested ingredient to match recipes. Custom items can be recorded but will not match automatically. Saving replaces that item's current amount.</p><button type="submit" class="button wide">Save ingredient</button></form>`,
     );
     document.getElementById("pantry-name").addEventListener("change", (ev) => {
-      const found = Object.values(ingredients()).find(
-        (i) => C.text(i.name) === C.text(ev.target.value),
+      const found = C.resolveIngredient(
+        ev.target.value,
+        Object.values(ingredients()),
       );
       if (found) {
         const unit = document.getElementById("pantry-unit");
@@ -2324,12 +2320,7 @@
           ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
           ...Object.values(I),
         ],
-        id = choices.find(
-          (i) =>
-            i.id === input ||
-            `${i.name} [${i.id}]` === input ||
-            C.text(i.name) === C.text(input),
-        )?.id,
+        id = C.resolveIngredient(input, choices)?.id,
         ids = groups[id]?.ids || (I[id] ? [id] : []);
       change(
         () => {
@@ -2488,12 +2479,7 @@
           }
           case "pantry-link-form": {
             const input = value("link-target"),
-              target = Object.values(I).find(
-                (i) =>
-                  i.id === input ||
-                  i.name === input ||
-                  `${i.name} [${i.id}]` === input,
-              );
+              target = C.resolveIngredient(input, Object.values(I));
             if (!document.getElementById("link-confirm").checked)
               throw Error("Confirm the ingredient and usable amount.");
             C.linkPantryItem(
@@ -2510,12 +2496,13 @@
             const name = value("pantry-name").trim(),
               unit = value("pantry-unit"),
               always = document.getElementById("pantry-always").checked;
-            let i = Object.values(ingredients()).find(
-              (i) =>
-                C.text(i.name) === C.text(name) ||
-                C.text(i.id) === C.text(name),
-            );
-            if (!name || name.length > 80)
+            const choices = Object.values(ingredients());
+            let i = C.resolveIngredient(name, choices);
+            if (!i && choices.some((i) => C.text(i.name) === C.text(name)))
+              throw Error(
+                "Choose a suggestion with the right unit for this ingredient.",
+              );
+            if (!name || (!i && name.length > 80))
               throw Error("Enter an ingredient name.");
             if (!i) {
               const customId =

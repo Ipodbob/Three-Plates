@@ -394,3 +394,13 @@ test('fish cakes and uncertain dashi respect broad fish exclusions without inven
  assert.match(find('gf2-miso-soup').methodNote,/can contain fish/);
  const s=C.defaults();s.pantry=[{id:'tuna',qty:300,always:false}];assert.equal(C.stock(s,'ex-eomuk-a86f582c'),0);
 });
+
+test('readable ingredient labels uniquely resolve the catalogue and reject ambiguous bare names',()=>{
+ const values=Object.values(I);const labels=values.map(C.ingredientLabel);assert.equal(new Set(labels).size,values.length);
+ for(const i of values){assert.equal(C.resolveIngredient(C.ingredientLabel(i),values)?.id,i.id);assert.ok(!C.ingredientLabel(i).includes('['+i.id+']'));}
+ assert.equal(C.resolveIngredient('Milk',values),undefined);assert.equal(C.resolveIngredient('milk',values),undefined);
+ assert.equal(C.resolveIngredient('Milk (ml)',values).id,'milk');assert.equal(C.resolveIngredient('Milk (g)',values).id,'ex-milk-1c47d6ee');
+ assert.equal(C.resolveIngredient('Milk [milk]',values).id,'milk');
+ const customs=[{id:'custom-barcode-12345678',name:'Milk',unit:'ml'},{id:'custom-barcode-23456789',name:'Milk',unit:'ml'},{id:'custom-milk',name:'Milk',unit:'ml'}];
+ for(const i of customs)assert.equal(C.resolveIngredient(C.ingredientLabel(i),values.concat(customs)).id,i.id);
+});

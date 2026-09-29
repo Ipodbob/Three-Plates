@@ -646,7 +646,7 @@
           .slice(0, 8)
           .map(
             (i) =>
-              `<button type="button" class="button secondary" data-match="${esc(i.id)}">${esc(i.name)}</button>`,
+              `<button type="button" class="button secondary" data-match="${esc(i.id)}">${esc(C.ingredientLabel(i))}</button>`,
           )
           .join(
             "",
@@ -660,7 +660,7 @@
           )
           .map(
             (i) =>
-              `<option value="${esc(i.name)} [${esc(i.id)}]">${esc(i.unit)}</option>`,
+              `<option value="${esc(C.ingredientLabel(i))}">${esc(i.unit)}</option>`,
           )
           .join(
             "",
@@ -689,7 +689,7 @@
         expected = old?.qty || 0;
         q("#scan-unit").disabled = !!i;
         q("#scan-unit").value = i?.unit || p.amount?.unit || "each";
-        q("#scan-ingredient").value = i ? `${i.name} [${i.id}]` : "";
+        q("#scan-ingredient").value = i ? C.ingredientLabel(i) : "";
         if (!p.name && i) q("#scan-product-name").value = i.name;
         q("#scan-qty").value =
           mode === "use"
@@ -745,9 +745,7 @@
         update();
       };
       q("#scan-ingredient").onchange = (ev) => {
-        const i = Object.values(all).find(
-          (i) => `${i.name} [${i.id}]` === ev.target.value,
-        );
+        const i = C.resolveIngredient(ev.target.value, Object.values(all));
         if (i) choose(i.id);
       };
       q("#scan-fraction").oninput = () => {
