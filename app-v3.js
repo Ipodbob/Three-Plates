@@ -106,7 +106,10 @@
     finishedCount = 20,
     purchaseQuery = "",
     purchaseCount = 20,
-    archives = { batch: { query: "", count: 20 }, empty: { query: "", count: 20 } },
+    archives = {
+      batch: { query: "", count: 20 },
+      empty: { query: "", count: 20 },
+    },
     dialogReturn = null,
     searchWindow = { key: "", count: 12 },
     shown = { choose: [], batch: [] },
@@ -435,7 +438,10 @@
       ratio += Math.min(1, have / i.qty);
     }
     for (const i of r.unmeasuredIngredients || []) {
-      if (C.stock(state, i.id) === Infinity) { yes++; ratio++; }
+      if (C.stock(state, i.id) === Infinity) {
+        yes++;
+        ratio++;
+      }
     }
     const total = items.length + (r.unmeasuredIngredients?.length || 0);
     return { yes, total, ratio: total ? ratio / total : 0 };
@@ -646,12 +652,23 @@
   }
   function archivePanel(key, title, records, content) {
     const view = archives[key],
-      localDate = (r) => r.cookedAt ? C.dateLocal(new Date(r.cookedAt).getTime()) : r.date,
+      localDate = (r) =>
+        r.cookedAt ? C.dateLocal(new Date(r.cookedAt).getTime()) : r.date,
       dates = view.query.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [],
-      matches = records.filter((r) => dates.every((d) => d === localDate(r)) && C.searchMatches(
-        `${recipe(r.recipeId).name} ${localDate(r)} ${r.location || ""}`,
-        view.query,
-      )).sort((a, b) => String(b.cookedAt || b.date).localeCompare(String(a.cookedAt || a.date))),
+      matches = records
+        .filter(
+          (r) =>
+            dates.every((d) => d === localDate(r)) &&
+            C.searchMatches(
+              `${recipe(r.recipeId).name} ${localDate(r)} ${r.location || ""}`,
+              view.query,
+            ),
+        )
+        .sort((a, b) =>
+          String(b.cookedAt || b.date).localeCompare(
+            String(a.cookedAt || a.date),
+          ),
+        ),
       visible = matches.slice(0, view.count),
       previous = document.getElementById(key + "-archive"),
       open = previous ? previous.open : !!view.query;
@@ -659,7 +676,15 @@
   }
   function batchHistory() {
     const done = state.batches.filter((b) => b.cooked);
-    return done.length ? archivePanel("batch", "Cooked batch records", done, (b) => `<p class="helper"><strong>${e(recipe(b.recipeId).name)}</strong> · ${b.servings} made<br>${b.cookedAt ? e(stamp(b.cookedAt)) : e(day(b.date))}<br>${b.allocation ? `${b.allocation.eat} served immediately · ${b.allocation.fridge} originally refrigerated · ${b.allocation.freezer} originally frozen` : "Original allocation was not recorded by the earlier app version."}</p>${plannedRecipeButton(b, "batch")}`) : "";
+    return done.length
+      ? archivePanel(
+          "batch",
+          "Cooked batch records",
+          done,
+          (b) =>
+            `<p class="helper"><strong>${e(recipe(b.recipeId).name)}</strong> · ${b.servings} made<br>${b.cookedAt ? e(stamp(b.cookedAt)) : e(day(b.date))}<br>${b.allocation ? `${b.allocation.eat} served immediately · ${b.allocation.fridge} originally refrigerated · ${b.allocation.freezer} originally frozen` : "Original allocation was not recorded by the earlier app version."}</p>${plannedRecipeButton(b, "batch")}`,
+        )
+      : "";
   }
   function batchCard(b) {
     const r = recipe(b.recipeId),
@@ -742,7 +767,9 @@
               method(r),
               r.cuisine,
               ...(r.tags || []),
-              ...[...r.ingredients, ...(r.unmeasuredIngredients || [])].map((i) => ing(i.id).name),
+              ...[...r.ingredients, ...(r.unmeasuredIngredients || [])].map(
+                (i) => ing(i.id).name,
+              ),
             ].join(" "),
             query,
           ),
@@ -849,8 +876,13 @@
     const previous = document.getElementById("finished-history");
     const open = previous ? previous.open : !!finishedQuery;
     const dates = finishedQuery.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
-    const matches = done.filter((p) => dates.every((d) => d === p.date) &&
-      C.searchMatches(`${recipe(p.recipeId).name} ${p.date} ${day(p.date)} ${p.meal}`, finishedQuery),
+    const matches = done.filter(
+      (p) =>
+        dates.every((d) => d === p.date) &&
+        C.searchMatches(
+          `${recipe(p.recipeId).name} ${p.date} ${day(p.date)} ${p.meal}`,
+          finishedQuery,
+        ),
     );
     const visible = matches.slice(0, finishedCount);
     return `<details id="finished-history" class="details-box" ${open ? "open" : ""}><summary>Finished meals (${done.length})</summary><form id="finished-search-form" class="recipe-search"><label class="sr-only" for="finished-search">Search finished meals</label><input id="finished-search" type="search" maxlength="100" placeholder="Recipe, date or meal" value="${e(finishedQuery)}"><button class="icon-btn" type="submit" aria-label="Search finished meals">${icon("search")}</button>${finishedQuery ? btn("Clear", "finished-clear", "", "ghost") : ""}</form><p class="helper">Newest first. All records remain saved.</p>${visible.map((p) => `<section class="finished-record" tabindex="-1" data-history-id="${e(p.id)}" aria-label="${e(day(p.date) + " " + p.date.slice(0, 4) + " " + p.meal + " · " + recipe(p.recipeId).name)}"><p class="plan-date">${e(day(p.date))} ${e(p.date.slice(0, 4))}</p>${planCard(p)}</section>`).join("") || '<p class="helper">No finished meals match this search.</p>'}<p role="status">Showing ${visible.length} of ${matches.length} finished meals</p>${visible.length < matches.length ? btn("Show older meals", "finished-more") : ""}</details>`;
@@ -871,7 +903,9 @@
         );
       const update = () => {
         const n = selected().length;
-        const hidden = [...form.querySelectorAll('[name="prep-ref"]:checked')].filter((x) => x.closest(".prep-choice").hidden).length;
+        const hidden = [
+          ...form.querySelectorAll('[name="prep-ref"]:checked'),
+        ].filter((x) => x.closest(".prep-choice").hidden).length;
         document.getElementById("prep-selection-count").textContent =
           `${n} selected · Up to 20${hidden ? ` · ${hidden} hidden by search` : ""}`;
         document.getElementById("prep-build").disabled = n === 0 || n > 20;
@@ -880,18 +914,28 @@
         ev.stopPropagation();
         update();
       });
-      const search = document.getElementById("prep-search"), clear = document.getElementById("prep-search-clear");
+      const search = document.getElementById("prep-search"),
+        clear = document.getElementById("prep-search-clear");
       const filter = () => {
-        const q = search.value.trim(), dates = q.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
+        const q = search.value.trim(),
+          dates = q.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [];
         const rows = [...form.querySelectorAll(".prep-choice")];
         for (const row of rows)
-          row.hidden = !dates.every((d) => d === row.dataset.date) || !C.searchMatches(row.textContent + " " + row.dataset.date, q);
+          row.hidden =
+            !dates.every((d) => d === row.dataset.date) ||
+            !C.searchMatches(row.textContent + " " + row.dataset.date, q);
         clear.hidden = !q;
-        document.getElementById("prep-no-meals").hidden = rows.some((row) => !row.hidden);
+        document.getElementById("prep-no-meals").hidden = rows.some(
+          (row) => !row.hidden,
+        );
         update();
       };
       search.oninput = filter;
-      clear.onclick = () => { search.value = ""; filter(); search.focus(); };
+      clear.onclick = () => {
+        search.value = "";
+        filter();
+        search.focus();
+      };
       form.onsubmit = (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -1043,7 +1087,7 @@
   }
   function unmeasuredNotice(items) {
     if (!items?.length) return "";
-    return `<section class="notice unmeasured-ingredients"><h3>Check amounts</h3><p class="helper">These required ingredients have no measured quantity. Check what you have before shopping or cooking. They are not included in quantity totals or automatic stock deductions.</p>${items.map(i => `<div class="section-space"><strong>${e(ing(i.id)?.name || i.id)} · ${C.stock(state, i.id) === Infinity ? "Always stocked — assumed enough" : "Check amount"}</strong>${i.recipeName ? `<p class="helper">${e(i.recipeName)}</p>` : ""}<p>${e(i.note)}</p>${i.source ? `<a href="${e(i.source.url)}" target="_blank" rel="noopener noreferrer">Check publisher method ↗</a>` : ""}</div>`).join("")}</section>`;
+    return `<section class="notice unmeasured-ingredients"><h3>Check amounts</h3><p class="helper">These required ingredients have no measured quantity. Check what you have before shopping or cooking. They are not included in quantity totals or automatic stock deductions.</p>${items.map((i) => `<div class="section-space"><strong>${e(ing(i.id)?.name || i.id)} · ${C.stock(state, i.id) === Infinity ? "Always stocked — assumed enough" : "Check amount"}</strong>${i.recipeName ? `<p class="helper">${e(i.recipeName)}</p>` : ""}<p>${e(i.note)}</p>${i.source ? `<a href="${e(i.source.url)}" target="_blank" rel="noopener noreferrer">Check publisher method ↗</a>` : ""}</div>`).join("")}</section>`;
   }
   function shoppingRow(i) {
     const p = C.purchase(state, i.id, i.remaining, ingredients());
@@ -1054,7 +1098,9 @@
       need = rows.filter((i) => !i.covered),
       have = rows.filter((i) => i.covered),
       purchased = Object.entries(state.bought).filter(([, q]) => q > 0),
-      extraPurchases = purchased.filter(([id]) => !need.some((i) => i.id === id));
+      extraPurchases = purchased.filter(
+        ([id]) => !need.some((i) => i.id === id),
+      );
     const groups = [...new Set(need.map((i) => ing(i.id).group))].sort();
     return (
       head(
@@ -1093,14 +1139,23 @@
   function purchaseHistory() {
     const rows = (state.purchaseHistory || []).slice().reverse();
     if (!rows.length) return "";
-    const status = (p) => ({pending: "Waiting for pantry", stocked: "Added to pantry", corrected: "Replaced by correction"})[p.status],
-      retailer = (p) => p.retailer === "none" ? "No preference" : p.retailer,
+    const status = (p) =>
+        ({
+          pending: "Waiting for pantry",
+          stocked: "Added to pantry",
+          corrected: "Replaced by correction",
+        })[p.status],
+      retailer = (p) => (p.retailer === "none" ? "No preference" : p.retailer),
       purchaseDate = (p) => C.dateLocal(new Date(p.purchasedAt).getTime()),
       dates = purchaseQuery.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [],
-      matches = rows.filter((p) => dates.every((d) => d === purchaseDate(p)) && C.searchMatches(
-        `${ing(p.ingredientId).name} ${retailer(p)} ${purchaseDate(p)} ${stamp(p.purchasedAt)} ${p.status} ${status(p)} ${p.pack?.product || ""}`,
-        purchaseQuery,
-      )),
+      matches = rows.filter(
+        (p) =>
+          dates.every((d) => d === purchaseDate(p)) &&
+          C.searchMatches(
+            `${ing(p.ingredientId).name} ${retailer(p)} ${purchaseDate(p)} ${stamp(p.purchasedAt)} ${p.status} ${status(p)} ${p.pack?.product || ""}`,
+            purchaseQuery,
+          ),
+      ),
       visible = matches.slice(0, purchaseCount),
       previous = document.getElementById("purchase-history"),
       open = previous ? previous.open : !!purchaseQuery;
@@ -1188,7 +1243,12 @@
                     "Mark a batch cooked, then split its portions between eat now, fridge and freezer.",
                     '<a href="#batch" class="button">Plan a batch</a>',
                   )
-            }${archivePanel("empty", "Empty portion records", state.lots.filter((l) => l.portions === 0), lotCard)}<details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
+            }${archivePanel(
+              "empty",
+              "Empty portion records",
+              state.lots.filter((l) => l.portions === 0),
+              lotCard,
+            )}<details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
           : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div>${useSoonPanel()}<form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}${p.useSoon ? `<small class="reminder-date">Reminder · ${e(day(p.useSoon))}</small>` : ""}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
       }`
     );
@@ -1368,12 +1428,14 @@
       });
   }
   function ingredientList(r, n) {
-    return C.scaled(r, n)
-      .map(
-        (i) =>
-          `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
-      )
-      .join("") + unmeasuredNotice(r.unmeasuredIngredients);
+    return (
+      C.scaled(r, n)
+        .map(
+          (i) =>
+            `<div class="ingredient-line"><span>${e(ing(i.id).name)}</span><strong>${amount(i.id, i.qty)}</strong></div>`,
+        )
+        .join("") + unmeasuredNotice(r.unmeasuredIngredients)
+    );
   }
   function batchModal(id, edit = false) {
     const b = edit ? state.batches.find((b) => b.id === id) : null,
@@ -1438,6 +1500,18 @@
     );
     const portions = document.getElementById("lot-servings"),
       days = document.getElementById("lot-days");
+    const meal = document.getElementById("lot-meal"),
+      time = document.getElementById("lot-time");
+    let timeEdited = false;
+    time.addEventListener("input", () => {
+      timeEdited = true;
+    });
+    time.addEventListener("change", () => {
+      timeEdited = true;
+    });
+    meal.addEventListener("change", () => {
+      if (!timeEdited) time.value = C.mealTimes[meal.value];
+    });
     portions.addEventListener("change", () => {
       if (!C.integer(+portions.value, 1, Math.min(12, free))) return;
       days.max = Math.min(7, Math.floor(free / +portions.value));
@@ -1629,7 +1703,9 @@
         return `☐ ${ing(i.id).name}: ${amount(i.id, p.qty)}${p.pack ? " (" + p.count + " × " + amount(i.id, p.pack.size) + "; " + p.pack.basis + ")" : ""}`;
       });
     for (const i of C.unmeasuredRequirements(state, R))
-      lines.push(`☐ ${C.stock(state, i.id) === Infinity ? "ASSUMED STOCKED — CHECK RECIPE AMOUNT" : "CHECK AMOUNT"}: ${ing(i.id).name} — ${i.recipeName}. ${i.note}`);
+      lines.push(
+        `☐ ${C.stock(state, i.id) === Infinity ? "ASSUMED STOCKED — CHECK RECIPE AMOUNT" : "CHECK AMOUNT"}: ${ing(i.id).name} — ${i.recipeName}. ${i.note}`,
+      );
     const text =
       "THREE PLATES — " +
       (C.activeShop(state) === "none" ? "SHOPPING" : C.activeShop(state)) +
@@ -1713,11 +1789,20 @@
       batch = route === "batch",
       key = batch ? "batch" : "choose";
     if ((act === "archive-more" || act === "archive-clear") && archives[id]) {
-      const view = archives[id], previous = document.querySelectorAll("#" + id + "-archive .archive-record").length;
+      const view = archives[id],
+        previous = document.querySelectorAll(
+          "#" + id + "-archive .archive-record",
+        ).length;
       if (act === "archive-more") view.count += 20;
-      else { view.query = ""; view.count = 20; }
+      else {
+        view.query = "";
+        view.count = 20;
+      }
       render();
-      if (act === "archive-more") document.querySelectorAll("#" + id + "-archive .archive-record")[previous]?.focus();
+      if (act === "archive-more")
+        document
+          .querySelectorAll("#" + id + "-archive .archive-record")
+          [previous]?.focus();
       else document.getElementById(id + "-archive-search")?.focus();
       return;
     }
@@ -1898,7 +1983,10 @@
               ? "Original cooked batch (reference)"
               : kind === "batch"
                 ? record.cooked
-                  ? "Cooked batch · " + (record.cookedAt ? stamp(record.cookedAt) : day(record.date))
+                  ? "Cooked batch · " +
+                    (record.cookedAt
+                      ? stamp(record.cookedAt)
+                      : day(record.date))
                   : "Planned batch for " + day(record.date)
                 : record.meal + " on " + day(record.date),
         };
@@ -2310,14 +2398,20 @@
     ev.preventDefault();
     if (form.dataset.archive && archives[form.dataset.archive]) {
       const key = form.dataset.archive;
-      archives[key].query = document.getElementById(key + "-archive-search").value.trim().slice(0, 100);
+      archives[key].query = document
+        .getElementById(key + "-archive-search")
+        .value.trim()
+        .slice(0, 100);
       archives[key].count = 20;
       render();
       document.getElementById(key + "-archive-search")?.focus();
       return;
     }
     if (form.id === "purchase-search-form") {
-      purchaseQuery = document.getElementById("purchase-search").value.trim().slice(0, 100);
+      purchaseQuery = document
+        .getElementById("purchase-search")
+        .value.trim()
+        .slice(0, 100);
       purchaseCount = 20;
       render();
       document.getElementById("purchase-search")?.focus();

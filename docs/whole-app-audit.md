@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Stored-meal serving time
+
+- Changing Meal in Plan stored portions now updates the suggested serving time until the user edits it. Explicitly chosen or cleared times remain untouched by later meal changes.
+- The regression first failed with Breakfast retaining 12:00, then passed with 08:00. It checks successive defaults, custom and blank values, required-field validity, no saved-state changes before submission, persistence after booking/reload, and unchanged pantry stock.
+- Four focused UI checks and all 17 Phase 1 checks passed, covering allocation, reservations, migration and once-only ingredient deduction. This entry records automated verification, not physical-phone validation or a live deployment claim.
+
 ## Scanner detection, skip and save feedback
 
 - Continuous-camera Skip reused a next-item message starting Saved even though it never committed stock. The next-item transition now receives the actual save outcome; skipping says Skipped. Nothing was saved, while successful confirmation says Saved. Detection also now says Will be added as a separate product instead of Saved as its own product before confirmation.
