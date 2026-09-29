@@ -993,6 +993,8 @@
       `<form id="menu-use-form" data-id="${e(id)}">${field("New first day", "menu-new-start", '<input id="menu-new-start" type="date" value="' + C.addDays(C.today(), 7) + '" required>')}<label class="check-label"><input id="menu-adjust" type="checkbox">Change people per meal</label><div id="menu-people-controls" hidden>${field("People per meal", "menu-people", numInput("menu-people", state.filters.servings, 1, 12))}</div><p class="helper">Unchecked keeps saved portions. Whole bakes always keep their saved yield. Copies start uncooked; stored meals become fresh recipes. Existing meal slots must be empty.</p><ul id="menu-preview" class="menu-preview" aria-live="polite"></ul><button class="button wide" id="menu-apply" type="submit">Copy meals to plan</button></form>`,
     );
     const preview = () => {
+      document.getElementById("menu-people").disabled =
+        !document.getElementById("menu-adjust").checked;
       document.getElementById("menu-people-controls").hidden =
         !document.getElementById("menu-adjust").checked;
       try {

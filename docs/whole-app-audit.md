@@ -2,6 +2,12 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Optional menu headcount validation
+
+- The optional people input remained required while hidden. Clearing it (or entering an out-of-range/fractional value) and then unticking Change people per meal left an invisible invalid control that could prevent native form submission. The input is now disabled whenever adjustment is off, and enabled again when selected. Saved yields, date conflicts, food preferences and stock behaviour are unchanged.
+- Six relevant checks passed: all four saved-menu domain checks, the existing copy/conflict/reload UI journey and a new native-form-validity regression covering empty, excessive and fractional headcounts. The new regression failed before the fix. Prior full-suite baseline remains 251 checks; no additional full-suite run is claimed.
+- Browser verified clearing the enabled field, unticking adjustment, copying a meal week and reloading with both original and copied two-portion meals intact. Synthetic localhost records were removed through Settings afterward.
+
 ## Consistent pantry, history and prep searches
 
 - Pantry, finished meals, prep selection and prep ingredient searches now use the same accent/punctuation-tolerant, order-independent word matching as Choose. Finished-meal and prep-selection searches retain exact YYYY-MM-DD matching so date components cannot match a different day. Search never changes quantities or saved selections.
