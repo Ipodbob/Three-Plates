@@ -1263,6 +1263,7 @@
   }
 ]);
   // Reviewed quantified omissions; sources and decisions are retained in docs/catalogue.
+  for (const ingredient of [{"id":"prepared-mashed-potato","name":"Prepared mashed potato (not raw)","unit":"g","group":"Chilled"}]) root.PLATES_DATA.ingredients[ingredient.id] = ingredient;
   requiredIngredientCorrections.push(...[
   {
     "recipeId": "sp-amyjacky-instant-pot-beef-broccoli",
@@ -1421,6 +1422,70 @@
     ],
     "note": "Includes 1 teaspoon of Dijon mustard in the dressing. Further mustard and optional garnishes remain adjustable.",
     "ingredientGuidance": "Includes 1 teaspoon of Dijon mustard in the dressing. Further mustard and optional garnishes remain adjustable."
+  },
+  {
+    "recipeId": "sp-kingarthur-sour-cream-chive-potato-bread-or-rolls-recipe",
+    "source": "https://www.kingarthurbaking.com/recipes/sour-cream-chive-potato-bread-or-rolls-recipe",
+    "items": [
+      {
+        "id": "prepared-mashed-potato",
+        "oldQty": 0,
+        "qty": 135,
+        "avoidIds": [
+          "potato"
+        ]
+      },
+      {
+        "id": "ex-green-spring-onions-93581d5c",
+        "oldQty": 0,
+        "qty": 24,
+        "avoidIds": [
+          "onion"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "heaping 1/2 cup (135g) prepared mashed potatoes, leftover is fine, so long as they're not highly salted",
+        ""
+      ],
+      [
+        "1/4 to 1/2 cup finely chopped scallion tops or fresh or dried chives, to taste",
+        ""
+      ]
+    ],
+    "note": "Includes 135g prepared mashed potato, kept separate from raw potato stock. Plans the upper end of the herb range: half a US cup of finely chopped spring onion tops (24 teaspoons); chives are an alternative. Optional dough flavouring remains optional.",
+    "ingredientGuidance": "Includes 135g prepared mashed potato, kept separate from raw potato stock. Plans the upper end of the herb range: half a US cup of finely chopped spring onion tops (24 teaspoons); chives are an alternative. Optional dough flavouring remains optional."
+  },
+  {
+    "recipeId": "sp-sally-healthy-berry-streusel-bars",
+    "source": "https://sallysbakingaddiction.com/healthy-berry-streusel-bars/",
+    "items": [
+      {
+        "id": "flaked-almonds",
+        "oldQty": 0,
+        "qty": 64
+      },
+      {
+        "id": "ex-old-fashioned-whole-rolled-oats-39f8b507",
+        "oldQty": 213,
+        "qty": 218
+      },
+      {
+        "id": "ex-almond-butter-b2e86a6d",
+        "oldQty": 255,
+        "qty": 255,
+        "avoidIds": []
+      }
+    ],
+    "replace": [
+      [
+        "for topping: 1/2 cup (64g) sliced or chopped almonds and 1 extra Tablespoon oats",
+        ""
+      ]
+    ],
+    "note": "Includes 64g sliced almonds and an extra tablespoon of oats for the topping. Plans 218g oats total: 213g plus an estimated 5g, rounded from the publisher's 213g per 2.5 cups. Almond butter is a plant ingredient; the listed coconut-oil option is used.",
+    "ingredientGuidance": "Includes 64g sliced almonds and an extra tablespoon of oats for the topping. Plans 218g oats total: 213g plus an estimated 5g, rounded from the publisher's 213g per 2.5 cups. Almond butter is a plant ingredient; the listed coconut-oil option is used."
   }
 ]);
   for (const correction of requiredIngredientCorrections) {

@@ -575,3 +575,23 @@ test('publisher recipe actions precede ingredients while detailed provenance sta
  a.click('#recipe-portions-minus');assert.match(ingredients.textContent,/153.125 ml/);a.click('#recipe-actions [data-act="plan-add"]');assert.equal(a.state().plans[0].servings,7);
  a.route('plan');a.click('[data-act="recipe"][data-context="plan"]');assert.equal(a.q('#recipe-actions [data-act="plan-add"]'),null);assert.ok(a.q('#recipe-actions a'));assert.match(a.q('#recipe-amounts').textContent,/153.125 ml/);a.dom.window.close();
 });
+
+
+test('reviewed potato bread and berry bars show complete shopping amounts after reload', (t) => {
+ for(const [id,query,amounts]of [
+  ['sp-kingarthur-sour-cream-chive-potato-bread-or-rolls-recipe','sour cream chive potato',{'prepared-mashed-potato':'135 g','ex-green-spring-onions-93581d5c':'24 tsp'}],
+  ['sp-sally-healthy-berry-streusel-bars','healthy berry streusel',{'flaked-almonds':'64 g','ex-old-fashioned-whole-rolled-oats-39f8b507':'218 g'}],
+ ]){
+  const a=app();t.after(()=>a.dom.window.close());a.click('#f-time-any');
+  while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');
+  a.q('#recipe-search').value=query;a.submit('#search-form');
+  a.click('[data-act="recipe"][data-id="'+id+'"]');assert.match(a.q('#sheet').textContent,/Includes/);
+  a.click('#sheet [data-act="close"]');a.click('[data-act="plan-add"][data-id="'+id+'"]');a.route('shop');
+  const b=app({'three-plates-v3':JSON.stringify(a.state())});t.after(()=>b.dom.window.close());b.route('shop');
+  for(const view of [a,b])for(const [ingredient,amount]of Object.entries(amounts)){
+   const row=view.q('[data-act="bought"][data-id="'+ingredient+'"]').closest('.shopping-row');
+   assert.ok(row.textContent.includes(amount),row.textContent);
+  }
+  assert.deepEqual(b.state().pantry,[]);assert.equal(b.state().plans[0].recipeId,id);
+ }
+});
