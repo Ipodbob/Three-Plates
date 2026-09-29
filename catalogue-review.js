@@ -2,7 +2,34 @@
 (function (root) {
   "use strict";
   const patches = {
+    "gf2-no-bake-pbj-cheesecake-squares": {
+      method: "no-cook",
+      methodNote:
+        "No oven or hob required; boiling kettle water melts the butter and dissolves the jelly.",
+    },
+    "sp-sally-no-bake-pumpkin-cheesecake": {
+      method: "no-cook",
+      methodNote:
+        "Cold assembly and chilling. Melted butter is needed for the base.",
+    },
+    "sp-sally-no-bake-cheesecake": {
+      method: "no-cook",
+      methodNote:
+        "Cold assembly and chilling. Melted butter is needed for the base.",
+    },
+    "sp-sally-mini-no-bake-cheesecakes": {
+      method: "no-cook",
+      methodNote:
+        "Cold filling with melted butter in the base. Baking the crust is optional.",
+    },
+    "sp-sally-chocolate-peanut-butter-no-bake-cookies": {
+      method: "hob",
+      methodNote:
+        "No oven needed. The mixture is boiled on the hob, then chilled.",
+    },
     "sp-lovelemons-no-bake-protein-balls": {
+      method: "no-cook",
+      methodNote: "Mix, shape and chill; no heating required.",
       dishRole: "snack",
       meals: ["Breakfast", "Dessert"],
     },

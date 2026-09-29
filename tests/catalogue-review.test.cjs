@@ -132,3 +132,48 @@ test("microwave recipes and savoury Korean meals use the right filter and preser
     "oven-hob",
   );
 });
+
+test("reviewed no-bake recipes match their actual preparation and retain heat requirements", () => {
+  const s = C.defaults();
+  const checks = {
+    "sp-lovelemons-no-bake-protein-balls": "no-cook",
+    "sp-sally-chocolate-peanut-butter-no-bake-cookies": "hob",
+    "sp-sally-mini-no-bake-cheesecakes": "no-cook",
+    "sp-sally-no-bake-cheesecake": "no-cook",
+    "sp-sally-no-bake-pumpkin-cheesecake": "no-cook",
+    "gf2-no-bake-pbj-cheesecake-squares": "no-cook",
+    "gf2-lemon-cheesecake": "hob",
+    "sp-sally-pumpkin-pie-in-a-jar": "hob",
+  };
+  for (const [id, method] of Object.entries(checks)) {
+    const r = find(id);
+    const f = { ...s.filters, meal: r.meals[0], time: "any", method };
+    assert.equal(C.matching(r, f, s, R, I), true, id);
+    assert.equal(C.matching(r, { ...f, method: "oven" }, s, R, I), false, id);
+  }
+  assert.match(
+    find("sp-sally-mini-no-bake-cheesecakes").methodNote,
+    /optional/,
+  );
+  assert.match(find("sp-sally-no-bake-cheesecake").methodNote, /Melted butter/);
+  assert.match(find("gf2-no-bake-pbj-cheesecake-squares").methodNote, /kettle/);
+});
+
+test("longer-time filter includes additional chilling or proving without admitting quick meals", () => {
+  const s = C.defaults();
+  for (const id of [
+    "gf2-lemon-cheesecake",
+    "gf2-no-bake-pbj-cheesecake-squares",
+    "gf2-focaccia",
+  ]) {
+    const r = find(id),
+      f = { ...s.filters, meal: r.meals[0], method: "any" };
+    assert.equal(C.matching(r, { ...f, time: "long" }, s, R, I), true, id);
+    assert.equal(C.matching(r, { ...f, time: "30" }, s, R, I), false, id);
+  }
+  const quick = find("pesto-pea-pasta");
+  assert.equal(
+    C.matching(quick, { ...s.filters, meal: "Dinner", time: "long" }, s, R, I),
+    false,
+  );
+});
