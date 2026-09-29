@@ -1,6 +1,24 @@
 /* Reviewed catalogue metadata; evidence in docs/catalogue/classification-review.json. */
 (function (root) {
   "use strict";
+  // Reviewed preference aliases only; original recipe/stock records stay intact.
+  root.PLATES_DATA.ingredientPreferenceAliases = {
+    "ex-ground-black-peppercorn-8bda9b84": ["black-pepper"],
+    "ex-black-pepper-426afb4b": ["black-pepper"],
+    "ex-whole-black-peppercorn-5d2a2e00": ["black-pepper"],
+    "ex-whole-black-peppercorns-d58baed3": ["black-pepper"],
+    "ex-ground-black-pepper-ede01e79": ["black-pepper"],
+    "ex-ground-black-pepper-848029a9": ["black-pepper"],
+    "black-pepper": ["black-pepper"],
+    "ex-cracked-black-pepper-de856107": ["black-pepper"],
+    "ex-grinds-of-black-pepper-cd32773d": ["black-pepper"],
+    "ex-fresh-ground-black-pepper-e0ae6248": ["black-pepper"],
+    "ex-salt-and-black-pepper-bb887bdf": ["black-pepper"],
+    "ex-green-peppercorn-b334a3cc": [],
+    "ex-peppercorns-197d9e27": [],
+    "ex-peppermint-extract-9f005f6b": [],
+    "white-pepper": ["white-pepper"],
+  };
   // Preference families never combine stock or convert ingredient quantities.
   root.PLATES_DATA.preferenceFamilies = [
     {
@@ -320,7 +338,11 @@
 
     "sp-gfmore-philly-cheesesteak": { kind: "meat" },
     "sp-recipetineats-beef-rice-noodles": { kind: "meat" },
-    "sp-recipetineats-beef-steak-marinade": { kind: "meat", dishRole: "main", meals: ["Lunch", "Dinner"] },
+    "sp-recipetineats-beef-steak-marinade": {
+      kind: "meat",
+      dishRole: "main",
+      meals: ["Lunch", "Dinner"],
+    },
     "sp-skinnytaste-thai-marinated-steak-salad": { kind: "meat" },
     "sp-skinnytaste-shrimp-tacos": { kind: "fish" },
     "sp-skinnytaste-shrimp-piccata-foil-packets": { kind: "fish" },
