@@ -210,3 +210,14 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Fabricated records and preferences on isolated localhost:4174 were cleared through Settings; other origins were untouched. Physical phone checks remain outstanding.
 
 - Validation: all 227 full-suite checks passed (32 core and 195 Node test-runner checks). The final reordered side-query assertion passed separately after its test wording was updated; no production code changed after the full run.
+
+
+## Required ingredients hidden by optional-extra wording
+
+- Reviewed publisher ingredients and methods for five confirmed omissions. Classic carrot cake retains its 150g self-raising flour and now includes 50g rye flour (the first publisher option), with the all-self-raising alternative explained. Chicken souvlaki now includes the marinade lemon as well as the existing half-lemon for tzatziki. Chicken, mango & noodle salad restores two dressing limes and the missing teaspoon of honey (20ml total). Spinach falafel & hummus restores its hummus lemon. Pasta e fagioli restores 30ml cooking oil; optional serving extras remain separate.
+- Source decisions and exact before/after quantities are recorded in docs/catalogue/required-ingredient-corrections.json. Existing IDs, ratings, pantry balances and completed records remain unchanged. Uncooked saved plans now require the corrected amounts. Preservation tests permit only these explicit changes plus the earlier fish additions; targeted tests cover shopping, scaling context, reload and once-only deduction.
+- The same noodle-salad publisher method confirms cold assembly with kettle-soaked noodles and ready-cooked chicken. Corrected Hob to No cook and added a preparation note; raw chicken stock remains a separate ingredient identity.
+- Browser verified the two-person noodle salad shows one lime and 10ml honey in both recipe and Shopping, appears under No cook after reload, and shows its preparation note. The full carrot cake shows 150g self-raising plus 50g rye flour and the substitution note. Isolated localhost test records cleared afterward.
+- Further screening found mixed herb/serving lines in the seafood roast, pork casserole, ratatouille, Thai fried rice, courgette soup and no-cook fajitas. These need publisher checks and defensible units before changing quantities. This release does not claim that all catalogue omission notes or ingredient amounts have been verified.
+
+- Validation: full suite passed 228 checks (32 core and 196 Node checks) before the final noodle-salad method correction. All 21 catalogue checks passed after that correction. Browser verified the final method and quantities.
