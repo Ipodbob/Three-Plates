@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 208 checks: 31 core regressions, 46 added domain checks,
-30 catalogue checks, 71 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 209 checks: 31 core regressions, 46 added domain checks,
+30 catalogue checks, 72 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -317,3 +317,10 @@ Existing saved anchor IDs remain valid; these mappings do not substitute pantry
 stock or convert quantities. Vegan chicken, unrelated steaks, seasoning and graham
 crackers stay outside the relevant families. The [review register](docs/catalogue/meat-preferences.json)
 records scope and remaining ambiguous sausage/cured-meat review.
+
+## Shopping pack editor
+
+The pack editor puts the amount and Save first, with optional product provenance
+in an expandable section. Exact-weight mode disables the unused pack-size field
+so an invalid previous size cannot block saving. Returning to pack mode restores
+required positive-size validation. Existing product details remain saved.

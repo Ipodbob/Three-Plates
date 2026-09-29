@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 3f305d4 (PR #16): Pages run 36506074752 succeeded, all 21 checked public assets matched v3.11.7, and a fresh live navigation displayed v3.11.7. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 2bda48a (PR #18): Pages run 36507570414 succeeded, all 21 checked public assets matched v3.11.9, and a fresh live navigation displayed v3.11.9. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -87,3 +87,8 @@ Recorded dates cannot prove actual food safety. Recipe-specific freezer suitabil
 - Added explicit preference-only mappings for 69 chicken, 42 beef and 38 pork ingredient variants; broad groups render as one removable chip. No stock, quantity or saved-ID migration.
 - Full suite: 208 checks passed; three targeted regressions also passed after final generic-steak review: catalogue preservation, ingredient coverage/false-positive checks and group reload/removal. Browser verified all three chips survive reload and can be removed. Temporary preferences were cleared.
 - Unspecified sausages and mixed cured meats still require review; this is not a claim of complete ingredient validation. Release verification pending.
+
+## Pack editor review
+
+- Browser reproduced an exact-weight save blocked by a zero pack size. Disabled unused size validation now allows saving, and the exact-weight choice survives reload. Returning to pack mode restores required validation; a connected UI regression checks product metadata retention as well.
+- The mobile editor now puts Save before expandable optional product details. Inspected in a 320px iframe. 209 full-suite checks passed. Browser screenshot confirms Save is visible and the dialog fits at 320px. Temporary test meal, pack override and search were cleared; release verification follows merge.

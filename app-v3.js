@@ -1415,10 +1415,24 @@
   }
   function packModal(id) {
     const p = C.packFor(state, id),
-      override = state.packs[C.activeShop(state)]?.[id];
+      override = state.packs[C.activeShop(state)]?.[id],
+      exact = override?.size === 0;
     modal(
       "Pack size or exact weight",
-      `<h3>${e(ing(id).name)}</h3><p class="helper">Saved for ${e(C.activeShop(state) === "none" ? "No preference" : C.activeShop(state))}. This is your entered size, not a verified retailer listing.</p><form id="pack-form" data-id="${id}">${field("Amount in one pack (" + e(ing(id).unit) + ")", "pack-size", `<input id="pack-size" type="number" inputmode="decimal" min="0.001" max="1000000" step="any" value="${p?.size || ""}">`)}<label class="check-label"><input type="checkbox" id="pack-exact" ${override?.size === 0 ? "checked" : ""}>Buy exact weight / loose / butcher</label><p class="helper">For drained tinned foods, enter the drained usable weight on the label. Count ingredients use individual slices, cloves, eggs or wraps, not loaves, bulbs or packs.</p>${field("Product / variant (optional)", "pack-product", `<input id="pack-product" maxlength="300" value="${e(override?.product || "")}">`)}${field("Product source URL (optional)", "pack-url", `<input id="pack-url" type="url" value="${e(override?.url || "")}">`)}${field("Label checked on (optional)", "pack-verified", `<input id="pack-verified" type="date" value="${e(override?.verifiedOn || "")}">`)}<p class="helper">Match the exact ingredient variant, fresh/frozen form and usable weight; mass and count are not interchangeable. User-entered sources are not independently verified.</p><div class="action-wrap"><button class="button" type="submit">Save</button>${btn("Reset to generic estimate", "pack-reset", id)}</div></form>`,
+      `<h3>${e(ing(id).name)}</h3><p class="helper">Saved for ${e(C.activeShop(state) === "none" ? "No preference" : C.activeShop(state))}.</p>
+      <form id="pack-form" data-id="${id}">
+      <label class="check-label"><input type="checkbox" id="pack-exact" ${exact ? "checked" : ""}>Buy exact weight / loose / butcher</label>
+      ${field("Amount in one pack (" + e(ing(id).unit) + ")", "pack-size", `<input id="pack-size" type="number" inputmode="decimal" min="0.001" max="1000000" step="any" value="${p?.size || ""}" ${exact ? "disabled" : "required"}>`)}
+      <p class="helper">Use the usable weight after draining, or the number of individual items. Exact weight skips pack rounding.</p>
+      <button class="button wide" type="submit">Save</button>
+      <details class="details-box"><summary>Product details (optional)</summary>
+      ${field("Product / variant (optional)", "pack-product", `<input id="pack-product" maxlength="300" value="${e(override?.product || "")}">`)}
+      ${field("Product source URL (optional)", "pack-url", `<input id="pack-url" type="url" value="${e(override?.url || "")}">`)}
+      ${field("Label checked on (optional)", "pack-verified", `<input id="pack-verified" type="date" value="${e(override?.verifiedOn || "")}">`)}
+      <p class="helper">Match the ingredient variant, fresh/frozen form and usable amount. Count ingredients use individual slices, cloves, eggs or wraps, not loaves, bulbs or packs. Entered sizes and sources are not independently verified retailer listings.</p>
+      </details>
+      <div class="action-wrap">${btn("Reset to generic estimate", "pack-reset", id)}</div>
+      </form>`,
     );
   }
   function purchaseModal(id) {
@@ -2157,6 +2171,12 @@
           ),
         );
       });
+    }
+    if (id === "pack-exact") {
+      const size = document.getElementById("pack-size");
+      size.disabled = t.checked;
+      size.required = !t.checked;
+      return;
     }
     if (id === "batch-mode") {
       route = t.checked ? "batch" : "choose";
