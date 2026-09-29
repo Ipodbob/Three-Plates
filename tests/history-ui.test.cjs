@@ -46,6 +46,41 @@ function app(seed) {
   };
 }
 const tick = () => new Promise((r) => setImmediate(r));
+function batchRecords(s, C, count = 1002) {
+  for (let n = 0; n < count; n++) {
+    const date = C.addDays('2020-01-01', n), cookedAt = date + 'T12:00:00.000Z';
+    s.batches.push({id:'batch'+n, recipeId:'prep-bolognese', date, servings:2, cooked:true, cookedAt, allocation:{eat:0,fridge:0,freezer:2}});
+    s.lots.push({id:'lot'+n, batchId:'batch'+n, recipeId:'prep-bolognese', portions:0, capacity:2, consumed:0, location:'freezer', cookedAt, frozenAt:date+'T12:10:00.000Z', thawedAt:null, thawStartedAt:null});
+  }
+}
+test('batch and empty-portion histories page and search all records without deleting data', (t) => {
+  for (const key of ['batch', 'empty']) {
+    const a=app(batchRecords); t.after(()=>a.dom.window.close());
+    route(a,key==='batch'?'batch':'pantry');
+    if(key==='empty')a.q('[data-act="pantry-tab"][data-id="prepared"]').click();
+    const saved=a.w.localStorage.getItem('three-plates-v3');
+    const panel='#'+key+'-archive';
+    assert.equal(a.w.document.querySelectorAll(panel+' .archive-record').length,20);
+    assert.equal(a.q(panel+' .archive-record').dataset.archiveId,key==='batch'?'batch1001':'lot1001');
+    a.q(panel).open=true;
+    a.q(panel+' [data-act="archive-more"]').click();
+    assert.equal(a.w.document.querySelectorAll(panel+' .archive-record').length,40);
+    assert.equal(a.w.document.activeElement.dataset.archiveId,key==='batch'?'batch981':'lot981');
+    a.q('#'+key+'-archive-search').value='2020-01-01';
+    a.q(panel+' form').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));
+    assert.equal(a.w.document.querySelectorAll(panel+' .archive-record').length,1);
+    assert.equal(a.q(panel+' .archive-record').dataset.archiveId,key==='batch'?'batch0':'lot0');
+    assert.equal(a.w.document.activeElement.id,key+'-archive-search');
+    assert.ok(a.q(panel+' [data-act="recipe"]'));
+    a.q(panel+' [data-act="recipe"]').click();
+    assert.match(a.q('#sheet').textContent,key==='batch'?/Cooked batch/:/Original cooked batch/);
+    assert.match(a.q('#sheet').textContent,/2 portions/);
+    a.q('#sheet [data-act="close"]').click();
+    a.q(panel+' [data-act="archive-clear"]').click();
+    assert.equal(a.w.document.querySelectorAll(panel+' .archive-record').length,20);
+    assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved);
+  }
+});
 function purchases(s, C, count = 1101) {
   for (let n = 0; n < count; n++) s.purchaseHistory.push({
     id: 'purchase' + n, ingredientId: 'pasta', qty: 500, unit: 'g',
@@ -54,6 +89,25 @@ function purchases(s, C, count = 1101) {
     status: n === 0 ? 'corrected' : 'stocked',
   });
 }
+test('an older empty record can reopen its recipe and restore a mistaken discard without deducting ingredients', (t) => {
+  const a=app((s,C)=>batchRecords(s,C,25)); t.after(()=>a.dom.window.close());
+  route(a,'pantry'); a.q('[data-act="pantry-tab"][data-id="prepared"]').click();
+  a.q('#empty-archive').open=true;
+  a.q('#empty-archive-search').value='2020-01-01';
+  a.q('#empty-archive-form').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));
+  a.q('#empty-archive [data-act="recipe"]').click();
+  assert.match(a.q('#sheet').textContent,/2 portions/);
+  assert.equal(a.q('#sheet [data-act="batch-add"]'),null);
+  a.q('#sheet [data-act="close"]').click();
+  a.q('#empty-archive [data-act="lot-correct"]').click();
+  a.q('#lot-count').value='1';
+  a.q('#lot-correction-form').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));
+  assert.equal(a.state().lots.find(x=>x.id==='lot0').portions,1);
+  assert.deepEqual(a.state().pantry,[]);
+  assert.equal(a.state().batches.length,25);
+  assert.match(a.q('#empty-archive').textContent,/No records match/);
+  assert.ok(a.q('.prepared-grid [data-id="lot0"]'));
+});
 test('purchase history pages all saved records without changing stock or persistence', (t) => {
   const a = app(purchases); t.after(() => a.dom.window.close()); route(a, 'shop');
   const saved = a.w.localStorage.getItem('three-plates-v3');

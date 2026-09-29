@@ -106,6 +106,7 @@
     finishedCount = 20,
     purchaseQuery = "",
     purchaseCount = 20,
+    archives = { batch: { query: "", count: 20 }, empty: { query: "", count: 20 } },
     dialogReturn = null,
     searchWindow = { key: "", count: 12 },
     shown = { choose: [], batch: [] },
@@ -643,11 +644,22 @@
           '<a class="button secondary" href="#shop">Open combined shopping list</a></section>'
       : "";
   }
+  function archivePanel(key, title, records, content) {
+    const view = archives[key],
+      localDate = (r) => r.cookedAt ? C.dateLocal(new Date(r.cookedAt).getTime()) : r.date,
+      dates = view.query.match(/\b\d{4}-\d{2}-\d{2}\b/g) || [],
+      matches = records.filter((r) => dates.every((d) => d === localDate(r)) && C.searchMatches(
+        `${recipe(r.recipeId).name} ${localDate(r)} ${r.location || ""}`,
+        view.query,
+      )).sort((a, b) => String(b.cookedAt || b.date).localeCompare(String(a.cookedAt || a.date))),
+      visible = matches.slice(0, view.count),
+      previous = document.getElementById(key + "-archive"),
+      open = previous ? previous.open : !!view.query;
+    return `<details id="${key}-archive" class="panel section-space" ${open ? "open" : ""}><summary>${title} (${records.length})</summary><form id="${key}-archive-form" data-archive="${key}" class="recipe-search"><label class="sr-only" for="${key}-archive-search">Search ${title.toLowerCase()}</label><input id="${key}-archive-search" type="search" maxlength="100" placeholder="Recipe or cooking date" value="${e(view.query)}"><button type="submit" class="icon-btn" aria-label="Search ${title.toLowerCase()}">${icon("search")}</button>${view.query ? btn("Clear", "archive-clear", key, "ghost") : ""}</form><p class="helper">Newest cooking dates first. Search a date as YYYY-MM-DD. All records remain saved.</p>${visible.map((r) => `<section class="archive-record" tabindex="-1" data-archive-id="${e(r.id)}" aria-label="${e(recipe(r.recipeId).name + " · " + localDate(r))}"><p class="plan-date">${e(localDate(r))}</p>${content(r)}</section>`).join("") || '<p class="helper">No records match this search.</p>'}<p role="status">Showing ${visible.length} of ${matches.length} records</p>${visible.length < matches.length ? btn("Show older records", "archive-more", key) : ""}</details>`;
+  }
   function batchHistory() {
     const done = state.batches.filter((b) => b.cooked);
-    return done.length
-      ? `<details class="panel section-space"><summary>Cooked batch records (${done.length})</summary>${done.map((b) => `<p class="helper"><strong>${e(recipe(b.recipeId).name)}</strong> · ${b.servings} made<br>${b.cookedAt ? e(stamp(b.cookedAt)) : e(day(b.date))}<br>${b.allocation ? `${b.allocation.eat} served immediately · ${b.allocation.fridge} originally refrigerated · ${b.allocation.freezer} originally frozen` : "Original allocation was not recorded by the earlier app version."}</p>`).join("")}</details>`
-      : "";
+    return done.length ? archivePanel("batch", "Cooked batch records", done, (b) => `<p class="helper"><strong>${e(recipe(b.recipeId).name)}</strong> · ${b.servings} made<br>${b.cookedAt ? e(stamp(b.cookedAt)) : e(day(b.date))}<br>${b.allocation ? `${b.allocation.eat} served immediately · ${b.allocation.fridge} originally refrigerated · ${b.allocation.freezer} originally frozen` : "Original allocation was not recorded by the earlier app version."}</p>${plannedRecipeButton(b, "batch")}`) : "";
   }
   function batchCard(b) {
     const r = recipe(b.recipeId),
@@ -1169,12 +1181,7 @@
                     "Mark a batch cooked, then split its portions between eat now, fridge and freezer.",
                     '<a href="#batch" class="button">Plan a batch</a>',
                   )
-            }<details class="panel storage-details"><summary>Empty portion records</summary>${
-              state.lots
-                .filter((l) => l.portions === 0)
-                .map(lotCard)
-                .join("") || "No empty records."
-            }</details><details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
+            }${archivePanel("empty", "Empty portion records", state.lots.filter((l) => l.portions === 0), lotCard)}<details class="panel storage-details"><summary>Storage & reheating guide</summary>${storageGuide()}</details>`
           : `<div class="page-actions">${btn("Scan barcode", "pantry-scan", "", "")} ${btn(icon("plus") + " Add an ingredient", "pantry-add")}</div>${useSoonPanel()}<form id="pantry-search-form" class="recipe-search"><label class="sr-only" for="pantry-search">Search pantry</label><input id="pantry-search" type="search" maxlength="100" placeholder="Search your pantry" value="${e(pantryQuery)}"><button class="icon-btn" aria-label="Search pantry" type="submit">${icon("search")}</button>${pantryQuery ? btn("Clear", "pantry-search-clear", "", "ghost") : ""}</form><section class="panel">${stock.length ? stock.map((p) => `<div class="pantry-item"><div class="item-name">${e(ing(p.id).name)}${p.useSoon ? `<small class="reminder-date">Reminder · ${e(day(p.useSoon))}</small>` : ""}<small>${p.id.startsWith("custom-") ? "Custom item · not matched to recipes" : p.always ? "Assumed sufficient for every meal" : ""}</small></div><span class="quantity-pill">${p.always ? "Always stocked" : amount(p.id, p.qty)}</span>${p.id.startsWith("custom-") && !p.always && p.qty > 0 ? btn("Link to recipes", "pantry-link", p.id, "ghost") : ""}${btn("Edit", "pantry-edit", p.id, "ghost")}<button class="icon-btn" data-act="pantry-remove" data-id="${p.id}" aria-label="Remove ${e(ing(p.id).name)}">${icon("close")}</button></div>`).join("") : pantryQuery ? '<p class="helper">No pantry items match this search. Clear it to see everything.</p>' : '<p class="helper">Start with rice, pasta, tins and oil. We do not assume any ingredients are stocked.</p>'}</section>`
       }`
     );
@@ -1698,6 +1705,15 @@
       id = b.dataset.id,
       batch = route === "batch",
       key = batch ? "batch" : "choose";
+    if ((act === "archive-more" || act === "archive-clear") && archives[id]) {
+      const view = archives[id], previous = document.querySelectorAll("#" + id + "-archive .archive-record").length;
+      if (act === "archive-more") view.count += 20;
+      else { view.query = ""; view.count = 20; }
+      render();
+      if (act === "archive-more") document.querySelectorAll("#" + id + "-archive .archive-record")[previous]?.focus();
+      else document.getElementById(id + "-archive-search")?.focus();
+      return;
+    }
     if (act === "purchase-more") {
       const previous = document.querySelectorAll(".purchase-record").length;
       purchaseCount += 20;
@@ -1874,7 +1890,9 @@
             kind === "lot"
               ? "Original cooked batch (reference)"
               : kind === "batch"
-                ? "Planned batch for " + day(record.date)
+                ? record.cooked
+                  ? "Cooked batch · " + (record.cookedAt ? stamp(record.cookedAt) : day(record.date))
+                  : "Planned batch for " + day(record.date)
                 : record.meal + " on " + day(record.date),
         };
       }
@@ -2283,6 +2301,14 @@
     const form = ev.target;
     if (!form.matches("form")) return;
     ev.preventDefault();
+    if (form.dataset.archive && archives[form.dataset.archive]) {
+      const key = form.dataset.archive;
+      archives[key].query = document.getElementById(key + "-archive-search").value.trim().slice(0, 100);
+      archives[key].count = 20;
+      render();
+      document.getElementById(key + "-archive-search")?.focus();
+      return;
+    }
     if (form.id === "purchase-search-form") {
       purchaseQuery = document.getElementById("purchase-search").value.trim().slice(0, 100);
       purchaseCount = 20;
