@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 197 checks: 31 core regressions, 44 added domain checks,
-26 catalogue checks, 66 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 201 checks: 31 core regressions, 46 added domain checks,
+26 catalogue checks, 68 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -263,12 +263,18 @@ unchanged. Their recipe views explain why they are no longer in discovery.
 The 45 original examples remain explicitly labelled unrated. Stored ratings
 are snapshots, not a live feed.
 
+Current-format backups with invalid food preferences or pack override records
+are rejected before replacement. Loading damaged local records pauses saving
+and retains the original text for recovery. Valid exclusions, favourites, diets,
+equipment preferences, pack sizes and exact-weight overrides survive restore;
+version-1 compatibility and omitted legacy optional fields are retained.
+
 ## Verification and release status
 
-The latest verified release is v3.11.4 at `8db7994` (PR #13): Pages run
-36504302487 succeeded, all 21 checked public assets matched, and a fresh live
-navigation displayed v3.11.4. The current v3.11.5 publisher-rating policy awaits
-release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
+The latest verified release is v3.11.5 at `8c12446` (PR #14): Pages run
+36504855625 succeeded, all 21 checked public assets matched, and a fresh live
+navigation displayed v3.11.5. The current v3.11.6 preference and pack validation
+changes await release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
 
 The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:
 all six destinations fit without horizontal overflow or fields leaving the viewport.

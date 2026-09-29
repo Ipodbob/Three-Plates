@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 8db7994 (PR #13): Pages run 36504302487 succeeded, all 21 checked public assets matched v3.11.4, and a fresh live navigation displayed v3.11.4. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 8c12446 (PR #14): Pages run 36504855625 succeeded, all 21 checked public assets matched v3.11.5, and a fresh live navigation displayed v3.11.5. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -30,6 +30,8 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Released v3.11.1 removes remaining count cutoffs for custom products, meals, batches and lots. Damaged v3 records fail safely before saved data replacement. The formatted-backup limit increases from 2 MB to 20 MB, and menu copies can extend histories beyond 1,000 meals.
 
 ## Verification evidence
+- Preference/pack validation: all 201 checks passed. Malformed current-format preference lists, diet/equipment fields, pack containers, retailer keys and discarded pack records now reject restore instead of silently dropping entries. Domain checks retain valid preferences and exact/pack overrides, tolerate omitted optional fields and retain v1 compatibility. Connected UI covers save blocking with original text intact and rejected imports before replacement confirmation. Real browser retained Vegan and disabled slow-cooker preferences across reload without a storage warning; local test preferences were restored afterward.
+
 - Rating policy: all 197 checks passed. Boundary/malformed-rating checks enforce 4/5 and five whole-number ratings for publisher discovery. Connected UI proves the low-count soup disappears from search while its saved plan still opens, explains its status, and generates shopping. Local browser verified the empty exact search and 993-rated-recipe count in Settings. Existing original examples stay visibly unrated.
 
 - Search-draft fix: all 195 checks passed. Three connected UI regressions cover independent Choose/Batch drafts across method/headcount/navigation changes, no per-keystroke persistence, submit/reload, clear/reset, storage-failure retry and pantry shortcuts. Browser reproduced the original loss and verified pesto survives Hob selection and a Batch round trip while bolognese stays independent; Search then applies the correct text. Test filters were restored afterward.
@@ -70,7 +72,7 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Continue remaining correction-dialog checks (partial discard/capacity restoration now verified at 320px). The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
 - Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
-- The handover's cooking aids and combined prep are released. Large-history preservation is released; history navigation and focus changes are released; no-bake filter corrections are released; search-draft preservation is released; publisher-rating discovery policy awaits release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- The handover's cooking aids and combined prep are released. Large-history preservation is released; history navigation and focus changes are released; no-bake filter corrections are released; search-draft preservation is released; publisher-rating discovery policy is released; preference/pack validation awaits release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate

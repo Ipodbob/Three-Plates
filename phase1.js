@@ -146,6 +146,59 @@
     const s = original.migrate(raw, recipes, baseIngredients),
       ingredients = { ...baseIngredients, ...s.custom };
     if (raw.version === 3) {
+      const object = (value) =>
+        value && typeof value === "object" && !Array.isArray(value);
+      if (raw.prefs !== undefined) {
+        if (!object(raw.prefs))
+          throw Error(
+            "Invalid food preferences. Original data has not been replaced.",
+          );
+        for (const key of [
+          "exclusions",
+          "likedIngredients",
+          "favourites",
+          "hidden",
+          "cuisines",
+        ]) {
+          const values = raw.prefs[key];
+          if (
+            values !== undefined &&
+            (!Array.isArray(values) ||
+              values.length !== s.prefs[key].length ||
+              values.some((value) => !s.prefs[key].includes(value)))
+          )
+            throw Error(
+              "Invalid " +
+                key +
+                " preferences. Original data has not been replaced.",
+            );
+        }
+        if (
+          (raw.prefs.diet !== undefined && raw.prefs.diet !== s.prefs.diet) ||
+          (raw.prefs.slowCooker !== undefined &&
+            typeof raw.prefs.slowCooker !== "boolean")
+        )
+          throw Error(
+            "Invalid food preferences. Original data has not been replaced.",
+          );
+      }
+      if (raw.packs !== undefined) {
+        if (!object(raw.packs))
+          throw Error(
+            "Invalid pack records. Original data has not been replaced.",
+          );
+        for (const [shop, records] of Object.entries(raw.packs)) {
+          if (
+            !C.shops.includes(shop) ||
+            !object(records) ||
+            Object.keys(records).length !==
+              Object.keys(s.packs[shop] || {}).length
+          )
+            throw Error(
+              "Invalid pack records. Original data has not been replaced.",
+            );
+        }
+      }
       for (const key of ["custom", "bought"])
         if (
           raw[key] !== undefined &&
