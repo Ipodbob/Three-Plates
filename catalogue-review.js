@@ -76,6 +76,7 @@
         "ex-bone-in-chicken-drumsticks-c75afe54",
         "ex-chicken-thighs-871b706e",
       ],
+      meat: true,
     },
     {
       anchors: ["beef", "beef-mince"],
@@ -123,6 +124,7 @@
         "ex-steaks-747c7530",
         "ex-steaks-c3f04e0f",
       ],
+      meat: true,
     },
     {
       anchors: ["pork", "sausages"],
@@ -165,7 +167,18 @@
         "ex-center-cut-boneless-pork-chops-47c31867",
         "ex-pork-loin-cutlets-9ade1158",
         "ex-slices-center-cut-bacon-e85809ba",
+        "chorizo",
+        "kielbasa",
+        "ex-chorizo-ring-85c95a26",
+        "ex-cooking-chorizo-skin-removed-and-99182caa",
+        "ex-cooking-chorizo-66599d7f",
+        "ex-ring-chorizo-18dcf07b",
+        "ex-raw-chorizo-715bceaa",
+        "ex-italian-sausage-892a77ed",
+        "ex-country-sausage-65efbbea",
+        "ex-chorizo-sausage-3d8e0058",
       ],
+      meat: true,
     },
     {
       anchors: ["salmon", "tuna", "prawns"],
@@ -291,7 +304,21 @@
       ],
     },
   ];
+  root.PLATES_DATA.unspecifiedMeatIngredients = [
+    "ex-good-quality-sausages-277dbc67",
+    "ex-sausages-of-your-choice-ef7dba6f",
+    "ex-sausagemeat-6605e123",
+    "ex-ground-sausage-a22abf31",
+    "ex-smoked-sausage-9e67d273",
+    "ex-sausages-skins-removed-ec022881",
+    "ex-uncooked-mild-italian-sausage-20a5f2b4",
+    "ex-pepperoni-slices-d83045ab",
+  ];
   const patches = {
+    "sp-gfmore-philly-cheesesteak": { kind: "meat" },
+    "sp-recipetineats-beef-rice-noodles": { kind: "meat" },
+    "sp-recipetineats-beef-steak-marinade": { kind: "meat", dishRole: "main", meals: ["Lunch", "Dinner"] },
+    "sp-skinnytaste-thai-marinated-steak-salad": { kind: "meat" },
     "sp-skinnytaste-shrimp-tacos": { kind: "fish" },
     "sp-skinnytaste-shrimp-piccata-foil-packets": { kind: "fish" },
     "sp-skinnytaste-scallops-grapefruit-arugula-and-spinach": { kind: "fish" },

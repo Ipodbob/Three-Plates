@@ -123,3 +123,13 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Domain checks verify imported ground chicken receives extra weight in both modes, vegan chicken does not, exclusions still reject the dish, and saved IDs round-trip. Connected UI checks reload and removal without changing an unrelated exclusion. Browser verified the compact Chicken group survives reload and removes cleanly; test preference cleared.
 
 - Verification accounting: the full run passed 212 checks and failed the new UI test because its setup selected the same liked and excluded group. Existing conflict handling correctly removed the favourite. After correcting the test to use an unrelated exclusion, both new targeted checks passed. No production code changed after that full run.
+
+## Sausage and cured-meat review
+
+- Reviewed all 18 previously unmapped sausage/chorizo/pepperoni ingredient identities. Ten map to pork using publisher definitions, categories or explicit substitutions. Eight retain unspecified/variable species and are omitted under broad meat exclusions only. The source register records each decision; no uncertain identity is boosted as a favourite.
+- Targeted checks cover every consuming recipe, unrestricted discovery, unchanged stock separation and original catalogue preservation. Browser verified Air fryer sausages disappears with Pork excluded and returns after removing it. Test filters were restored.
+- This resolves the recorded sausage ambiguity through explicit uncertainty handling; it does not claim independent validation of all imported quantities or product labels.
+
+- Four further beef classifications corrected: Philly cheesesteak, Beef Rice Noodles, Beef Steak Marinade and Thai Steak Salad. A catalogue-wide regression checks all recipes containing reviewed meat against vegetarian, vegan and pescatarian diets. Full suite passed 214 checks before these final four metadata corrections; all 12 catalogue-review checks passed afterward. Browser verified Beef Steak Marinade disappears under Pescatarian and returns unrestricted. Test preferences restored.
+
+- The steak marinade recipe includes two steaks and their cooking method; corrected its component-only role to a main for Lunch/Dinner. Browser confirmed the corrected main appears unrestricted, disappears under Pescatarian, and returns when the diet is removed. All 12 catalogue-review checks passed after the final role correction.

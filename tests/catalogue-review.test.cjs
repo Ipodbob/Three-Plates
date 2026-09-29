@@ -287,3 +287,20 @@ test('favourite ingredient families rank imported cuts but never override food e
  s.prefs.exclusions=ids;assert.equal(C.foodAllowed(ground,s.prefs),false);
  assert.deepEqual(s.prefs.likedIngredients,ids);assert.deepEqual(C.migrate(s,R,I).prefs.likedIngredients,ids);
 });
+
+test('reviewed sausages exclude uncertain meat without inventing favourite matches or stock equivalence',()=>{
+ const audit=require('../docs/catalogue/sausage-review.json');assert.equal(audit.knownPork.length,10);assert.equal(audit.unspecifiedMeat.length,8);
+ for(const anchors of [['pork','sausages'],['beef','beef-mince'],['chicken','chicken-thigh']]){
+  const s=C.defaults();s.prefs.exclusions=anchors;
+  for(const i of audit.unspecifiedMeat){assert.deepEqual(I[i.id],i);for(const r of R.filter(r=>r.ingredients.some(x=>x.id===i.id)))assert.equal(C.foodAllowed(r,s.prefs),false,r.id);}
+ }
+ const s=C.defaults();s.prefs.exclusions=['pork','sausages'];for(const i of audit.knownPork)for(const r of R.filter(r=>r.ingredients.some(x=>x.id===i.id)))assert.equal(C.foodAllowed(r,s.prefs),false,r.id);
+ const plain={id:'uncertain-test',kind:'meat',ingredients:[{id:audit.unspecifiedMeat[0].id,qty:1}]};s.prefs.exclusions=[];assert.equal(C.foodAllowed(plain,s.prefs),true);const base=C.choiceWeight(plain,s,false);s.prefs.likedIngredients=['pork','sausages'];assert.equal(C.choiceWeight(plain,s,false),base);
+ assert.ok(C.preferenceIds(s.prefs.likedIngredients).has('chorizo'));s.pantry=[{id:'pork',qty:500,always:false}];assert.equal(C.stock(s,'chorizo'),0);
+});
+
+test('every recipe containing reviewed meat is excluded by vegetarian and pescatarian diets',()=>{
+ const meat=new Set(PLATES_DATA.preferenceFamilies.filter(f=>f.meat).flatMap(f=>f.members).concat(PLATES_DATA.unspecifiedMeatIngredients));
+ const recipes=R.filter(r=>r.ingredients.some(i=>meat.has(i.id)));assert.ok(recipes.length>100);
+ for(const r of recipes){assert.equal(r.kind,'meat',r.id);for(const diet of ['vegetarian','vegan','pescatarian'])assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet}),false,r.id+' '+diet);}
+});

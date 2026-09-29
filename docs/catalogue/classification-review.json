@@ -810,5 +810,46 @@
     "patch": {
       "kind": "fish"
     }
+  },
+  {
+    "id": "sp-gfmore-philly-cheesesteak",
+    "url": "https://www.bbcgoodfood.com/recipes/philly-cheesesteak",
+    "reviewedOn": "2026-09-29",
+    "reason": "Published beef/steak dish and included meat ingredient override an incorrect vegetarian or fish classification.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-recipetineats-beef-rice-noodles",
+    "url": "https://www.recipetineats.com/beef-rice-noodles/",
+    "reviewedOn": "2026-09-29",
+    "reason": "Published beef/steak dish and included meat ingredient override an incorrect vegetarian or fish classification.",
+    "patch": {
+      "kind": "meat"
+    }
+  },
+  {
+    "id": "sp-recipetineats-beef-steak-marinade",
+    "url": "https://www.recipetineats.com/beef-steak-marinade/",
+    "reviewedOn": "2026-09-29",
+    "reason": "Published beef/steak dish and included meat ingredient override an incorrect vegetarian or fish classification. The recipe includes and cooks two steaks, so it is a main rather than marinade alone.",
+    "patch": {
+      "kind": "meat",
+      "dishRole": "main",
+      "meals": [
+        "Lunch",
+        "Dinner"
+      ]
+    }
+  },
+  {
+    "id": "sp-skinnytaste-thai-marinated-steak-salad",
+    "url": "https://www.skinnytaste.com/thai-marinated-steak-salad/",
+    "reviewedOn": "2026-09-29",
+    "reason": "Published beef/steak dish and included meat ingredient override an incorrect vegetarian or fish classification.",
+    "patch": {
+      "kind": "meat"
+    }
   }
 ]
