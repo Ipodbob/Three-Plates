@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 178 checks: 31 core regressions, 39 added domain checks,
-23 catalogue checks, 55 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 186 checks: 31 core regressions, 44 added domain checks,
+23 catalogue checks, 58 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -46,8 +46,8 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.10.0 was verified live after PR #8 (merge 74aa34e, successful
-Pages run 36500344765 and all 18 checked public assets matched). The fallback shares 100 requests per
+frontend v3.11.0 was verified live after PR #9 (merge 20b7729, successful
+Pages run 36501405285 and all 21 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
@@ -146,7 +146,7 @@ checks, plus the existing regression suite. Implementation references:
 [Screen Wake Lock specification](https://www.w3.org/TR/screen-wake-lock/) and
 [MDN timer throttling](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout#reasons_for_delays_longer_than_specified).
 
-## Combined prep checklist (current feature branch)
+## Combined prep checklist (released in v3.11.0)
 
 Plan > Prep checklist combines the ingredients for up to 20 selected meals and
 batches. Select by recipe, meal or date, then gather from one searchable list.
@@ -164,6 +164,20 @@ Ten domain/connected UI checks cover totals, stored portions, changes, failed
 saves, restoration and independence from pantry/cooking state. The browser
 verified 450 g pasta split into 180 g and 270 g, saved checks after reload, the
 320px ingredient search/breakdown, and removal of finished meal quantities.
+
+## Large-history preservation (current feature branch)
+
+Reload no longer truncates custom products at 500 or meal plans at 1,000, and
+histories over 1,000 batches/containers can load. Menu copies no longer require
+deleting older meals. Invalid v3 stock, purchase or meal records reject the restore
+instead of silently disappearing; original saved data stays available for export.
+Legacy v1 migration is retained. Backup import accepts files up to 20 MB, with
+normal validation and an explicit replacement confirmation; failed storage writes
+do not replace current data.
+
+Regression checks cover 601 custom products, 1,101 meals, 1,002 batch containers,
+late reservations and a formatted backup containing 9,000 meals larger than 2 MB.
+Cooking progress, prep choices, purchase history and quantities round-trip.
 
 ## Saved data
 
@@ -226,9 +240,9 @@ of cooking. Plan stored portions after cooking; advance allocation is a backlog 
 
 ## Verification and release status
 
-The latest verified release is v3.10.0 at `74aa34e` (PR #8): Pages run
-36500344765 succeeded, all 20 checked public assets matched, and the live app
-displayed v3.10.0. The current prep-checklist changes await their own release
+The latest verified release is v3.11.0 at `20b7729` (PR #9): Pages run
+36501405285 succeeded, all 21 checked public assets matched, and the live app
+displayed v3.11.0. The current history-preservation fixes await release
 verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
 
 The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:

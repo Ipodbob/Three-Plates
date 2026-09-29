@@ -1536,8 +1536,8 @@
   async function importData(file) {
     if (!file) return;
     try {
-      if (file.size > 2e6)
-        throw Error("Backup is too large. Use a file below 2 MB.");
+      if (file.size > 20e6)
+        throw Error("Backup is too large. Use a file below 20 MB.");
       const next = C.migrate(JSON.parse(await file.text()), R, I);
       const currentSaved = localStorage.getItem(KEY);
       confirmAction(

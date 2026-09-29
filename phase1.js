@@ -145,6 +145,26 @@
         throw Error("Invalid " + key + " records.");
     const s = original.migrate(raw, recipes, baseIngredients),
       ingredients = { ...baseIngredients, ...s.custom };
+    if (raw.version === 3) {
+      for (const key of ["custom", "bought"])
+        if (
+          raw[key] !== undefined &&
+          (!raw[key] || typeof raw[key] !== "object" || Array.isArray(raw[key]))
+        )
+          throw Error(
+            "Invalid " + key + " records. Original data has not been replaced.",
+          );
+      for (const key of ["pantry", "plans"])
+        if ((raw[key]?.length || 0) !== s[key].length)
+          throw Error(
+            "Invalid " + key + " record. Original data has not been replaced.",
+          );
+      for (const key of ["custom", "bought"])
+        if (Object.keys(raw[key] || {}).length !== Object.keys(s[key]).length)
+          throw Error(
+            "Invalid " + key + " record. Original data has not been replaced.",
+          );
+    }
     if (
       (raw.lots?.length || 0) !== s.lots.length ||
       (raw.batches?.length || 0) !== s.batches.length

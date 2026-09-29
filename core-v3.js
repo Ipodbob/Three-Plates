@@ -164,7 +164,7 @@
       throw Error("Use a Three Plates version 1 or 3 backup.");
     const s = defaults(),
       ids = new Set(recipes.map((r) => r.id));
-    for (const [id, i] of Object.entries(raw.custom || {}).slice(0, 500))
+    for (const [id, i] of Object.entries(raw.custom || {}))
       if (
         idOK(id) &&
         id.startsWith("custom-") &&
@@ -287,10 +287,7 @@
       if (ing.has(id) && Number.isFinite(v) && v >= 0 && v <= 1e7)
         s.bought[id] = v;
     const batchIds = new Set();
-    for (const b of (Array.isArray(raw.batches) ? raw.batches : []).slice(
-      0,
-      1000,
-    ))
+    for (const b of Array.isArray(raw.batches) ? raw.batches : [])
       if (
         b &&
         idOK(b.id) &&
@@ -309,7 +306,7 @@
         batchIds.add(b.id);
       }
     const lotIds = new Set();
-    for (const l of (Array.isArray(raw.lots) ? raw.lots : []).slice(0, 1000))
+    for (const l of Array.isArray(raw.lots) ? raw.lots : [])
       if (
         l &&
         idOK(l.id) &&
@@ -345,7 +342,7 @@
       }
     const slots = new Set(),
       planIds = new Set();
-    for (const p of (Array.isArray(raw.plans) ? raw.plans : []).slice(0, 1000))
+    for (const p of Array.isArray(raw.plans) ? raw.plans : [])
       if (
         p &&
         ids.has(p.recipeId) &&
