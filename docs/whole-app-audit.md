@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 20b7729 (PR #9): Pages run 36501405285 succeeded, all 21 checked public assets matched v3.11.0, and the live Plan/prep entry displayed v3.11.0. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 04940c7 (PR #10): Pages run 36502234280 succeeded, all 21 checked public assets matched v3.11.1, and live Settings displayed v3.11.1. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -27,9 +27,11 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 
 - Released v3.11.0 adds a saved, searchable combined ingredient checklist for up to 20 meals/batches, with per-recipe amounts and cooking links. Stored meals add fresh sides only. Changes invalidate affected ready checks, and finished/removed meals leave the totals. Prep checks never change pantry, cooking progress, timers or finish status.
 
-- Branch fix/preserve-large-histories removes remaining count cutoffs for custom products, meals, batches and lots. Damaged v3 records fail safely before saved data replacement. The formatted-backup limit increases from 2 MB to 20 MB, and menu copies can extend histories beyond 1,000 meals.
+- Released v3.11.1 removes remaining count cutoffs for custom products, meals, batches and lots. Damaged v3 records fail safely before saved data replacement. The formatted-backup limit increases from 2 MB to 20 MB, and menu copies can extend histories beyond 1,000 meals.
 
 ## Verification evidence
+- v3.11.2 branch: all 190 checks passed. Four new DOM regressions verify 1,101 finished records render in pages of 20, search reaches older records, saves remain unchanged, and native/button dialog closure restores focus after rerender. Real browser: finished a synthetic meal, searched its ISO date, cleared the search, and closed its recipe back to the Recipe button. Search controls were inspected at 320px. Isolated port-4174 data only.
+
 - Large-history fix: all 186 checks passed, including eight new domain/connected UI regressions. Verified 601 custom products, 1,101 meals, 1,002 batches/lots and a formatted 9,000-meal backup above 2 MB. Connected UI proves a later preference save retains every custom stock record and damaged stock leaves the original saved text untouched.
 - Correction browser check: recorded five refrigerated portions, discarded one, then corrected back to five. The increase control stopped at capacity; cooking time/deadline stayed unchanged and the result survived reload. The correction form's stepper and date/time field were visually inspected at 320px. Isolated port-4174 records only.
 
@@ -60,7 +62,7 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Continue remaining correction-dialog checks (partial discard/capacity restoration now verified at 320px). The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
 - Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
-- The handover's cooking aids and combined prep are released. Large-history fixes await release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- The handover's cooking aids and combined prep are released. Large-history preservation is released; history navigation and focus changes await release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate

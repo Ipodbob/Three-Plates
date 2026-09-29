@@ -46,6 +46,94 @@ function app(seed) {
   };
 }
 const tick = () => new Promise((r) => setImmediate(r));
+function route(a, name) {
+  a.w.location.hash = name;
+  a.w.dispatchEvent(new a.w.HashChangeEvent("hashchange"));
+}
+function meals(s, C, count = 45) {
+  for (let n = 0; n < count; n++)
+    s.plans.push({
+      id: "meal" + n,
+      recipeId: "pesto-pea-pasta",
+      date: C.addDays("2025-01-01", n),
+      meal: "Dinner",
+      serveTime: "18:30",
+      servings: 2,
+      kind: "cook",
+      lotId: null,
+      side: "none",
+      cooked: true,
+    });
+}
+test("finished history initially renders only twenty newest records and older meals keep focus and saved data", () => {
+  const a = app((s, C) => meals(s, C, 1101));
+  route(a, "plan");
+  const before = a.w.localStorage.getItem("three-plates-v3");
+  assert.equal(a.w.document.querySelectorAll(".finished-record").length, 20);
+  assert.equal(a.q(".finished-record").dataset.historyId, "meal1100");
+  a.q("#finished-history").open = true;
+  a.q('[data-act="finished-more"]').focus();
+  a.q('[data-act="finished-more"]').click();
+  assert.equal(a.w.document.querySelectorAll(".finished-record").length, 40);
+  assert.equal(a.w.document.activeElement.dataset.historyId, "meal1080");
+  assert.equal(a.q("#finished-history").open, true);
+  assert.equal(a.w.localStorage.getItem("three-plates-v3"), before);
+  a.dom.window.close();
+});
+test("finished-meal search reaches records outside the rendered page and can clear without deleting history", () => {
+  const a = app(meals);
+  route(a, "plan");
+  a.q("#finished-history").open = true;
+  a.q("#finished-search").value = "2025-01-01";
+  a.q("#finished-search-form").dispatchEvent(
+    new a.w.Event("submit", { bubbles: true, cancelable: true }),
+  );
+  assert.equal(a.w.document.querySelectorAll(".finished-record").length, 1);
+  assert.equal(a.q(".finished-record").dataset.historyId, "meal0");
+  assert.equal(a.w.document.activeElement.id, "finished-search");
+  a.q('[data-act="finished-clear"]').click();
+  assert.equal(a.w.document.querySelectorAll(".finished-record").length, 20);
+  assert.equal(a.state().plans.length, 45);
+  a.dom.window.close();
+});
+test("modal close returns to the recreated opener after a save rerenders its page", () => {
+  const a = app((s, C) => meals(s, C, 1));
+  route(a, "plan");
+  a.q("#finished-history").open = true;
+  const opener = a.q('[data-act="recipe"]');
+  opener.focus();
+  opener.click();
+  assert.equal(a.w.document.activeElement.dataset.act, "close");
+  // A data update can rerender the page behind an open dialog.
+  a.w.dispatchEvent(
+    new a.w.StorageEvent("storage", {
+      key: "three-plates-v3",
+      newValue: a.original,
+    }),
+  );
+  assert.equal(opener.isConnected, false);
+  a.q('[data-act="close"]').click();
+  assert.equal(a.w.document.activeElement.dataset.act, "recipe");
+  assert.equal(a.w.document.activeElement.dataset.record, "meal0");
+  a.dom.window.close();
+});
+test("native dialog close returns keyboard focus and a new dialog focuses its Close button", () => {
+  const a = app();
+  route(a, "plan");
+  const opener = a.q('[data-act="prep"]');
+  opener.focus();
+  opener.click();
+  a.q("#sheet").close();
+  assert.equal(a.w.document.activeElement, opener);
+  route(a, "you");
+  const reset = a.q('[data-act="reset"]');
+  reset.focus();
+  reset.click();
+  assert.equal(a.w.document.activeElement.dataset.act, "close");
+  a.q("#sheet").close();
+  assert.equal(a.w.document.activeElement, reset);
+  a.dom.window.close();
+});
 test("a normal preference save after loading 601 custom products retains every stock amount", () => {
   const a = app((s) => {
     for (let n = 0; n < 601; n++) {
