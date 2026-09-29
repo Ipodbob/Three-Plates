@@ -89,6 +89,7 @@
   let route = location.hash.slice(1) || "choose",
     pantryTab = "ingredients",
     pantryQuery = "",
+    searchDrafts = { choose: null, batch: null },
     finishedQuery = "",
     finishedCount = 20,
     dialogReturn = null,
@@ -268,7 +269,8 @@
       toast(storageError);
       return false;
     }
-    const before = C.clone(state);
+    const before = C.clone(state),
+      beforeDrafts = { ...searchDrafts };
     try {
       fn();
       const saved = persist();
@@ -279,6 +281,7 @@
       return true;
     } catch (err) {
       state = before;
+      searchDrafts = beforeDrafts;
       if (storageError) render();
       toast(err.message || "Could not save that change.");
       return false;
@@ -474,8 +477,9 @@
     )}${choices("method", "Cooking method", methods)}<p class="helper">Prep time is shown on each recipe. Larger batches can take longer.</p></section>`;
   }
   function searchBox(batch) {
-    const f = currentFilters(batch);
-    return `<form id="search-form" class="recipe-search" data-batch="${batch}"><label class="sr-only" for="recipe-search">Search recipes or ingredients</label><input id="recipe-search" type="search" maxlength="100" placeholder="Search dishes, ingredients or styles" aria-describedby="search-help" value="${e(f.query)}"><button class="icon-btn" aria-label="Search recipes" type="submit">${icon("search")}</button>${f.query ? btn("Clear", "clear-search", "", "ghost") : ""}</form><p id="search-help" class="helper">Try traybake, soup, pastry, savoury, simple or complex. Your meal, time and food filters still apply.</p>${["Baking", "Dessert"].includes(f.meal) ? '<p class="helper">Cakes, breads and other bakes start at the full recipe yield, regardless of headcount. You can adjust the quantity in the recipe.</p>' : ""}`;
+    const f = currentFilters(batch),
+      query = searchDrafts[batch ? "batch" : "choose"] ?? f.query;
+    return `<form id="search-form" class="recipe-search" data-batch="${batch}"><label class="sr-only" for="recipe-search">Search recipes or ingredients</label><input id="recipe-search" type="search" maxlength="100" placeholder="Search dishes, ingredients or styles" aria-describedby="search-help" value="${e(query)}"><button class="icon-btn" aria-label="Search recipes" type="submit">${icon("search")}</button>${btn("Clear", "clear-search", "", "ghost")}</form><p id="search-help" class="helper">Try traybake, soup, pastry, savoury, simple or complex. Your meal, time and food filters still apply.</p>${["Baking", "Dessert"].includes(f.meal) ? '<p class="helper">Cakes, breads and other bakes start at the full recipe yield, regardless of headcount. You can adjust the quantity in the recipe.</p>' : ""}`;
   }
   function card(r, batch) {
     const key = batch ? "batch" : "choose",
@@ -1614,6 +1618,7 @@
               );
             localStorage.setItem(KEY, JSON.stringify(next));
             state = next;
+            searchDrafts = { choose: null, batch: null };
             blocked = false;
             storageError = "";
             clearChoices();
@@ -1856,6 +1861,7 @@
       if (!item) return;
       const ok = change(
         () => {
+          searchDrafts.choose = null;
           state.filters.query = item.name;
           clearChoices();
         },
@@ -1928,6 +1934,7 @@
         blocked = false;
         storageError = "";
         state = C.defaults();
+        searchDrafts = { choose: null, batch: null };
         clearChoices();
         render();
         toast("Local data deleted.");
@@ -2037,9 +2044,11 @@
             );
             break;
           case "clear-search":
+            searchDrafts[key] = null;
             (batch ? state.batchFilters : state.filters).query = "";
             break;
           case "reset-filters":
+            searchDrafts[key] = null;
             Object.assign(batch ? state.batchFilters : state.filters, {
               query: "",
               time: "any",
@@ -2112,6 +2121,13 @@
       ].includes(act),
     );
   }
+  document.addEventListener("input", (ev) => {
+    if (ev.target.id === "recipe-search") {
+      const key =
+        ev.target.closest("form").dataset.batch === "true" ? "batch" : "choose";
+      searchDrafts[key] = ev.target.value.slice(0, 100);
+    }
+  });
   document.addEventListener("change", (ev) => {
     const t = ev.target,
       id = t.id;
@@ -2210,8 +2226,10 @@
       return;
     }
     if (form.id === "search-form") {
+      const draftKey = form.dataset.batch === "true" ? "batch" : "choose";
       change(
         () => {
+          searchDrafts[draftKey] = null;
           (form.dataset.batch === "true"
             ? state.batchFilters
             : state.filters

@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 192 checks: 31 core regressions, 44 added domain checks,
-25 catalogue checks, 62 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 195 checks: 31 core regressions, 44 added domain checks,
+25 catalogue checks, 65 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -249,12 +249,18 @@ no-bake recipes now have corrected methods and concise heat/preparation notes;
 no-bake recipes which boil a mixture or cook custard remain under Hob. Evidence
 and publisher links are in `docs/catalogue/classification-review.json`.
 
+Unsubmitted recipe text survives filters, headcount changes and navigation in
+the current session. Choose and Batch keep independent drafts; Search applies
+and saves the text. Clear/reset, backup restore and pantry recipe shortcuts
+replace drafts deliberately. Failed saves retain drafts for retry. Drafts are
+not persisted on every keystroke or restored after a full page reload.
+
 ## Verification and release status
 
-The latest verified release is v3.11.2 at `2cfa0f7` (PR #11): Pages run
-36503126271 succeeded, all 21 checked public assets matched, and the live app
-displayed v3.11.2. The current v3.11.3 no-bake method and longer-time filter
-changes await release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
+The latest verified release is v3.11.3 at `81cc46a` (PR #12): Pages run
+36503735803 succeeded, all 21 checked public assets matched, and a fresh live
+navigation displayed v3.11.3. The current v3.11.4 search-draft changes await
+release verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
 
 The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:
 all six destinations fit without horizontal overflow or fields leaving the viewport.
