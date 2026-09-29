@@ -253,3 +253,25 @@ test("specific seafood preferences cover their own forms without excluding unrel
     true,
   );
 });
+
+test('broad meat exclusions cover reviewed imported cuts and stocks without changing stock',()=>{
+ const audit=require('../docs/catalogue/meat-preferences.json');
+ for(const family of audit.families){
+  const s=C.defaults();s.prefs.exclusions=family.anchors;
+  for(const ingredient of family.members){
+   assert.deepEqual(I[ingredient.id],ingredient);
+   for(const r of R.filter(r=>r.ingredients.some(i=>i.id===ingredient.id))) assert.equal(C.foodAllowed(r,s.prefs),false,r.id);
+  }
+  assert.deepEqual(C.migrate(s,R,I).prefs.exclusions,family.anchors);
+ }
+ const chicken=C.preferenceIds(['chicken','chicken-thigh']);
+ assert.ok(chicken.has('ex-ground-chicken-06bee616'));
+ assert.equal(chicken.has('ex-vegan-chicken-pieces-d9355e4b'),false);
+ const beef=C.preferenceIds(['beef','beef-mince']);
+ assert.ok(beef.has('ex-thin-cut-minute-steak-afec6c06'));
+ for(const id of ['lamb','steak-seasoning','ex-pork-shoulder-steaks-5400764f'])assert.equal(beef.has(id),false);
+ const pork=C.preferenceIds(['pork','sausages']);
+ assert.ok(pork.has('ex-ham-cc3ff06f'));
+ assert.equal(pork.has('ex-graham-cracker-crumbs-e70a0fa5'),false);
+ const s=C.defaults();s.pantry=[{id:'chicken',qty:500,always:false}];assert.equal(C.stock(s,'ex-ground-chicken-06bee616'),0);
+});

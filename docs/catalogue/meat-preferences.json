@@ -1,0 +1,940 @@
+{
+  "reviewed": "2026-09-29",
+  "basis": "Explicit catalogue ingredient names and unambiguous named cuts; static IDs used at runtime. Preference matching only, never stock conversion.",
+  "limits": "Unspecified sausages and mixed cured meats require publisher review. Vegan chicken, lamb/pork steaks and steak seasoning are excluded from the beef mapping; graham crackers are excluded from pork.",
+  "families": [
+    {
+      "name": "Chicken",
+      "anchors": [
+        "chicken",
+        "chicken-thigh"
+      ],
+      "members": [
+        {
+          "id": "chicken",
+          "name": "Chicken breast",
+          "group": "Meat & fish",
+          "unit": "g"
+        },
+        {
+          "id": "chicken-thigh",
+          "name": "Boneless chicken thighs",
+          "group": "Meat & fish",
+          "unit": "g"
+        },
+        {
+          "id": "chicken-breast-count",
+          "name": "Chicken breasts",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "chicken-thigh-count",
+          "name": "Boneless chicken thighs",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "chicken-thigh-bone",
+          "name": "Bone-in chicken thighs",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "whole-chicken",
+          "name": "Whole chicken",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "chicken-stock",
+          "name": "Prepared chicken stock",
+          "unit": "ml",
+          "group": "Staples"
+        },
+        {
+          "id": "chicken-stock-cube",
+          "name": "Chicken stock cubes",
+          "unit": "each",
+          "group": "Staples"
+        },
+        {
+          "id": "ex-boneless-and-skinless-chicken-thighs-e12206cc",
+          "name": "Boneless and skinless chicken thighs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-stock-pot-55e1d287",
+          "name": "Chicken stock pot (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-low-salt-chicken-stock-2e39c1d4",
+          "name": "Low salt chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-skinless-chicken-thighs-2c2e2be9",
+          "name": "Boneless skinless chicken thighs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-livers-a7f7c493",
+          "name": "Chicken livers",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-fresh-chicken-stock-6bd878bb",
+          "name": "Fresh chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-low-salt-chicken-stock-5ac0f721",
+          "name": "Low-salt chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-chicken-thigh-750770b2",
+          "name": "Boneless chicken thigh",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-low-sodium-chicken-stock-52bbf67e",
+          "name": "Low-sodium chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-wings-5812fa3e",
+          "name": "Chicken wings (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-skinless-boneless-chicken-thighs-6fed608d",
+          "name": "Skinless boneless chicken thighs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-mini-fillets-b861916c",
+          "name": "Chicken mini fillets",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-dbe196c4",
+          "name": "Chicken (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-cooked-skinless-chicken-breasts-1ee4e665",
+          "name": "Cooked skinless chicken breasts (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-drumsticks-9ec39a45",
+          "name": "Chicken drumsticks (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-unsalted-chicken-stock-e334b367",
+          "name": "Unsalted chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-thighs-f9f4a37a",
+          "name": "Chicken thighs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-skinless-chicken-breasts-e5024b3d",
+          "name": "Boneless skinless chicken breasts (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-drumsticks-01a4789a",
+          "name": "Chicken drumsticks",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-chicken-breasts-574ed814",
+          "name": "Boneless chicken breasts",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-wings-drumettes-a79924c9",
+          "name": "Chicken wings & drumettes",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-good-quality-whole-chicken-28886fd7",
+          "name": "Good quality whole chicken",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-whole-chicken-f4f40712",
+          "name": "Whole chicken (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-breasts-1db2e96b",
+          "name": "Chicken breasts",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-skinless-chicken-breasts-138587eb",
+          "name": "Boneless skinless chicken breasts",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-split-chicken-breasts-515c83cc",
+          "name": "Split chicken breasts (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-skinless-chicken-breast-afe56ae2",
+          "name": "Boneless skinless chicken breast (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-skinless-chicken-thighs-26893a35",
+          "name": "Skinless chicken thighs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-stock-cube-crumbled-2497d7f9",
+          "name": "Chicken stock cube crumbled (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-skinless-chicken-thighs-f62c145e",
+          "name": "Boneless skinless chicken thighs",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-leftover-roast-chicken-shredded-81a82462",
+          "name": "Leftover roast chicken shredded",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-and-skinless-chicken-thighs-3ea0a139",
+          "name": "Boneless and skinless chicken thighs",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-skinless-and-boneless-chicken-breast-ce86b250",
+          "name": "Skinless and boneless chicken breast (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-legs-a69e6b1e",
+          "name": "Chicken legs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-skin-on-chicken-thighs-41d3f81e",
+          "name": "Skin-on chicken thighs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-skin-on-bone-in-chicken-thighs-efaca27a",
+          "name": "Skin-on bone-in chicken thighs",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-thighs-skin-on-9cb9c331",
+          "name": "Chicken thighs skin on (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-rotisserie-chicken-3220f508",
+          "name": "Rotisserie chicken (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-cooked-chicken-09eae3f6",
+          "name": "Cooked chicken",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boiling-hot-stock-chicken-be01b180",
+          "name": "Boiling hot stock chicken",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-cooked-chicken-fillets-9a1490a2",
+          "name": "Cooked chicken fillets",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-bone-in-chicken-thighs-and-drumsticks-761f276c",
+          "name": "Bone-in chicken thighs and drumsticks",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-skin-on-bone-in-chicken-thighs-60fcb9d4",
+          "name": "Skin-on bone-in chicken thighs (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-cooked-skinless-chicken-breasts-shredded-f53c95c8",
+          "name": "Cooked skinless chicken breasts shredded (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-skinless-chicken-breast-fillet-0206fb6a",
+          "name": "Skinless chicken breast fillet (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-bone-in-chicken-thighs-skin-and-any-fat-remov-44907f8f",
+          "name": "Bone-in chicken thighs skin and any fat removed (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-stock-made-with-low-salt-chicken-stoc-e30e69b0",
+          "name": "Chicken stock made with low-salt chicken stock cube",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-s-chicken-stock-a0490dc2",
+          "name": "S chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-thighs-skin-on-and-bone-in-7e99321e",
+          "name": "Chicken thighs skin on and bone in (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-cooked-chicken-breasts-54a0a48e",
+          "name": "Cooked chicken breasts (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-reduced-sodium-chicken-stock-c8c80832",
+          "name": "Reduced-sodium chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-ground-chicken-06bee616",
+          "name": "Ground chicken",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-tenders-02a6d542",
+          "name": "Chicken tenders (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-wingettes-and-drumettes-74f6f517",
+          "name": "Chicken wingettes and drumettes (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-low-sodium-chicken-stock-10373357",
+          "name": "Low sodium chicken stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-tenderloins-cb5756fe",
+          "name": "Chicken tenderloins (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-and-skinless-chicken-breasts-f5148d99",
+          "name": "Boneless and skinless chicken breasts",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-skinless-chicken-breast-aeea65a5",
+          "name": "Boneless skinless chicken breast",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-low-sodium-chicken-stock-71b0b3ff",
+          "name": "Low sodium chicken stock",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-bone-in-chicken-drumsticks-c75afe54",
+          "name": "Bone-in chicken drumsticks (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chicken-thighs-871b706e",
+          "name": "Chicken thighs",
+          "unit": "g",
+          "group": "Meat & fish"
+        }
+      ]
+    },
+    {
+      "name": "Beef",
+      "anchors": [
+        "beef",
+        "beef-mince"
+      ],
+      "members": [
+        {
+          "id": "beef",
+          "name": "Stewing beef",
+          "group": "Meat & fish",
+          "unit": "g"
+        },
+        {
+          "id": "beef-mince",
+          "name": "Beef mince",
+          "group": "Meat & fish",
+          "unit": "g"
+        },
+        {
+          "id": "beef-stock-cube",
+          "name": "Beef stock cubes",
+          "unit": "each",
+          "group": "Staples"
+        },
+        {
+          "id": "beef-stock",
+          "name": "Prepared beef stock",
+          "unit": "ml",
+          "group": "Staples"
+        },
+        {
+          "id": "ex-thin-cut-minute-steak-afec6c06",
+          "name": "Thin-cut minute steak",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-concentrated-liquid-beef-stock-c5d3cd0b",
+          "name": "Concentrated liquid beef stock",
+          "unit": "tsp",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-sirloin-steaks-5a9d9137",
+          "name": "Sirloin steaks (count)",
+          "unit": "each",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-lean-beef-mince-3f381f50",
+          "name": "Lean beef mince",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-rump-steak-aaac0a8d",
+          "name": "Rump steak",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-rich-beef-stock-06f07332",
+          "name": "Rich beef stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-meatballs-049841c5",
+          "name": "Beef meatballs",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-strips-bf9cd0d4",
+          "name": "Beef strips",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chuck-steak-50029c55",
+          "name": "Chuck steak",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-beef-brisket-8c3a00a6",
+          "name": "Beef brisket",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-corned-beef-6aade533",
+          "name": "Corned beef",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-finger-meat-c5ff4d34",
+          "name": "Beef finger meat",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-lean-ground-beef-ba56b4c0",
+          "name": "Lean ground beef",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-well-marbled-chuck-steak-839d286d",
+          "name": "Well marbled chuck steak",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-ground-beef-0ce713cf",
+          "name": "Ground beef",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-chuck-roast-c5775b8a",
+          "name": "Beef chuck roast",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-broth-9ef6e4d1",
+          "name": "Beef broth",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-stew-meat-1705b4a6",
+          "name": "Beef stew meat",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-steak-mince-aa57196d",
+          "name": "Steak mince",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-minced-beef-b9f56145",
+          "name": "Minced beef",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-warm-beef-stock-86d27c1a",
+          "name": "Warm beef stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-stewing-628fd0a4",
+          "name": "Beef stewing",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-slices-corned-beef-93fb15a4",
+          "name": "Slices corned beef (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-roasting-joint-0c86db29",
+          "name": "Beef roasting joint",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-lean-minced-beef-5857c6b0",
+          "name": "Lean minced beef",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-top-round-steak-07150f9a",
+          "name": "Top round steak",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-chuck-beef-a55d94f9",
+          "name": "Chuck beef",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-cheeks-d785cd5a",
+          "name": "Beef cheeks",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-broth-stock-e4d0f462",
+          "name": "Beef broth/stock",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chuck-beef-stew-meat-8b077828",
+          "name": "Chuck beef stew meat",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-beef-chuck-roast-1ba6a19e",
+          "name": "Boneless beef chuck roast",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-beef-bone-broth-ff789720",
+          "name": "Beef bone broth",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-low-sodium-beef-broth-c1354ad4",
+          "name": "Low sodium beef broth",
+          "unit": "ml",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-ground-sirloin-beef-62302618",
+          "name": "Ground sirloin beef",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-flank-steak-354eede3",
+          "name": "Flank steak",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-beef-top-sirloin-2be3265c",
+          "name": "Beef top sirloin",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-steaks-747c7530",
+          "name": "Steaks",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-steaks-c3f04e0f",
+          "name": "Steaks (count)",
+          "unit": "each",
+          "group": "Cupboard"
+        }
+      ]
+    },
+    {
+      "name": "Pork",
+      "anchors": [
+        "pork",
+        "sausages"
+      ],
+      "members": [
+        {
+          "id": "pork",
+          "name": "Pork shoulder",
+          "group": "Meat & fish",
+          "unit": "g"
+        },
+        {
+          "id": "sausages",
+          "name": "Pork sausages",
+          "group": "Meat & fish",
+          "unit": "each"
+        },
+        {
+          "id": "bacon",
+          "name": "Bacon rashers",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "bacon-lardons",
+          "name": "Bacon lardons",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-thick-slice-of-ham-3a4d8c7c",
+          "name": "Thick slice of ham (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-pork-leg-533e4d76",
+          "name": "Boneless pork leg",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-thick-pork-belly-pork-slices-f9510d94",
+          "name": "Thick pork belly pork slices",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-chunky-bacon-lardons-35fef56a",
+          "name": "Chunky bacon lardons",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-rashers-back-bacon-22dd9fc3",
+          "name": "Rashers back bacon (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-pancetta-cubes-35dc3db7",
+          "name": "Pancetta cubes",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-smoked-bacon-rashers-0fc51942",
+          "name": "Smoked bacon rashers (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-cooked-ham-carved-into-thick-slices-10c5a6d4",
+          "name": "Cooked ham carved into thick slices",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-slices-prosciutto-fat-removed-7ab0ce71",
+          "name": "Slices prosciutto fat removed (count)",
+          "unit": "each",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-pork-shoulder-steaks-5400764f",
+          "name": "Pork shoulder steaks (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-pork-tenderloin-65b5a225",
+          "name": "Pork tenderloin",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-rashers-smoked-back-bacon-f9f2bbba",
+          "name": "Rashers smoked back bacon (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-strips-bacon-88f3abb3",
+          "name": "Strips bacon (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-bacon-3e59b487",
+          "name": "Bacon",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-bone-in-well-marbled-pork-loin-center-chops-2f990278",
+          "name": "Bone-in well-marbled pork loin center chops (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-boneless-pork-butt-287e7167",
+          "name": "Boneless pork butt",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-pork-butt-6b22d5ad",
+          "name": "Pork butt",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-cubetti-di-pancetta-4826499e",
+          "name": "Cubetti di pancetta",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-cooked-crispy-bacon-rashers-broken-into-piece-3ff561a7",
+          "name": "Cooked crispy bacon rashers broken into pieces (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-streaky-bacon-ae83765c",
+          "name": "Streaky bacon",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-prosciutto-ee36bbcf",
+          "name": "Prosciutto",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-rashers-streaky-bacon-34439294",
+          "name": "Rashers streaky bacon (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-bacon-lardon-8dcbdde5",
+          "name": "Bacon lardon",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-slices-smoked-ham-ea0fb3da",
+          "name": "Slices smoked ham (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-pork-shoulder-skinless-and-boneless-af486e20",
+          "name": "Pork shoulder skinless and boneless",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-smoked-ham-torn-25cd9afb",
+          "name": "Smoked ham torn",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-thin-cut-pork-loin-steaks-21891701",
+          "name": "Thin-cut pork loin steaks (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-lard-3019229e",
+          "name": "Lard",
+          "unit": "g",
+          "group": "Cupboard"
+        },
+        {
+          "id": "ex-cooked-bacon-cbb4778e",
+          "name": "Cooked bacon",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-slices-bacon-429f9d43",
+          "name": "Slices bacon (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-ham-cc3ff06f",
+          "name": "Ham",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-center-cut-boneless-pork-chops-47c31867",
+          "name": "Center cut boneless pork chops (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-pork-loin-cutlets-9ade1158",
+          "name": "Pork loin cutlets",
+          "unit": "g",
+          "group": "Meat & fish"
+        },
+        {
+          "id": "ex-slices-center-cut-bacon-e85809ba",
+          "name": "Slices center cut bacon (count)",
+          "unit": "each",
+          "group": "Meat & fish"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.bbcgoodfood.com/recipes/philly-cheesesteak",
+      "ingredient": "ex-steaks-747c7530",
+      "basis": "Beef inferred from the named Philly cheesesteak dish and steak preparation; source ingredient says steaks."
+    },
+    {
+      "url": "https://www.recipetineats.com/beef-steak-marinade/",
+      "ingredient": "ex-steaks-c3f04e0f",
+      "basis": "Publisher explicitly describes beef steak."
+    }
+  ]
+}

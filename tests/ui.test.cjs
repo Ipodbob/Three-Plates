@@ -201,3 +201,13 @@ test('fish and seafood group stays compact across reload and can be removed with
  const a=app();a.route('you');a.set('#pref-exclusions','Fish & seafood');a.submit('.pref-form[data-key="exclusions"]');assert.equal(a.w.document.querySelectorAll('[data-act="pref-remove"][data-key="exclusions"]').length,1);assert.match(a.q('[data-act="pref-remove"][data-key="exclusions"]').textContent,/Fish & seafood/);
  a.set('#pref-exclusions','Garlic cloves');a.submit('.pref-form[data-key="exclusions"]');const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('you');assert.equal(b.w.document.querySelectorAll('[data-act="pref-remove"][data-key="exclusions"]').length,2);b.click('[data-act="pref-remove"][data-id="group-fish"]');assert.deepEqual(b.state().prefs.exclusions,['garlic']);a.dom.window.close();b.dom.window.close();
 });
+
+test('broad meat exclusions remain single removable chips after reload',()=>{
+ const a=app();a.route('you');
+ for(const label of ['Chicken — all cuts','Beef — all cuts','Pork — including sausages']){a.set('#pref-exclusions',label);a.submit('.pref-form[data-key="exclusions"]');}
+ a.set('#pref-exclusions','Garlic cloves');a.submit('.pref-form[data-key="exclusions"]');
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('you');
+ assert.equal(b.w.document.querySelectorAll('[data-act="pref-remove"][data-key="exclusions"]').length,4);
+ for(const id of ['group-chicken','group-beef','group-pork'])b.click('[data-act="pref-remove"][data-id="'+id+'"]');
+ assert.deepEqual(b.state().prefs.exclusions,['garlic']);a.dom.window.close();b.dom.window.close();
+});

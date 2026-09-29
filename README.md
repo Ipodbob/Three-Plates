@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 206 checks: 31 core regressions, 46 added domain checks,
-29 catalogue checks, 70 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 208 checks: 31 core regressions, 46 added domain checks,
+30 catalogue checks, 71 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -308,3 +308,12 @@ version live. The existing live baseline was inspected; Pages configuration is u
 - Finish whole-app dialog/correction checks and release verification for new changes.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,
   and physical-device/WebKit testing.
+
+## Meat preference coverage
+
+Chicken, beef and pork exclusions cover 149 reviewed ingredient variants, including
+imported cuts and stocks. Each broad exclusion appears as one removable chip.
+Existing saved anchor IDs remain valid; these mappings do not substitute pantry
+stock or convert quantities. Vegan chicken, unrelated steaks, seasoning and graham
+crackers stay outside the relevant families. The [review register](docs/catalogue/meat-preferences.json)
+records scope and remaining ambiguous sausage/cured-meat review.
