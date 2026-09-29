@@ -1,6 +1,6 @@
 # Current completion audit
 
-Reviewed 29 September 2026 against main `bf2c7d8e5a141504439ad6e1a7504b6847c7d8fd` (v3.11.52), with the v3.11.53 catalogue follow-up. This is a scope-and-evidence register, not a declaration that the whole product is complete. Earlier observations are retained in [whole-app-audit.md](whole-app-audit.md).
+Reviewed 29 September 2026 against main `600a1f36cfc8ac818ac0f3da584ad06ebbd79242` (v3.11.53), with the v3.11.54 Panettone follow-up. This is a scope-and-evidence register, not a declaration that the whole product is complete. Earlier observations are retained in [whole-app-audit.md](whole-app-audit.md).
 
 ## Authority and scope
 
@@ -10,9 +10,11 @@ The goal remains comprehensive, simple, consistent and functional across Choose,
 
 ## Current delivery evidence
 
-- Latest verified deployment: PR #65 merged v3.11.52 at the main commit above. Pages run [36542066120](https://github.com/Ipodbob/Three-Plates/actions/runs/36542066120) succeeded; all 21 checked public assets matched. Static GitHub Pages hosting and the case-sensitive /Three-Plates/ path are unchanged.
-- v3.11.53 candidate completes the 36-entry omitted-quantity review: 34 recipes corrected and two optional/conditional omissions retained. This follow-up corrects 19 recipes, including salt across main/dressing components, baking flavourings, chilli and missing watercress. It also restores 2.25-teaspoon oil/vinegar quantities that had been misread as 0.25. Watercress weight and the nominal heaped-salt amount are explicitly labelled planning estimates.
-- Targeted checks: 72 passed (71 catalogue/review/Phase 1 and one connected UI check for new flavouring/watercress shopping, purchase and reload). Full regression: **281 passed** (32 core plus 249 Node checks), zero failures, cancellations or skips; Node stage 160 seconds. Deployment is a separate check.
+- Latest verified deployment: PR #66 merged v3.11.53 at the main commit above. Pages run [36543131105](https://github.com/Ipodbob/Three-Plates/actions/runs/36543131105) succeeded; all 21 checked public assets matched. Static GitHub Pages hosting and the case-sensitive /Three-Plates/ path are unchanged.
+- v3.11.53 completes the 36-entry omitted-quantity review: 34 recipes corrected and two optional/conditional omissions retained. This follow-up corrects 19 recipes, including salt across main/dressing components, baking flavourings, chilli and missing watercress. It also restores 2.25-teaspoon oil/vinegar quantities that had been misread as 0.25. Watercress weight and the nominal heaped-salt amount are explicitly labelled planning estimates.
+- Previous release checks: 72 passed (71 catalogue/review/Phase 1 and one connected UI check for new flavouring/watercress shopping, purchase and reload). Full regression: **281 passed** (32 core plus 249 Node checks), zero failures, cancellations or skips; Node stage 160 seconds. Deployment is a separate check.
+- v3.11.54 candidate corrects Panettone topping sugar from two counted items to the publisher’s 32g and uses 255g dried fruit, consistent with the stated upper-range planning policy. Separate weighed sugar preserves legacy counted/spoon stock and exclusions. All 73 targeted checks passed (72 catalogue/review/Phase 1 plus one connected UI test with four shopping/purchase/reload cases). The full 281-check result above belongs to v3.11.53, not this candidate.
+- At 320px, corrected recipe and shopping quantities, wrapped ingredient labels and pack-editor actions were checked. The editor was closed without saving; the single synthetic Panettone plan was removed through its own action.
 - Browser records use isolated localhost:4174. Cleanup removes only test-created plans and portions through their individual UI actions; synthetic archived history remains. User origins and production data are not reset.
 
 ## Requirement-by-requirement evidence
