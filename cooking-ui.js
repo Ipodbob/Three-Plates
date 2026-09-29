@@ -43,8 +43,8 @@
         acquiring = false,
         wakeMessage = "";
       const state = () => view().saved || { checked: [], timers: [] };
-      const button = (label, action, value = "") =>
-        `<button type="button" class="button secondary" data-cook="${action}" data-value="${esc(value)}">${esc(label)}</button>`;
+      const button = (label, action, value = "", accessibleLabel = "") =>
+        `<button type="button" class="button secondary" data-cook="${action}" data-value="${esc(value)}"${accessibleLabel ? ` aria-label="${esc(accessibleLabel)}"` : ""}>${esc(label)}</button>`;
       const check = (key, label, checked, cls = "") =>
         `<label class="cook-check ${cls}"><input type="checkbox" data-cook-check="${esc(key)}" ${checked.includes(key) ? "checked" : ""}><span>${label}</span></label>`;
       function draw() {
@@ -74,13 +74,31 @@
       function drawTimers() {
         const node = panel.querySelector("#cooking-timers");
         if (!node) return;
+        const active = document.activeElement,
+          focused = node.contains(active) ? active.dataset : null,
+          oldIndex = focused
+            ? [...node.querySelectorAll('[data-cook="remove"]')].findIndex(
+                (b) => b.dataset.value === focused.value,
+              )
+            : -1;
         node.innerHTML = state()
           .timers.map(
             (t) =>
-              `<div class="cook-timer"><strong>${esc(t.label)}</strong><output role="timer" aria-live="off" data-timer-clock="${esc(t.id)}" aria-label="${esc(t.label)} remaining"></output><div class="action-wrap">${button(t.endAt === null ? "Resume" : "Pause", t.endAt === null ? "resume" : "pause", t.id)}${button("Remove " + t.label, "remove", t.id)}</div></div>`,
+              `<div class="cook-timer"><strong>${esc(t.label)}</strong><output role="timer" aria-live="off" data-timer-clock="${esc(t.id)}" aria-label="${esc(t.label)} remaining"></output><div class="action-wrap">${button(t.endAt === null ? "Resume" : "Pause", t.endAt === null ? "resume" : "pause", t.id, (t.endAt === null ? "Resume " : "Pause ") + t.label)}${button("Remove " + t.label, "remove", t.id)}</div></div>`,
           )
           .join("");
         tick();
+        if (focused) {
+          const controls = [...node.querySelectorAll("[data-cook]")],
+            sameTimer = controls.find(
+              (b) => b.dataset.value === focused.value &&
+                (focused.cook === "remove" ? b.dataset.cook === "remove" : b.dataset.cook !== "remove") &&
+                !b.disabled,
+            ),
+            removals = controls.filter((b) => b.dataset.cook === "remove"),
+            fallback = removals[Math.min(Math.max(oldIndex, 0), removals.length - 1)];
+          (sameTimer || fallback || panel.querySelector("#cooking-timer-label"))?.focus({ preventScroll: true });
+        }
       }
       function tick() {
         if (disposed || !panel.isConnected) return;

@@ -58,6 +58,51 @@ function app(saved, setup = () => {}) {
   return { dom, w, q, click, state };
 }
 const tick = () => new Promise((r) => setImmediate(r));
+
+test("timer controls retain keyboard focus across pause, resume and removal", (t) => {
+  const a = app();
+  t.after(() => a.dom.window.close());
+  a.click('[data-act="cooking"]');
+  for (const name of ["Pasta", "Sauce"]) {
+    a.q("#cooking-timer-label").value = name;
+    a.q("#cooking-timer-form").dispatchEvent(
+      new a.w.Event("submit", { bubbles: true, cancelable: true }),
+    );
+  }
+  const first = a.q('[data-cook="pause"]');
+  const id = first.dataset.value;
+  first.focus();
+  first.click();
+  assert.equal(a.w.document.activeElement.dataset.cook, "resume");
+  assert.equal(a.w.document.activeElement.dataset.value, id);
+  assert.equal(a.w.document.activeElement.getAttribute("aria-label"), "Resume Pasta");
+  a.w.document.activeElement.click();
+  assert.equal(a.w.document.activeElement.dataset.cook, "pause");
+  assert.equal(a.w.document.activeElement.getAttribute("aria-label"), "Pause Pasta");
+  a.q('[data-cook="remove"]').focus();
+  a.w.document.activeElement.click();
+  assert.equal(a.w.document.activeElement.textContent, "Remove Sauce");
+  a.w.document.activeElement.click();
+  assert.equal(a.w.document.activeElement.id, "cooking-timer-label");
+  assert.equal(a.state().cooking["plan:meal1"].timers.length, 0);
+  assert.equal(a.state().plans[0].cooked, false);
+  a.dom.window.close();
+});
+
+test("a failed timer save preserves focus and the original control", (t) => {
+  const a = app();
+  t.after(() => a.dom.window.close());
+  a.click('[data-act="cooking"]');
+  a.q("#cooking-timer-form").dispatchEvent(
+    new a.w.Event("submit", { bubbles: true, cancelable: true }),
+  );
+  const control = a.q('[data-cook="pause"]');
+  control.focus();
+  a.w.Storage.prototype.setItem = () => { throw Error("quota"); };
+  control.click();
+  assert.equal(a.w.document.activeElement, control);
+  assert.equal(a.q('[data-cook="resume"]'), null);
+});
 test("expired timer alerts clear on removal and shortcuts focus their headings", () => {
   let a = app();
   a.click('[data-act="cooking"]');

@@ -2,6 +2,12 @@
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Cooking timer keyboard continuity
+
+- Reproduced lost focus when Pause/Resume replaced the timer controls. Controls now retain focus on the same timer after a successful change; removing a timer selects the next remaining Remove control (or previous at the end), and removing the last returns to the timer-name field. Rebuilding timers does not move focus from elsewhere in the dialog.
+- Pause and Resume accessible names include the timer name, while their compact visible labels remain unchanged. Failed persistence keeps the original control and focus. Timer calculations, saved formats and pantry deductions are unchanged.
+- All 26 cooking/prep domain and connected UI checks passed. Regression failed before the change and passed afterward; browser verified Pause Pasta -> Resume Pasta -> Pause Pasta and final removal -> timer-name field. Temporary isolated localhost meal removed after checking. Physical phone and screen-reader interaction remain outstanding.
+
 ## Verified release baseline
 - Main 8367ded (PR #19): Pages run 36508219070 succeeded, all 21 checked public assets matched v3.11.10, and a fresh live navigation displayed v3.11.10. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
