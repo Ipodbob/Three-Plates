@@ -265,3 +265,12 @@ test('counted herb shopping shows bunches and retains the unused half after cook
  a.route('plan');a.click('[data-act="plan-finish"]');a.click('#confirm-action');assert.equal(a.state().pantry.find(i=>i.id===id).qty,0.5);
  const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('pantry');assert.match(b.q('main').textContent,/0.5 bunches/);a.dom.window.close();b.dom.window.close();
 });
+
+test('required unmeasured seasoning appears in recipe, shopping, copy, cooking and prep',async()=>{
+ const a=app();a.click('#f-time-any');a.q('#recipe-search').value='courgette soup';a.submit('#search-form');a.click('[data-act="recipe"][data-id="sp-gfmore-courgette-potato-cheddar-soup"]');assert.match(a.q('.sheet .unmeasured-ingredients').textContent,/nutmeg.*Check amount/i);a.click('.sheet [data-act="close"]');a.click('[data-act="plan-add"][data-id="sp-gfmore-courgette-potato-cheddar-soup"]');
+ a.route('shop');assert.match(a.q('.unmeasured-ingredients').textContent,/nutmeg.*Check amount/i);
+ let copied='';Object.defineProperty(a.w.navigator,'clipboard',{value:{writeText:async t=>{copied=t;}}});a.click('[data-act="copy-list"]');await new Promise(r=>setImmediate(r));assert.match(copied,/CHECK AMOUNT: Fresh nutmeg/);
+ a.route('plan');a.click('[data-act="cooking"]');assert.match(a.q('#cooking-panel .unmeasured-ingredients').textContent,/nutmeg/i);a.click('.sheet [data-act="close"]');
+ a.click('[data-act="prep"]');a.q('[name="prep-ref"]').checked=true;a.submit('#prep-select-form');assert.match(a.q('#prep-panel .unmeasured-ingredients').textContent,/nutmeg/i);
+ a.dom.window.close();
+});

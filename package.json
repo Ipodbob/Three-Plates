@@ -2,7 +2,7 @@
   "name": "three-plates",
   "private": true,
   "scripts": {
-    "test": "node tests/core-v3.test.cjs && node --test tests/phase1.test.cjs tests/ui.test.cjs tests/catalogue.test.cjs tests/barcode.test.cjs tests/barcode-ui.test.cjs tests/barcode-relay.test.cjs tests/server.test.cjs tests/menus.test.cjs tests/catalogue-review.test.cjs tests/sides.test.cjs tests/cooking.test.cjs tests/cooking-ui.test.cjs tests/prep.test.cjs tests/prep-ui.test.cjs tests/history.test.cjs tests/history-ui.test.cjs",
+    "test": "node tests/core-v3.test.cjs && node --test tests/phase1.test.cjs tests/ui.test.cjs tests/catalogue.test.cjs tests/barcode.test.cjs tests/barcode-ui.test.cjs tests/barcode-relay.test.cjs tests/server.test.cjs tests/menus.test.cjs tests/catalogue-review.test.cjs tests/sides.test.cjs tests/cooking.test.cjs tests/cooking-ui.test.cjs tests/prep.test.cjs tests/prep-ui.test.cjs tests/history.test.cjs tests/history-ui.test.cjs tests/unmeasured.test.cjs",
     "start": "node scripts/serve.cjs"
   },
   "devDependencies": {

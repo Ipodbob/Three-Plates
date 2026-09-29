@@ -361,6 +361,18 @@
     if (!r.planningNotes.includes(note))
       r.planningNotes = (r.planningNotes.trim() + " " + note).trim();
   }
+  // Required seasoning confirmed in the publisher's courgette soup method.
+  const soup = root.PLATES_DATA.recipes.find(
+    (r) => r.id === "sp-gfmore-courgette-potato-cheddar-soup",
+  );
+  if (soup)
+    soup.unmeasuredIngredients = [
+      {
+        id: "ex-fresh-nutmeg-8f09666c",
+        avoidIds: ["nutmeg", "ex-whole-nutmeg-07230ac5"],
+        note: "Freshly grate to season the soup. The publisher gives no measured amount; check what you have and follow the method.",
+      },
+    ];
   root.PLATES_DATA.unspecifiedFishIngredients = ["ex-dashi-a03a1e85"];
   // Reviewed preference aliases only; original recipe/stock records stay intact.
   root.PLATES_DATA.ingredientPreferenceAliases = {

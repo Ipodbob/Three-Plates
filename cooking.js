@@ -89,6 +89,9 @@
     function group(r, prefix, items, name) {
       groups.push({
         name,
+        ...(r?.unmeasuredIngredients?.length
+          ? { unmeasured: r.unmeasuredIngredients }
+          : {}),
         source: r?.source || null,
         ingredients: items.map((i, n) => ({
           ...i,

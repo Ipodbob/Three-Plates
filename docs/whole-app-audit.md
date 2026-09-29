@@ -234,3 +234,13 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Browser finished the synthetic meal and confirmed 0.5 bunch remains after reload. The isolated localhost test stock, purchase history and meal were cleared through Settings afterward.
 
 - Final validation: all 231 checks passed (32 core plus 199 Node test-runner checks), including the end-to-end bunch purchase/cook/reload test and all catalogue preservation checks.
+
+
+## Required ingredients without a measured amount
+
+- Added explicit unmeasured-ingredient metadata for the publisher-confirmed nutmeg in courgette soup. Shopping and copied lists now include a Check amount entry; recipe, Cooking and combined Prep show the same reminder separately from measured totals. No amount, purchase quantity or stock deduction is invented.
+- Active fresh plans, uncooked batches and fresh recipe sides contribute reminders. Finished meals and already-cooked stored mains do not. The same ingredient in multiple active recipes retains recipe context. Ingredient exclusions and search include these entries; No shopping excludes recipes needing an unknown amount. Favourite ranking includes the known ingredient identity without pretending a quantity.
+- Prep counts explicitly describe measured ingredients. Existing ordinary cooking signatures retain their prior shape; an affected recipe asks for an updated checklist after its required-ingredient information changes. Saved stock, quantities, backups and completed records retain their existing formats.
+- Domain/connected tests cover copy, search, exclusions, no-shopping, stored/fresh-side separation, unchanged stock, completion removal, stale affected checks and all displayed workflow stages. Browser verified Shopping, Cooking and Prep display the nutmeg reminder with the source method available. This mechanism currently covers reviewed metadata, not automatic interpretation of every remaining catalogue note.
+
+- Validation: full suite passed 236 checks (32 core and 204 Node checks). After the final favourite-ranking and side-search inclusion adjustment, four unmeasured-domain checks and the connected UI flow passed again. Browser test plan/prep state was cleared through Settings on isolated localhost.
