@@ -1,0 +1,84 @@
+{
+  "reviewedOn": "2026-09-29",
+  "scope": "Finite triage of numeric plus amounts still described as omitted in reviewed runtime notes. Heuristic: omission marker followed before a period by plus and a digit or half/one/two. This is not a complete ingredient or conversion audit; other omissions, fractions and wording can be missed. Pending means source decision outstanding, not a confirmed error.",
+  "entries": [
+    {
+      "recipeId": "gf2-easy-caramel-cake",
+      "source": "https://www.bbcgoodfood.com/recipes/easy-caramel-cake",
+      "status": "pending"
+    },
+    {
+      "recipeId": "gf2-hot-cross-buns-2",
+      "source": "https://www.bbcgoodfood.com/recipes/hot-cross-buns-2",
+      "status": "unchanged",
+      "decision": "Conditional dough adjustment; see finishing-ingredient-corrections.json unchanged record."
+    },
+    {
+      "recipeId": "gf2-hot-spicy-sweet-potatoes",
+      "source": "https://www.bbcgoodfood.com/recipes/hot-spicy-sweet-potatoes",
+      "status": "corrected",
+      "decision": "Source verified; exact items and notes in required-ingredient-corrections.json."
+    },
+    {
+      "recipeId": "gf2-lebanese-poussin-spiced-aubergine-pilaf",
+      "source": "https://www.bbcgoodfood.com/recipes/lebanese-poussin-spiced-aubergine-pilaf",
+      "status": "pending"
+    },
+    {
+      "recipeId": "gf2-lemon-sponge",
+      "source": "https://www.bbcgoodfood.com/recipes/lemon-sponge",
+      "status": "pending"
+    },
+    {
+      "recipeId": "gf2-new-york-cheesecake",
+      "source": "https://www.bbcgoodfood.com/recipes/new-york-cheesecake",
+      "status": "pending"
+    },
+    {
+      "recipeId": "gf2-next-level-chocolate-chip-cookies",
+      "source": "https://www.bbcgoodfood.com/recipes/next-level-chocolate-chip-cookies",
+      "status": "pending"
+    },
+    {
+      "recipeId": "gf2-peach-raspberry-almond-crumble-cake",
+      "source": "https://www.bbcgoodfood.com/recipes/peach-raspberry-almond-crumble-cake",
+      "status": "pending"
+    },
+    {
+      "recipeId": "gf2-roast-cod-paella-saffron-olive-oil",
+      "source": "https://www.bbcgoodfood.com/recipes/roast-cod-paella-saffron-olive-oil",
+      "status": "pending"
+    },
+    {
+      "recipeId": "gf2-smoked-trout-tartlets",
+      "source": "https://www.bbcgoodfood.com/recipes/smoked-trout-tartlets",
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-gfmore-microwave-garam-masala-vegetable-curry",
+      "source": "https://www.bbcgoodfood.com/recipes/microwave-garam-masala-vegetable-curry",
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-gfmore-raspberry-ripple-blondies",
+      "source": "https://www.bbcgoodfood.com/recipes/raspberry-ripple-blondies",
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-gfmore-spicy-tuna-wrap",
+      "source": "https://www.bbcgoodfood.com/recipes/spicy-tuna-wrap",
+      "status": "pending"
+    },
+    {
+      "recipeId": "sp-sally-double-chocolate-banana-bread",
+      "source": "https://sallysbakingaddiction.com/double-chocolate-banana-bread/",
+      "status": "corrected",
+      "decision": "Source verified; exact items and notes in required-ingredient-corrections.json."
+    },
+    {
+      "recipeId": "sp-sally-soft-chewy-chocolate-chip-cookie-bars",
+      "source": "https://sallysbakingaddiction.com/soft-chewy-chocolate-chip-cookie-bars/",
+      "status": "pending"
+    }
+  ]
+}

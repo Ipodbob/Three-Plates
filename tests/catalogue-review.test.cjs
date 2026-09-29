@@ -465,7 +465,7 @@ test('readable ingredient labels uniquely resolve the catalogue and reject ambig
 });
 
 test('required flour, citrus, honey and cooking oil remain in shopping and deduct only once',()=>{
- const expected=[['gf2-next-level-carrot-cake','ex-rye-flour-d9f0eba1',50],['gf2-chicken-gyros','lemon',1.5],['sp-gfmore-chicken-mango-noodle-salad','lime',2],['sp-gfmore-chicken-mango-noodle-salad','honey',20],['sp-gfmore-spinach-falafel-hummus-bowl','lemon',1],['sp-gfmore-pasta-e-fagioli','olive-oil',30]];
+ const expected=[['gf2-next-level-carrot-cake','ex-rye-flour-d9f0eba1',50],['gf2-chicken-gyros','lemon',1.5],['sp-gfmore-chicken-mango-noodle-salad','lime',2],['sp-gfmore-chicken-mango-noodle-salad','honey',20],['sp-gfmore-spinach-falafel-hummus-bowl','lemon',1],['sp-gfmore-pasta-e-fagioli','olive-oil',30],['gf2-hot-spicy-sweet-potatoes','sweet-potato',1000],['gf2-hot-spicy-sweet-potatoes','thyme',2],['sp-sally-double-chocolate-banana-bread','ex-semi-sweet-chocolate-chips-43880849',157]];
  for(const [recipeId,id,qty] of expected){
   const r=find(recipeId);assert.equal(r.ingredients.find(i=>i.id===id).qty,qty);assert.equal(r.ingredients.filter(i=>i.id===id).length,1);
   const s=C.defaults();s.pantry=[{id,qty:qty*2,always:false}];s.plans=[{id:'existing',recipeId,date:C.today(),meal:r.meals[0],servings:r.base,side:'none',cooked:false}];

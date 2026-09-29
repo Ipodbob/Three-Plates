@@ -924,6 +924,53 @@
   ],
   "note": "Includes 11g gelatine plus 1 tsp for the cheesecake, and a further heaped tsp for the coffee jelly. Shopping keeps 11g and an approximate 2 tsp as separate measured amounts; the heaped spoon is counted nominally. Follow the publisher spoon measures when cooking. Gram and teaspoon pantry stock are not automatically interchangeable."
 });
+  requiredIngredientCorrections.push(...[
+  {
+    "recipeId": "gf2-hot-spicy-sweet-potatoes",
+    "source": "https://www.bbcgoodfood.com/recipes/hot-spicy-sweet-potatoes",
+    "items": [
+      {
+        "id": "sweet-potato",
+        "oldQty": 400,
+        "qty": 1000
+      },
+      {
+        "id": "thyme",
+        "oldQty": 0,
+        "qty": 2
+      }
+    ],
+    "replace": [
+      [
+        "Planning conversion: 2 large  sweet potatoes (about 500g/1lb 4oz each) → 400g Sweet potatoes",
+        "Publisher weight allowance: two sweet potatoes at about 500g each, about 1kg total."
+      ],
+      [
+        "Additional dusting/greasing/serving amounts are not included: 2 tbsp fresh  thyme leaves, plus 2 sprigs of fresh thyme",
+        "Both the measured thyme leaves and two additional sprigs are included."
+      ]
+    ],
+    "note": "Uses the publisher allowance of two sweet potatoes at about 500g each (1000g total), replacing the generic size estimate. Includes 2 tbsp thyme leaves plus two sprigs placed in the parcels; sprigs stay separate from spoon-measured leaves."
+  },
+  {
+    "recipeId": "sp-sally-double-chocolate-banana-bread",
+    "source": "https://sallysbakingaddiction.com/double-chocolate-banana-bread/",
+    "items": [
+      {
+        "id": "ex-semi-sweet-chocolate-chips-43880849",
+        "oldQty": 135,
+        "qty": 157
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 135g semi-sweet chocolate chips, plus 2 tbsp for topping",
+        "The measured chocolate topping is included."
+      ]
+    ],
+    "note": "Includes 135g chocolate chips in the batter and the publisher's measured 22g topping, 157g total. No spoon-to-weight estimate is needed. Follow the publisher method for the hot water, which is not a shopping item."
+  }
+]);
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,
