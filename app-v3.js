@@ -53,6 +53,13 @@
   const number = (n, max = 3) =>
     Number(n).toLocaleString("en-GB", { maximumFractionDigits: max });
   const counts = {
+    "parsley-small-bunch": ["bunch", "bunches"],
+    "basil-small-bunch": ["bunch", "bunches"],
+    "coriander-small-bunch": ["bunch", "bunches"],
+    "spring-onion-bunch": ["bunch", "bunches"],
+    "sage-leaf": ["leaf", "leaves"],
+    bay: ["leaf", "leaves"],
+    thyme: ["sprig", "sprigs"],
     bread: ["slice", "slices"],
     eggs: ["egg", "eggs"],
     garlic: ["clove", "cloves"],
@@ -115,7 +122,7 @@
       return `${number(n)} ${counts[id][n === 1 ? 0 : 1]}`;
     if (u === "g" && n >= 1000) return `${number(n / 1000)} kg`;
     if (u === "ml" && n >= 1000) return `${number(n / 1000)} l`;
-    return `${number(n)} ${u === "each" ? "items" : u}`;
+    return `${number(n)} ${u === "each" ? (n === 1 ? "item" : "items") : u}`;
   }
   function duration(n) {
     return n < 60

@@ -19,7 +19,9 @@ const C = require("../menus.js"),
 const find = (id) => R.find((r) => r.id === id);
 const corrections = require("../docs/catalogue/fish-ingredient-corrections.json").corrections;
 const additions = new Set(corrections.map(c => c.ingredient.id));
-const requiredCorrections = require("../docs/catalogue/required-ingredient-corrections.json").corrections;
+const herbReview = require("../docs/catalogue/herb-ingredient-corrections.json");
+const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections];
+const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id)]);
 function correctedReference(old) {
   const r = JSON.parse(JSON.stringify(old));
   const correction = requiredCorrections.find(c => c.recipeId === old.id);
@@ -34,8 +36,9 @@ function correctedReference(old) {
 const correctedRecipes = before.recipes.map(correctedReference);
 test("review preserves identities and ratings with only documented ingredient corrections", () => {
   assert.equal(R.length, before.recipes.length);
-  assert.deepEqual(Object.fromEntries(Object.entries(I).filter(([id]) => !additions.has(id))), before.ingredients);
+  assert.deepEqual(Object.fromEntries(Object.entries(I).filter(([id]) => !definitionAdditions.has(id))), before.ingredients);
   for (const c of corrections) assert.deepEqual(I[c.ingredient.id],c.ingredient);
+  for(const i of herbReview.ingredients) assert.deepEqual(I[i.id],i);
   for (const old of before.recipes) {
     const r = find(old.id);
     assert.ok(r);
@@ -438,4 +441,24 @@ test('chicken noodle salad uses kettle-soaked noodles and ready-cooked chicken',
  assert.equal(C.matching(r,f,s,R,I),true);assert.equal(C.matching(r,{...f,method:'hob'},s,R,I),false);
  assert.match(r.methodNote,/boiling water/);assert.match(r.methodNote,/ready-cooked roast chicken/);
  assert.ok(r.ingredients.some(i=>i.id==='ex-leftover-roast-chicken-shredded-81a82462'));
+});
+
+test('required herb counts scale, round for buying and preserve weighed pantry stock',()=>{
+ for(const correction of herbReview.corrections){
+  const r=find(correction.recipeId),s=C.defaults();s.plans=[{id:'herb-plan',recipeId:r.id,date:C.today(),meal:r.meals[0],servings:r.base/2,side:'none',cooked:false}];
+  s.pantry=[{id:'parsley',qty:25,always:false},{id:'basil',qty:25,always:false},{id:'fresh-coriander',qty:25,always:false}];
+  const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.deepEqual(restored.pantry,s.pantry);
+  for(const item of correction.items){
+   const expected=item.qty/2;assert.equal(C.requirements(restored,R)[item.id],expected);
+   const row=C.shopping(restored,R).find(i=>i.id===item.id);assert.equal(row.remaining,expected);assert.equal(C.purchase(restored,item.id,row.remaining,I).qty,Math.ceil(expected));
+   assert.equal(C.foodAllowed(r,{...s.prefs,exclusions:[item.id]}),false);
+   for(const alias of item.avoidIds||[])assert.equal(C.foodAllowed(r,{...s.prefs,exclusions:[alias]}),false);
+   restored.pantry.push({id:item.id,qty:item.qty,always:false});
+  }
+  C.finishPlan(restored,'herb-plan',R);
+  for(const item of correction.items)assert.equal(C.stock(restored,item.id),item.qty/2);
+  for(const id of ['parsley','basil','fresh-coriander'])assert.equal(C.stock(restored,id),25);
+  const finished=C.migrate(JSON.parse(JSON.stringify(restored)),R,I);assert.deepEqual(finished.pantry,restored.pantry);assert.throws(()=>C.finishPlan(finished,'herb-plan',R));
+ }
+ assert.match(find('sp-gfmore-courgette-potato-cheddar-soup').planningNotes,/nutmeg is also required/);
 });

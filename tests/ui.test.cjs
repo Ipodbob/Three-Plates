@@ -256,3 +256,12 @@ test('pantry and preference pickers distinguish repeated names by readable units
   const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('batch');assert.equal(b.q('#recipe-search').value,'sauce beef bolognese');assert.ok(b.q('[data-act="batch-add"][data-id="prep-bolognese"]'));
   a.dom.window.close();b.dom.window.close();
  });
+
+test('counted herb shopping shows bunches and retains the unused half after cooking',()=>{
+ const a=app();a.click('#f-time-any');a.q('#recipe-search').value='thai fried rice prawns peas';a.submit('#search-form');a.click('[data-act="plan-add"][data-id="gf2-thai-fried-rice-prawns-peas"]');a.route('shop');
+ const id='coriander-small-bunch',row=a.q('[data-act="bought"][data-id="'+id+'"]').closest('.shopping-row');
+ assert.match(row.textContent,/Need 0.5 bunches/);assert.equal(row.querySelector('.shopping-qty').textContent,'1 bunch');
+ a.click('[data-act="bought"][data-id="'+id+'"]');a.click('[data-act="stock-bought"]');a.route('pantry');assert.match(a.q('main').textContent,/1 bunch/);
+ a.route('plan');a.click('[data-act="plan-finish"]');a.click('#confirm-action');assert.equal(a.state().pantry.find(i=>i.id===id).qty,0.5);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('pantry');assert.match(b.q('main').textContent,/0.5 bunches/);a.dom.window.close();b.dom.window.close();
+});
