@@ -10,6 +10,8 @@ The product name, source and stated pack size appear with suggested recipe ingre
 
 Optional confirmed matches are bounded to 500 and stored in `barcodeMatches` within the existing `three-plates-v3` state. They roundtrip with backup/export; old backups remain valid. Invalid optional matches are discarded without altering pantry data. Forgetting matches leaves stock untouched. No scan changes shop purchase history or creates a bought transaction. Scanner writes are successful only if browser persistence succeeds; failed writes roll back and retain the confirmation card.
 
+Existing pantry matches retain their recorded unit, including kg, l and tbsp from valid restored records. The locked unit field and amount preview show that unit; an incompatible lookup size requires an explicit amount. New separate scanned products still use g, ml or items. Ordinary new manual entries convert kg/l/tbsp to base units; the scanner does not rewrite valid restored identities to achieve that normalization.
+
 ### Used items and recipes
 
 **Update amount left** scans a remembered product or lets the user choose an existing measured pantry ingredient. Its slider is a percentage of the currently recorded total across all packs, not the original package size. The confirmation states the exact amount that will remain; Empty removes the pantry entry. Exact remaining amounts can be entered under Edit. Corrections reject stale stock values, cannot increase stock, and retain barcode matches. For planned meals, **Open meal plan** leads to the established cooking workflow, which deducts ingredients once. The scanner does not independently subtract recipe ingredients or claim to track individual physical packs.

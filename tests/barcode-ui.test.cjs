@@ -59,6 +59,37 @@ function app(seed = {}, setup = () => {}) {
   };
 }
 const tick = () => new Promise((r) => setImmediate(r));
+test("scanner preserves existing pantry units through additions, partial use and reload", async (t) => {
+  for (const unit of ["kg", "l", "tbsp", "tsp"]) {
+    const id = "custom-unit-" + unit;
+    const seed = {version:3, custom:{[id]:{id,name:"Test stock",unit,group:"Other"}},pantry:[{id,qty:4,always:false}]};
+    const a = app({"three-plates-v3":JSON.stringify(seed)});
+    t.after(() => a.dom.window.close());
+    await lookup(a);
+    const picker = a.q("#scan-ingredient");
+    picker.value = "Test stock";
+    picker.dispatchEvent(new a.w.Event("change", {bubbles:true}));
+    assert.equal(a.q("#scan-unit").value, unit);
+    assert.equal(a.q("#scan-unit").disabled, true);
+    assert.equal(a.q("#scan-qty").value, "", "incompatible lookup weight needs an explicit amount");
+    a.q("#scan-qty").value = "2";
+    a.q("#scan-qty").dispatchEvent(new a.w.Event("input", {bubbles:true}));
+    assert.match(a.q("#scan-preview").textContent, new RegExp("2 " + unit));
+    a.click("#scan-save");
+    assert.equal(a.state().pantry.find(p=>p.id===id).qty, 6);
+    assert.equal(a.state().barcodeMatches[code].unit, unit);
+    const b = app({"three-plates-v3":JSON.stringify(a.state())});
+    t.after(() => b.dom.window.close());
+    await lookup(b);
+    b.click("#scan-use-mode");
+    assert.equal(b.q("#scan-unit").value, unit);
+    b.click('[data-fraction="0.5"]');
+    assert.match(b.q("#scan-preview").textContent, new RegExp("3 " + unit));
+    b.click("#scan-save");
+    assert.equal(b.state().pantry.find(p=>p.id===id).qty, 3);
+    assert.equal(b.state().custom[id].unit, unit);
+  }
+});
 async function lookup(a) {
   a.click('[data-act="pantry-scan"]');
   a.q("#barcode-number").value = code;
