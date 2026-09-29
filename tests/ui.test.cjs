@@ -121,6 +121,24 @@ test('stored meal time follows meal selection until explicitly edited and surviv
  assert.equal(b.state().plans[0].serveTime,'19:15');
 });
 
+test('always-stocked pantry form ignores inactive amounts and reminders but restores measured validation', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());a.route('pantry');a.q('[data-act="pantry-add"]').focus();a.click('[data-act="pantry-add"]');
+ a.set('#pantry-name','Pasta');a.set('#pantry-qty','-1');a.set('#pantry-use-soon','1900-01-01');
+ assert.equal(a.q('#pantry-form').checkValidity(),false);
+ a.q('#pantry-always').click();assert.equal(a.q('#pantry-qty').disabled,true);assert.equal(a.q('#pantry-use-soon').disabled,true);
+ assert.equal(a.q('#pantry-form').checkValidity(),true);
+ a.q('#pantry-always').click();assert.equal(a.q('#pantry-qty').value,'-1');assert.equal(a.q('#pantry-use-soon').value,'1900-01-01');
+ assert.equal(a.q('#pantry-form').checkValidity(),false);
+ a.q('#pantry-always').click();a.q('#pantry-form button[type="submit"]').click();
+ assert.equal(a.state().pantry.length,1);assert.equal(a.state().pantry[0].always,true);assert.equal(a.state().pantry[0].qty,0);assert.equal(a.state().pantry[0].useSoon,undefined);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});t.after(()=>b.dom.window.close());b.route('pantry');
+ b.q('[data-act="pantry-edit"]').focus();b.click('[data-act="pantry-edit"]');assert.equal(b.q('#pantry-qty').disabled,true);
+ const saved=JSON.stringify(b.state());b.q('#pantry-always').click();b.set('#pantry-qty','250');b.click('[data-act="close"]');
+ assert.equal(JSON.stringify(b.state()),saved);assert.equal(b.w.document.activeElement,b.q('[data-act="pantry-edit"]'));
+ b.click('[data-act="pantry-edit"]');b.q('#pantry-always').click();b.set('#pantry-qty','250');b.q('#pantry-form button[type="submit"]').click();
+ assert.equal(b.state().pantry[0].always,false);assert.equal(b.state().pantry[0].qty,250);
+});
+
 function app(seed={},failStorage=false){
  const dom=new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'),{url:'http://localhost/Three-Plates/',runScripts:'outside-only'}),w=dom.window;
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};

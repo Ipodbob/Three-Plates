@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Always-stocked pantry form
+
+- Browser reproduction found an invalid amount blocked native Save even when Always stocked was checked and the amount was ignored by the save handler. Amount and reminder inputs now disable for Always stocked, including when opening an existing staple. Toggling back retains draft values and restores native validation. Unit stays available because new custom ingredients still need an identity/unit.
+- Twelve relevant pantry UI checks and 22 Phase 1/unmeasured checks passed. The new regression covers invalid drafts, toggle restoration, native submit, reload, cancellation with exact saved-state preservation/focus return, and conversion back to 250g measured stock.
+- Browser confirmed the original obstruction, successful save after the fix, disabled inputs on reopening, and return to Edit. A 320px screenshot shows the complete dialog and Save action without horizontal clipping. This is desktop narrow-layout evidence, not physical-keyboard testing. Synthetic pantry data was cleared via Settings on isolated localhost.
+
 ## Stored-meal serving time
 
 - Changing Meal in Plan stored portions now updates the suggested serving time until the user edits it. Explicitly chosen or cleared times remain untouched by later meal changes.

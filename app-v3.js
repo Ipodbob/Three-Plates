@@ -1559,6 +1559,13 @@
           .join("")}</datalist>`,
       )}<div class="form-grid two section-space">${field("Amount available", "pantry-qty", `<input id="pantry-qty" type="number" inputmode="decimal" min="0" max="1000000" step="any" value="${p?.qty || 0}" required>`)}${field("Unit", "pantry-unit", select("pantry-unit", Object.keys(C.units), i?.unit || "g"))}</div><label class="check-label"><input type="checkbox" id="pantry-always" ${p?.always ? "checked" : ""}>Always stocked — assume enough</label>${field("Use soon reminder (optional)", "pantry-use-soon", `<input id="pantry-use-soon" type="date" min="2020-01-01" max="2100-12-31" value="${e(p?.useSoon || "")}" aria-describedby="use-soon-help">`)}<p id="use-soon-help" class="helper">A reminder for this ingredient, not an expiry date. Leave blank for no reminder. When combining packs, keep the earliest reminder. Not used for Always stocked items.</p><p class="helper">Pick a suggested ingredient to match recipes. Custom items can be recorded but will not match automatically. Saving replaces that item's current amount.</p><button type="submit" class="button wide">Save ingredient</button></form>`,
     );
+    const always = document.getElementById("pantry-always");
+    const updateStockFields = () => {
+      document.getElementById("pantry-qty").disabled = always.checked;
+      document.getElementById("pantry-use-soon").disabled = always.checked;
+    };
+    always.addEventListener("change", updateStockFields);
+    updateStockFields();
     document.getElementById("pantry-name").addEventListener("change", (ev) => {
       const found = C.resolveIngredient(
         ev.target.value,
@@ -2605,7 +2612,7 @@
                 "Use Link to recipes to combine this product with another ingredient. To add a different product, use Add an ingredient.",
               );
             state.pantry = state.pantry.filter((p) => p.id !== i.id);
-            const useSoon = value("pantry-use-soon");
+            const useSoon = always ? "" : value("pantry-use-soon");
             if (useSoon && !C.validDate(useSoon))
               throw Error("Choose a valid reminder date.");
             state.pantry.push({
