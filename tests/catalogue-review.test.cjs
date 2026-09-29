@@ -21,7 +21,8 @@ const corrections = require("../docs/catalogue/fish-ingredient-corrections.json"
 const additions = new Set(corrections.map(c => c.ingredient.id));
 const herbReview = require("../docs/catalogue/herb-ingredient-corrections.json");
 const bakingCorrections = require("../docs/catalogue/baking-ingredient-corrections.json").corrections;
-const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections];
+const finishingCorrections = require("../docs/catalogue/finishing-ingredient-corrections.json").corrections;
+const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections,...finishingCorrections];
 const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id)]);
 function correctedReference(old) {
   const r = JSON.parse(JSON.stringify(old));
@@ -503,4 +504,18 @@ test('required herb counts scale, round for buying and preserve weighed pantry s
   const finished=C.migrate(JSON.parse(JSON.stringify(restored)),R,I);assert.deepEqual(finished.pantry,restored.pantry);assert.throws(()=>C.finishPlan(finished,'herb-plan',R));
  }
  assert.match(find('sp-gfmore-courgette-potato-cheddar-soup').planningNotes,/nutmeg is also required/);
+});
+
+test('measured finishing ingredients scale into shopping and deduct once without changing saved stock on reload',()=>{
+ for(const correction of finishingCorrections){
+  const r=find(correction.recipeId),n=Math.min(r.base,C.maxServings(r));const s=C.defaults();
+  s.plans=[{id:'finish-check',recipeId:r.id,date:C.today(),meal:r.meals[0],servings:n,side:'none',cooked:false}];
+  const item=correction.items[0],qty=C.round(item.qty*n/r.base);s.pantry=[{id:item.id,qty:qty*2,always:false}];
+  const restored=C.migrate(C.clone(s),R,I);assert.deepEqual(restored.pantry,s.pantry);assert.equal(C.requirements(restored,R)[item.id],qty);
+  const empty=C.clone(restored);empty.pantry=[];assert.equal(C.shopping(empty,R).find(i=>i.id===item.id).need,qty);
+  assert.equal(r.ingredients.filter(i=>i.id===item.id).length,1);assert.equal(r.ingredients.find(i=>i.id===item.id).qty,item.qty);
+  assert.ok(!r.planningNotes.includes(correction.replace[0][0]));
+  C.finishPlan(restored,'finish-check',R);assert.equal(C.stock(restored,item.id),qty);const done=C.migrate(C.clone(restored),R,I);assert.deepEqual(done.pantry,restored.pantry);assert.throws(()=>C.finishPlan(done,'finish-check',R));
+ }
+ assert.equal(find('gf2-hot-cross-buns-2').ingredients.find(i=>i.id==='milk').qty,300);
 });

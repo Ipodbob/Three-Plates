@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Measured egg wash, brushing and pan amounts
+
+- Three source-verified corrections restore a separate glazing egg in Good Food egg-and-bacon pie (five total), 15ml brushing buttermilk in Sally ham-and-cheese scones (175ml total), and up to 56g pan butter in Sally crepes (99g total including batter). The pan value uses the upper end of the publisher range and is labelled a planning allowance. Source decisions are in docs/catalogue/finishing-ingredient-corrections.json.
+- The hot-cross-bun milk flag was reviewed and left at 300ml: the method uses that amount and the flour tip allows extra only for dry dough. It is not a mandatory glazing quantity. Cherry-pie extra almonds and citrus-cake syrup sugar/icing yogurt still need reviewed spoon-to-mass decisions and are recorded as pending rather than silently treated as resolved.
+- All 25 catalogue checks passed, including the new measured-finishing regression, preservation, scaled shopping, reload and once-only deduction. Prior complete-suite baseline is 256 checks. Browser verified the full eight-scone recipe and Shopping show 175ml buttermilk after reload; isolated localhost records were cleared through Settings.
+
 ## Optional menu headcount validation
 
 - The optional people input remained required while hidden. Clearing it (or entering an out-of-range/fractional value) and then unticking Change people per meal left an invisible invalid control that could prevent native form submission. The input is now disabled whenever adjustment is off, and enabled again when selected. Saved yields, date conflicts, food preferences and stock behaviour are unchanged.
