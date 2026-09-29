@@ -87,6 +87,34 @@ test("pantry scan confirms an additive amount, persists match, and prevents repe
   assert.match(a.q("#scan-session").textContent, /1 saved/);
   a.dom.window.close();
 });
+test("lookup focuses confirmation without saving and returns to entry for the next item", async () => {
+  const a = app();
+  await lookup(a);
+  assert.equal(a.w.document.activeElement, a.q("#scan-product-title"));
+  assert.equal(a.q("#scan-product-title").textContent, "Penne pasta");
+  assert.equal(a.state()?.pantry?.length || 0, 0);
+  a.click('[data-fraction="0.5"]');
+  a.click("#scan-save");
+  assert.equal(a.state().pantry[0].qty, 250);
+  assert.equal(a.w.document.activeElement, a.q("#barcode-number"));
+  a.w.fetch = async () => {
+    throw Error("Remembered match must not need a lookup");
+  };
+  a.q("#barcode-number").value = code;
+  a.q("#barcode-number-form").dispatchEvent(
+    new a.w.Event("submit", { bubbles: true, cancelable: true }),
+  );
+  await tick();
+  assert.equal(a.w.document.activeElement, a.q("#scan-product-title"));
+  assert.equal(a.state().pantry[0].qty, 250);
+  a.click("#scan-use-mode");
+  assert.equal(a.w.document.activeElement, a.q("#scan-product-title"));
+  a.click('[data-fraction="0.5"]');
+  a.click("#scan-save");
+  assert.equal(a.state().pantry[0].qty, 125);
+  assert.equal(a.w.document.activeElement, a.q("#barcode-number"));
+  a.dom.window.close();
+});
 test("barcode photo uses local decoding and revokes its temporary URL", async () => {
   let revoked, decoded;
   const a = app({}, (w) => {
@@ -308,14 +336,40 @@ test("camera starts once and continues after confirmation without another permis
   assert.ok(stops > 0);
   a.dom.window.close();
 });
-test('forgetting barcode matches requires explicit confirmation and never changes pantry stock',async()=>{const a=app();await lookup(a);a.click('#scan-save');const before=JSON.stringify(a.state().pantry);a.click('#scan-forget');assert.ok(a.state().barcodeMatches[code]);a.click('#scan-forget-no');assert.ok(a.state().barcodeMatches[code]);a.click('#scan-forget');a.click('#scan-forget-yes');assert.deepEqual(a.state().barcodeMatches,{});assert.equal(JSON.stringify(a.state().pantry),before);a.dom.window.close();});
+test("forgetting barcode matches requires explicit confirmation and never changes pantry stock", async () => {
+  const a = app();
+  await lookup(a);
+  a.click("#scan-save");
+  const before = JSON.stringify(a.state().pantry);
+  a.click("#scan-forget");
+  assert.ok(a.state().barcodeMatches[code]);
+  a.click("#scan-forget-no");
+  assert.ok(a.state().barcodeMatches[code]);
+  a.click("#scan-forget");
+  a.click("#scan-forget-yes");
+  assert.deepEqual(a.state().barcodeMatches, {});
+  assert.equal(JSON.stringify(a.state().pantry), before);
+  a.dom.window.close();
+});
 
-test('scanner ingredient picker uses readable units and saves the selected identity',async()=>{
- const a=app();await lookup(a);
- const list=[...a.w.document.querySelectorAll('#scan-options option')].map(o=>o.value);
- assert.ok(list.includes('Milk (ml)'));assert.ok(list.includes('Pasta (g)'));assert.ok(list.every(x=>!x.includes('[ex-')));
- const input=a.q('#scan-ingredient');input.value='Milk (ml)';input.dispatchEvent(new a.w.Event('change',{bubbles:true}));
- assert.equal(input.value,'Milk (ml)');assert.equal(a.q('#scan-unit').value,'ml');
- a.q('#scan-qty').value='200';a.q('#scan-qty').dispatchEvent(new a.w.Event('input',{bubbles:true}));a.click('#scan-save');
- assert.equal(a.state().pantry[0].id,'milk');assert.equal(a.state().pantry[0].qty,200);a.dom.window.close();
+test("scanner ingredient picker uses readable units and saves the selected identity", async () => {
+  const a = app();
+  await lookup(a);
+  const list = [...a.w.document.querySelectorAll("#scan-options option")].map(
+    (o) => o.value,
+  );
+  assert.ok(list.includes("Milk (ml)"));
+  assert.ok(list.includes("Pasta (g)"));
+  assert.ok(list.every((x) => !x.includes("[ex-")));
+  const input = a.q("#scan-ingredient");
+  input.value = "Milk (ml)";
+  input.dispatchEvent(new a.w.Event("change", { bubbles: true }));
+  assert.equal(input.value, "Milk (ml)");
+  assert.equal(a.q("#scan-unit").value, "ml");
+  a.q("#scan-qty").value = "200";
+  a.q("#scan-qty").dispatchEvent(new a.w.Event("input", { bubbles: true }));
+  a.click("#scan-save");
+  assert.equal(a.state().pantry[0].id, "milk");
+  assert.equal(a.state().pantry[0].qty, 200);
+  a.dom.window.close();
 });

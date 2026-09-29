@@ -191,3 +191,12 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Catalogue regression checks every label round-trip, including accented variants and same-name custom products. Connected tests cover unit-specific pantry creation/edit/reload, preference selection and scanner saving. Browser verified Milk (g) saves 125g, edits to 75g and survives reload; temporary stock removed.
 
 - Validation: full run passed 224 checks. After the final ambiguity guard and chip-label adjustment, all 19 catalogue checks and 17 focused pantry/preference/scanner UI checks passed. Browser confirmed readable unit-labelled suggestions, edit/reload persistence and selected preference labels; test stock/preferences cleared.
+
+
+## Scanner confirmation and real barcode audit
+
+- At 320px, used real Open Food Facts lookups for Nutella (400g, 3017620422003) and Coca-Cola Original (330ml, 5449000000996). The compact confirmation and Add & scan next were visible without scrolling to advanced fields. Saved half the Nutella pack and the full drink in one session; reloaded and verified 200g and 330ml.
+- Re-scanned the remembered Nutella in Update amount left, selected half, saved and reloaded: 100g remained and the drink stayed 330ml. This replaces stock rather than deducting a recipe a second time.
+- Lookup hid the focused barcode field without moving focus into the result. Product headings now receive programmatic focus without scrolling or saving automatically. Browser verified the detected Nutella heading is active; regression covers first lookup, remembered lookup, mode changes and return to barcode entry after confirmation.
+- All 30 scanner unit, UI and relay tests passed. Tests cover mocked camera continuity, persistence, storage failure, cancellation and stock corrections. Real mobile-width browser checks used barcode-number entry; physical iPhone camera/permission/VoiceOver behaviour remains unverified.
+- Isolated localhost:4174 test stock and remembered matches were cleared through Settings after verification. The user's saved data on other origins was not touched.
