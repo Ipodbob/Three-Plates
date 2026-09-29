@@ -1,5 +1,41 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
+
+test('bought amounts remain editable when pantry additions cover the recipe', (t) => {
+ const a=app(); t.after(()=>a.dom.window.close());
+ a.q('#recipe-search').value='pesto pea pasta'; a.submit('#search-form');
+ a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]'); a.route('shop');
+ a.set('#pack-mode','packs'); a.click('[data-act="bought"][data-id="pasta"]');
+ assert.equal(a.state().bought.pasta,500);
+ a.route('pantry'); a.click('[data-act="pantry-add"]');
+ a.set('#pantry-name','Pasta'); a.set('#pantry-qty','200'); a.submit('#pantry-form');
+ a.route('shop');
+ assert.equal(a.w.document.querySelectorAll('[data-act="purchase-edit"][data-id="pasta"]').length,1);
+ assert.match(a.q('#extra-purchases').textContent,/500 g/);
+ a.click('[data-act="purchase-edit"][data-id="pasta"]'); a.set('#purchase-qty','450'); a.submit('#purchase-form');
+ assert.equal(a.state().bought.pasta,450);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())}); t.after(()=>b.dom.window.close()); b.route('shop');
+ assert.match(b.q('#extra-purchases').textContent,/450 g/);
+ b.click('[data-act="stock-bought"]'); assert.equal(b.state().pantry.find(x=>x.id==='pasta').qty,650);
+ assert.equal(b.q('#extra-purchases'),null);
+ b.route('plan'); b.click('[data-act="plan-finish"]');
+ assert.equal(b.state().pantry.find(x=>x.id==='pasta').qty,470);
+ assert.equal(b.state().purchaseHistory.filter(x=>x.status==='stocked').length,1);
+});
+
+test('purchases from removed plans remain correctable without duplicating active rows', (t) => {
+ const a=app(); t.after(()=>a.dom.window.close());
+ a.q('#recipe-search').value='pesto pea pasta'; a.submit('#search-form');
+ a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]'); a.route('shop');
+ a.click('[data-act="bought"][data-id="pasta"]');
+ assert.equal(a.q('#extra-purchases'),null);
+ assert.equal(a.w.document.querySelectorAll('[data-act="purchase-edit"][data-id="pasta"]').length,1);
+ a.route('plan'); a.click('[data-act="plan-remove"]'); a.route('shop');
+ assert.match(a.q('#extra-purchases').textContent,/Pasta/);
+ a.click('[data-act="purchase-edit"][data-id="pasta"]'); a.set('#purchase-qty','0'); a.submit('#purchase-form');
+ assert.equal(a.q('#extra-purchases'),null); assert.equal(a.state().bought.pasta,0);
+ assert.equal(a.state().pantry.length,0);
+});
 test('new equipment buttons persist across reload and return actual specialist recipes',()=>{
  for(const method of ['pressure-cooker','barbecue','microwave']){const a=app();a.click('#f-time-any');a.click('#f-method-'+method);assert.ok(a.q('.meal-card'),method);a.route('batch');a.click('#bf-method-'+method);const b=app({'three-plates-v3':JSON.stringify(a.state())});assert.equal(b.state().filters.method,method);assert.equal(b.q('#f-method-'+method).getAttribute('aria-pressed'),'true');b.route('batch');assert.equal(b.q('#bf-method-'+method).getAttribute('aria-pressed'),'true');a.dom.window.close();b.dom.window.close();}
 });

@@ -1033,7 +1033,7 @@
       need = rows.filter((i) => !i.covered),
       have = rows.filter((i) => i.covered),
       purchased = Object.entries(state.bought).filter(([, q]) => q > 0),
-      orphan = purchased.filter(([id]) => !rows.some((i) => i.id === id));
+      extraPurchases = purchased.filter(([id]) => !need.some((i) => i.id === id));
     const groups = [...new Set(need.map((i) => ing(i.id).group))].sort();
     return (
       head(
@@ -1063,7 +1063,7 @@
               "Choose a meal or batch recipe and its ingredients appear here.",
               '<a class="button" href="#batch">Find a batch recipe</a>',
             )
-      }${orphan.length ? `<section class="panel section-space"><h2 class="section-title">Purchases from a changed plan</h2>${orphan.map(([id, q]) => `<div class="shopping-row"><span class="shopping-name">${e(ing(id).name)} · ${amount(id, q)}</span>${btn("Edit", "purchase-edit", id)}</div>`).join("")}</section>` : ""}${purchaseHistory()}${purchased.length ? '<p class="helper">Bought amounts are fixed when ticked. Changing shops or portions does not change previous purchases. Moving them to pantry includes the whole purchased amount.</p>' : ""}`
+      }${extraPurchases.length ? `<section id="extra-purchases" class="panel section-space"><h2 class="section-title">Bought extras</h2><p class="helper">Already bought, but not needed from this shopping list. Your pantry now covers the ingredient, or the plan has changed. Edit the amount if needed, then put bought items in pantry.</p>${extraPurchases.map(([id, q]) => `<div class="shopping-row"><span class="shopping-name">${e(ing(id).name)} · ${amount(id, q)}</span>${btn("Edit", "purchase-edit", id)}</div>`).join("")}</section>` : ""}${purchaseHistory()}${purchased.length ? '<p class="helper">Bought amounts are fixed when ticked. Changing shops or portions does not change previous purchases. Moving them to pantry includes the whole purchased amount.</p>' : ""}`
     );
   }
   function storageGuide() {
