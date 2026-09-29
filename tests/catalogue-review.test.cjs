@@ -38,6 +38,28 @@ function correctedReference(old) {
 }
 const correctedRecipes = before.recipes.map(correctedReference);
 
+test('milk avoidance permits reviewed plant ingredients but still excludes real dairy and exact avoided foods', () => {
+  const review=require('../docs/catalogue/plant-preference-corrections.json');
+  const p={...C.defaults().prefs,exclusions:['milk']};
+  assert.equal(Object.keys(review.aliases).length,22);
+  for(const [id,aliases] of Object.entries(review.aliases)) {
+    assert.ok(I[id]);assert.deepEqual(PLATES_DATA.ingredientPreferenceAliases[id],aliases);
+    const r={kind:'vegan',ingredients:[{id,qty:10,avoidIds:['milk']}]};
+    assert.equal(C.foodAllowed(r,p),true,id);
+    assert.equal(C.foodAllowed(r,{...p,exclusions:[id]}),false,id);
+    for(const alias of aliases)assert.equal(C.foodAllowed(r,{...p,exclusions:[alias]}),false,id);
+    assert.equal(C.foodAllowed({...r,ingredients:[...r.ingredients,{id:'milk',qty:10}]},p),false,id);
+  }
+  for(const id of ['sp-gfmore-vegan-cauliflower-cheese','sp-gfmore-black-forest-breakfast-bowl','gf2-vegan-scones','sp-gfmore-microwave-garam-masala-vegetable-curry'])assert.equal(C.foodAllowed(find(id),p),true,id);
+  assert.equal(C.foodAllowed(find('gf2-coconut-squash-dhansak'),p),false);
+  assert.equal(C.foodAllowed(find('gf2-easy-caramel-cake'),p),false);
+  const r=find('sp-gfmore-microwave-garam-masala-vegetable-curry'),s=C.defaults();
+  s.prefs=p;s.plans=[{id:'plant',recipeId:r.id,date:C.today(),meal:'Dinner',servings:2,side:'none',cooked:false}];
+  s.pantry=[{id:'milk',qty:700,always:false},{id:'coconut-milk',qty:200,always:false}];
+  const restored=C.migrate(C.clone(s),R,I);assert.deepEqual(restored.pantry,s.pantry);
+  C.finishPlan(restored,'plant',R);assert.equal(C.stock(restored,'milk'),700);assert.equal(C.stock(restored,'coconut-milk'),100);
+});
+
 test('mixed source quantities scale, preserve incompatible stock, and deduct once after reload', () => {
   const expected = {
     'gf2-easy-caramel-cake': {'caramel-sauce-ml':45},

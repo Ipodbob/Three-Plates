@@ -1329,6 +1329,45 @@
     "ex-peppermint-extract-9f005f6b": [],
     "white-pepper": ["white-pepper"],
   };
+  // Explicit plant identities: milk/butter words alone do not imply dairy.
+  Object.assign(root.PLATES_DATA.ingredientPreferenceAliases, {
+  "ex-peanut-butter-crunchy-is-best-c44b310a": [
+    "peanut-butter"
+  ],
+  "coconut-milk": [],
+  "ex-crunchy-peanut-butter-38430980": [
+    "peanut-butter"
+  ],
+  "peanut-butter": [],
+  "ex-unsweetened-almond-milk-43e7ab45": [],
+  "ex-coconut-cream-9fb5e725": [],
+  "ex-soy-milk-063db2a4": [],
+  "ex-thick-coconut-cream-e63e7e94": [],
+  "ex-fortified-soya-yogurt-fdfe987f": [],
+  "ex-almond-butter-b887b1db": [],
+  "ex-almond-milk-ea4b318d": [],
+  "ex-vegan-butter-block-a3c31248": [],
+  "ex-soya-milk-381c8e30": [],
+  "ex-vegan-cheddar-ab35a1df": [],
+  "ex-creamy-natural-peanut-butter-0807e03a": [
+    "peanut-butter"
+  ],
+  "ex-full-fat-coconut-milk-e1884b0d": [
+    "coconut-milk"
+  ],
+  "ex-nondairy-milk-56216a75": [],
+  "ex-creamy-peanut-butter-bd60003d": [
+    "peanut-butter"
+  ],
+  "ex-almond-butter-b2e86a6d": [],
+  "ex-smooth-peanut-butter-978c3c18": [
+    "peanut-butter"
+  ],
+  "ex-unsweetened-vanilla-almond-milk-51ae3389": [],
+  "ex-pbfit-peanut-butter-powder-afaf56f7": [
+    "peanut-butter"
+  ]
+});
   // Preference families never combine stock or convert ingredient quantities.
   root.PLATES_DATA.preferenceFamilies = [
     {

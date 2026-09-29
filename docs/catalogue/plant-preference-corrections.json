@@ -1,0 +1,72 @@
+{
+  "reviewedOn": "2026-09-29",
+  "scope": "Exact plant ingredient identities wrongly linked to milk by the importer. Preference aliases only: does not change stock, recipe ingredient records, quantities or overall dietary labels. Not an allergy certification.",
+  "aliases": {
+    "ex-peanut-butter-crunchy-is-best-c44b310a": [
+      "peanut-butter"
+    ],
+    "coconut-milk": [],
+    "ex-crunchy-peanut-butter-38430980": [
+      "peanut-butter"
+    ],
+    "peanut-butter": [],
+    "ex-unsweetened-almond-milk-43e7ab45": [],
+    "ex-coconut-cream-9fb5e725": [],
+    "ex-soy-milk-063db2a4": [],
+    "ex-thick-coconut-cream-e63e7e94": [],
+    "ex-fortified-soya-yogurt-fdfe987f": [],
+    "ex-almond-butter-b887b1db": [],
+    "ex-almond-milk-ea4b318d": [],
+    "ex-vegan-butter-block-a3c31248": [],
+    "ex-soya-milk-381c8e30": [],
+    "ex-vegan-cheddar-ab35a1df": [],
+    "ex-creamy-natural-peanut-butter-0807e03a": [
+      "peanut-butter"
+    ],
+    "ex-full-fat-coconut-milk-e1884b0d": [
+      "coconut-milk"
+    ],
+    "ex-nondairy-milk-56216a75": [],
+    "ex-creamy-peanut-butter-bd60003d": [
+      "peanut-butter"
+    ],
+    "ex-almond-butter-b2e86a6d": [],
+    "ex-smooth-peanut-butter-978c3c18": [
+      "peanut-butter"
+    ],
+    "ex-unsweetened-vanilla-almond-milk-51ae3389": [],
+    "ex-pbfit-peanut-butter-powder-afaf56f7": [
+      "peanut-butter"
+    ]
+  },
+  "evidence": [
+    {
+      "source": "https://www.bbcgoodfood.com/recipes/vegan-cauliflower-cheese",
+      "decision": "Publisher explicitly uses vegan butter, soya milk and vegan cheddar."
+    },
+    {
+      "source": "https://www.bbcgoodfood.com/recipes/vegan-scones",
+      "decision": "Publisher uses soy milk for vegan scones."
+    },
+    {
+      "source": "https://www.bbcgoodfood.com/recipes/black-forest-breakfast-bowl",
+      "decision": "Publisher specifies fortified soya yoghurt and almond butter in a vegan breakfast."
+    },
+    {
+      "source": "https://www.bbcgoodfood.com/recipes/microwave-garam-masala-vegetable-curry",
+      "decision": "Coconut milk is distinct from dairy milk; retain its exact stock identity."
+    },
+    {
+      "source": "https://www.pbfit.com/products/pbfit-classic",
+      "decision": "Manufacturer describes peanut powder; do not infer dairy from the word butter."
+    },
+    {
+      "source": "https://www.rachelsorganic.co.uk/products/organic-greek-style-coconut-bio-live-yogurt/",
+      "decision": "Milk and cream are listed. Retain the milk alias for ex-coconut-yogurt-8276bb66, named by the dhansak publisher. Do not apply a coconut-name rule."
+    }
+  ],
+  "unchanged": [
+    "ex-coconut-yogurt-8276bb66"
+  ],
+  "basis": "The remaining names explicitly identify almond/coconut/soy milk or cream, nut butter, or nondairy products. Reviewed IDs are enumerated, not a runtime substring rule. Recipes with other dairy ingredients still fail the milk exclusion."
+}

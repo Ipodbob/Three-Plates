@@ -1,6 +1,38 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
 
+test('milk preference keeps plant curry searchable and plan stock stable across reload', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());a.route('you');a.set('#pref-exclusions','Milk (ml)');a.submit('.pref-form[data-key="exclusions"]');
+ assert.ok(a.state().prefs.exclusions.includes('milk'));a.route('choose');a.click('#f-time-any');a.q('#recipe-search').value='microwave garam masala';a.submit('#search-form');
+ const recipe='sp-gfmore-microwave-garam-masala-vegetable-curry';assert.ok(a.q('[data-act="plan-add"][data-id="'+recipe+'"]'));
+ a.click('[data-act="plan-add"][data-id="'+recipe+'"]');const saved=JSON.stringify(a.state());
+ const b=app({'three-plates-v3':saved});t.after(()=>b.dom.window.close());assert.ok(b.state().prefs.exclusions.includes('milk'));assert.equal(b.state().plans[0].recipeId,recipe);assert.deepEqual(b.state().pantry,[]);
+ b.route('you');b.set('#pref-exclusions','Coconut milk (ml)');b.submit('.pref-form[data-key="exclusions"]');b.route('choose');assert.equal(b.q('[data-act="plan-add"][data-id="'+recipe+'"]'),null);
+ assert.equal(b.state().plans[0].recipeId,recipe);assert.deepEqual(b.state().pantry,[]);
+});
+
+test('pantry link and stored correction defrost discard drafts cancel without mutation and restore focus', (t) => {
+ const setup=app();const C=setup.w.PlatesCore,R=setup.w.PLATES_DATA.recipes,s=C.defaults(),now=Date.now();
+ s.custom['custom-penne']={id:'custom-penne',name:'Test penne',unit:'g',group:'Other'};
+ s.pantry=[{id:'custom-penne',qty:250,always:false},{id:'pasta',qty:100,always:false}];
+ s.batches=[{id:'cancel-batch',recipeId:'prep-chilli',servings:4,date:C.today(),cooked:false}];
+ C.finishBatch(s,'cancel-batch',{eat:0,fridge:0,freezer:4,cookedAt:new Date(now-120000).toISOString(),freezerConfirmed:true},R,now-60000);
+ C.changeStorage(s,s.lots[0].id,'thaw',R,now-30000);setup.dom.window.close();
+ const a=app({'three-plates-v3':JSON.stringify(s)});t.after(()=>a.dom.window.close());a.route('pantry');
+ const cancel=(opener,edit)=>{const before=a.w.localStorage.getItem('three-plates-v3');a.q(opener).focus();a.q(opener).click();assert.equal(a.q('#sheet').open,true);edit();a.q('#sheet [data-act="close"]').click();assert.equal(a.q('#sheet').open,false);assert.equal(a.w.localStorage.getItem('three-plates-v3'),before);assert.equal(a.w.document.activeElement,a.q(opener));};
+ for(const invalid of [false,true]) {
+  a.click('[data-act="pantry-tab"][data-id="ingredients"]');
+  cancel('[data-act="pantry-link"]',()=>{a.set('#link-target','Pasta');a.set('#link-qty',invalid?'0':'250');a.q('#link-confirm').checked=true;assert.equal(a.q('#pantry-link-form').checkValidity(),!invalid);});
+  a.click('[data-act="pantry-tab"][data-id="prepared"]');
+  cancel('[data-act="lot-correct"]',()=>{a.set('#lot-count',invalid?'-1':'3');assert.equal(a.q('#lot-correction-form').checkValidity(),!invalid);});
+  cancel('[data-act="lot-discard-some"]',()=>{a.set('#lot-count',invalid?'9':'2');assert.equal(a.q('#lot-discard-form').checkValidity(),!invalid);});
+  cancel('[data-act="defrosted"]',()=>{if(invalid)a.set('#thawed-at','2099-01-01T12:00');assert.equal(a.q('#defrost-form').checkValidity(),!invalid);});
+ }
+ cancel('[data-act="discard-lot"]',()=>assert.ok(a.q('#confirm-action')));
+ const b=app({'three-plates-v3':a.w.localStorage.getItem('three-plates-v3')});t.after(()=>b.dom.window.close());
+ assert.equal(b.state().lots[0].portions,4);assert.equal(b.state().lots[0].location,'thawing');assert.deepEqual(JSON.parse(JSON.stringify(b.state().pantry)),JSON.parse(JSON.stringify(a.state().pantry)));
+});
+
 test('corrected blondies plan a full bake with flour while unbaked pastry stays a searchable component', (t) => {
  const a=app();t.after(()=>a.dom.window.close());a.click('#f-time-any');
  a.q('#recipe-search').value='snickerdoodle blondies';a.submit('#search-form');assert.equal(a.q('.meal-card'),null);
