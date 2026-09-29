@@ -600,6 +600,8 @@ test('reviewed potato bread and berry bars show complete shopping amounts after 
 test('new baking flavouring and watercress shopping rows survive app reload', (t)=>{
  for(const [id,ingredient,qty,label]of [
   ['sp-kingarthur-panettone-muffins-recipe','fiori-di-sicilia',.25,'0.25 tsp'],
+  ['sp-kingarthur-panettone-muffins-recipe','coarse-sparkling-sugar-weighed',32,'32 g'],
+  ['sp-kingarthur-panettone-muffins-recipe','ex-dried-fruit-9265fca4',255,'255 g'],
   ['sp-skinnytaste-vietnamese-shaking-beef-bo-luc-lac','ex-watercress-6c01a4a4',136,'136 g'],
  ]){
   const setup=app(),C=setup.w.PlatesCore,r=setup.w.PLATES_DATA.recipes.find(r=>r.id===id),state=C.defaults();

@@ -639,6 +639,21 @@
           "id": "fiori-di-sicilia",
           "oldQty": 0,
           "qty": 0.25
+        },
+        {
+          "oldId": "ex-generous-tbsp-coarse-sparkling-sugar-b786b4cb",
+          "id": "coarse-sparkling-sugar-weighed",
+          "oldQty": 2,
+          "qty": 32,
+          "avoidIds": [
+            "ex-generous-tbsp-coarse-sparkling-sugar-b786b4cb",
+            "ex-coarse-sparkling-sugar-5152a8bb"
+          ]
+        },
+        {
+          "id": "ex-dried-fruit-9265fca4",
+          "oldQty": 213,
+          "qty": 255
         }
       ],
       "replace": [
@@ -647,8 +662,8 @@
           "further adjustment to taste (amount not specified)"
         ]
       ],
-      "note": "Includes Fiori di Sicilia baking flavouring at the upper end of the publisher’s range (0.125 to 0.25 teaspoon) for shopping. Adjust the amount used to taste.",
-      "ingredientGuidance": "Includes Fiori di Sicilia baking flavouring at the upper end of the publisher’s range (0.125 to 0.25 teaspoon) for shopping. Adjust the amount used to taste."
+      "note": "Includes Fiori di Sicilia baking flavouring at the upper end of the publisher’s range (0.125 to 0.25 teaspoon) for shopping. Adjust the amount used to taste. Includes the publisher’s 32g topping sugar in a separate weighed ingredient and 255g dried fruit, the upper end of the 213g to 255g range. Legacy counted or teaspoon sugar stock is not treated as grams.",
+      "ingredientGuidance": "Includes 255g dried fruit and 32g coarse sparkling sugar for topping. Fiori di Sicilia: 0.25 teaspoon. These use the upper ends of the publisher’s fruit and flavouring ranges; adjust to taste."
     },
     {
       "recipeId": "sp-recipetineats-marinated-bbq-vegetables",
@@ -1028,6 +1043,12 @@
       "id": "fiori-di-sicilia",
       "name": "Fiori di Sicilia baking flavouring",
       "unit": "tsp",
+      "group": "Staples"
+    },
+    {
+      "id": "coarse-sparkling-sugar-weighed",
+      "name": "Coarse sparkling sugar (weighed)",
+      "unit": "g",
       "group": "Staples"
     }
   ]

@@ -745,3 +745,19 @@ test('every omitted-quantity correction survives scaled shopping and once-only c
  assert.equal(breaded.ingredients.find(i=>i.id==='red-wine-vinegar').qty,2.25*5);
  assert.equal(breaded.ingredients.find(i=>i.id==='salt').qty,.25+.125+.25);
 });
+
+
+test('panettone weighed topping preserves legacy counted and spoon stock',()=>{
+ const r=find('sp-kingarthur-panettone-muffins-recipe'),s=C.defaults(),legacy='ex-generous-tbsp-coarse-sparkling-sugar-b786b4cb',spoons='ex-coarse-sparkling-sugar-5152a8bb',weighed='coarse-sparkling-sugar-weighed';
+ s.plans=[{id:'panettone',recipeId:r.id,date:C.today(),meal:'Baking',servings:6,side:'none',cooked:false}];
+ s.pantry=[{id:legacy,qty:4,always:false},{id:spoons,qty:7,always:false}];
+ const saved=C.migrate(C.clone(s),R,I);assert.deepEqual(saved.pantry,s.pantry);
+ assert.equal(C.shopping(saved,R).find(i=>i.id===weighed).remaining,16);
+ assert.equal(C.requirements(saved,R)['ex-dried-fruit-9265fca4'],127.5);
+ assert.equal(r.ingredients.some(i=>i.id===legacy),false);
+ assert.equal(C.foodAllowed(r,{...saved.prefs,exclusions:[legacy]}),false);
+ assert.equal(C.foodAllowed(r,{...saved.prefs,exclusions:[spoons]}),false);
+ saved.pantry.push({id:weighed,qty:32,always:false});C.finishPlan(saved,'panettone',R);
+ assert.equal(C.stock(saved,weighed),16);assert.equal(C.stock(saved,legacy),4);assert.equal(C.stock(saved,spoons),7);
+ const restored=C.migrate(C.clone(saved),R,I);assert.deepEqual(restored.pantry,saved.pantry);assert.throws(()=>C.finishPlan(restored,'panettone',R));
+});
