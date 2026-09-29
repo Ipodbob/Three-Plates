@@ -845,6 +845,58 @@
     "note": "Includes 43g butter in the batter plus up to 56g for the pan (99g total), using the upper end of the publisher's 43–56g pan allowance. This is a planning allowance; actual pan use can vary."
   }
 ]);
+  requiredIngredientCorrections.push(...[
+  {
+    "recipeId": "gf2-cherry-pie",
+    "source": "https://www.bbcgoodfood.com/recipes/cherry-pie",
+    "items": [
+      {
+        "id": "ground-almonds",
+        "oldQty": 50,
+        "qty": 61
+      },
+      {
+        "id": "salt",
+        "oldQty": 0,
+        "qty": 0.25
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 50g ground almonds plus 2 tbsp",
+        "Measured almonds beneath the filling are included as a planning estimate."
+      ]
+    ],
+    "note": "Includes 50g ground almonds in the pastry plus 2 tbsp beneath the filling, estimated as 11g (61g total). The estimate uses King Arthur Baking's almond-meal reference of 84g per cup, divided by 16 tablespoons and rounded to whole grams. Grind and packing vary: use the publisher's 2 tbsp when cooking. Also includes the 1/4 tsp salt specified in the pastry method. Unspecified dusting and sprinkling extras remain separate."
+  },
+  {
+    "recipeId": "gf2-citrus-almond-yogurt-cake",
+    "source": "https://www.bbcgoodfood.com/recipes/citrus-almond-yogurt-cake",
+    "items": [
+      {
+        "id": "sugar",
+        "oldQty": 200,
+        "qty": 224
+      },
+      {
+        "id": "yoghurt",
+        "oldQty": 75,
+        "qty": 103
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 200g golden caster sugar plus 2 tbsp",
+        "Measured syrup sugar is included as a planning estimate."
+      ],
+      [
+        "Additional dusting/greasing/serving amounts are not included: 75g natural yogurt plus 2 tbsp",
+        "Measured icing yogurt is included as a planning estimate."
+      ]
+    ],
+    "note": "Includes 200g caster sugar in the cake plus 2 tbsp in the syrup, estimated as 24g (224g total), and 75g yogurt in the cake plus 2 tbsp in the icing, estimated as 28g (103g total). Estimates use King Arthur Baking's caster-sugar and yogurt references of 190g and 227g per cup, divided by 16 tablespoons and rounded to whole grams. Product density varies: use the publisher's spoon measures when cooking."
+  }
+]);
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,

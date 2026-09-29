@@ -519,3 +519,13 @@ test('measured finishing ingredients scale into shopping and deduct once without
  }
  assert.equal(find('gf2-hot-cross-buns-2').ingredients.find(i=>i.id==='milk').qty,300);
 });
+
+test('measured topping estimates include every component and preserve gram stock identities',()=>{
+ const expected=[['gf2-cherry-pie',{ 'ground-almonds':61,salt:0.25}],['gf2-citrus-almond-yogurt-cake',{sugar:224,yoghurt:103}]];
+ for(const [recipeId,totals] of expected){const r=find(recipeId),s=C.defaults();s.plans=[{id:'topping',recipeId,date:C.today(),meal:r.meals[0],servings:r.base,side:'none',cooked:false}];
+  for(const [id,qty] of Object.entries(totals)){assert.equal(C.requirements(s,R)[id],qty);assert.equal(C.shopping(s,R).find(i=>i.id===id).need,qty);s.pantry.push({id,qty:qty*2,always:false});}
+  const restored=C.migrate(C.clone(s),R,I);assert.deepEqual(restored.pantry,s.pantry);C.finishPlan(restored,'topping',R);for(const [id,qty] of Object.entries(totals))assert.equal(C.stock(restored,id),qty);
+  assert.match(r.planningNotes,/estimated as/);assert.match(r.planningNotes,/King Arthur/);assert.throws(()=>C.finishPlan(restored,'topping',R));
+ }
+ const review=require('../docs/catalogue/finishing-ingredient-corrections.json');assert.deepEqual(review.pending,[]);for(const row of review.conversionEvidence.entries)assert.equal(Math.round(row.gramsPerCup/16*2),row.twoTablespoonsGrams);
+});
