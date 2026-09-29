@@ -37,4 +37,16 @@ test('Discarding a container releases its future meals',()=>{const s=cooked(),l=
 test('Full v3 state roundtrip preserves portion reservations',()=>{const s=cooked();C.scheduleLot(s,s.lots[0].id,today,'Lunch',2,2,'none',R,now);s.shop='Tesco';s.packs.Tesco={chickpeas:{size:230}};const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.equal(C.lotAvailable(restored,restored.lots[0]),2);assert.equal(restored.packs.Tesco.chickpeas.size,230);});
 test('Search can match an ingredient and respects exclusions',()=>{const s=fresh(),r=R.find(r=>r.id==='pesto-pea-pasta');const f={...s.filters,time:'any',query:'peas'};assert.equal(C.matching(r,f,s,R,I),true);s.prefs.exclusions=['peas'];assert.equal(C.matching(r,f,s,R,I),false);});
 test('Removing slow-cooker availability keeps oven meals',()=>{const s=fresh();s.prefs.slowCooker=false;assert.equal(C.permitted(R.find(r=>r.id==='prep-chilli'),s.prefs),false);assert.equal(C.permitted(R.find(r=>r.id==='prep-cottage'),s.prefs),true);});
+
+
+ test('Recipe search combines words across names and ingredients without relaxing filters',()=>{
+  const s=fresh(),r=R.find(r=>r.id==='pesto-pea-pasta'),before=JSON.stringify(s);
+  for(const query of ['pesto pea pasta','pasta pesto pea','pesto and pea pasta','pesto & pea pasta','  PÉSTO   pea-pasta  ','pesto lemon']) assert.equal(C.matching(r,{...s.filters,query},s,R,I),true,query);
+  assert.equal(C.matching(r,{...s.filters,query:'pesto chicken'},s,R,I),false);
+  assert.equal(C.matching(r,{...s.filters,query:'pesto pea pasta',method:'oven'},s,R,I),false);
+  assert.equal(C.matching(r,{...s.filters,query:'pesto pea pasta',meal:'Breakfast'},s,R,I),false);
+  assert.equal(JSON.stringify(s),before);
+  s.prefs.exclusions=['peas'];assert.equal(C.matching(r,{...s.filters,query:'pesto pea pasta'},s,R,I),false);
+ });
+
 console.log('\n'+count+' tests passed.');

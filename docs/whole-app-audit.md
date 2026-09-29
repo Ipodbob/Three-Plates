@@ -200,3 +200,13 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Lookup hid the focused barcode field without moving focus into the result. Product headings now receive programmatic focus without scrolling or saving automatically. Browser verified the detected Nutella heading is active; regression covers first lookup, remembered lookup, mode changes and return to barcode entry after confirmation.
 - All 30 scanner unit, UI and relay tests passed. Tests cover mocked camera continuity, persistence, storage failure, cancellation and stock corrections. Real mobile-width browser checks used barcode-number entry; physical iPhone camera/permission/VoiceOver behaviour remains unverified.
 - Isolated localhost:4174 test stock and remembered matches were cleared through Settings after verification. The user's saved data on other origins was not touched.
+
+
+## Flexible recipe search and shopping-to-cooking review
+
+- Reproduced an empty result for `pesto pea pasta` although Pesto & pea pasta was eligible. Recipe search required an exact contiguous phrase. Shared search now requires every entered word, in any order, across the existing recipe search fields. Punctuation, accents, repeated spaces and the and/ampersand conjunction are handled consistently. Fresh, Batch and recipe-side searches use the same matching; recipe IDs, saved queries and preference/method/time gates are retained.
+- Browser verified `pasta pea pesto`, `sauce beef bolognese` and `radishes air fryer` return the intended fresh, batch and side recipes. Domain/connected regressions cover reordered words, cross-field ingredient terms, exclusions, method/meal restrictions, planning and query reload.
+- Completed a separate browser stock journey: planned Pesto & pea pasta for two, purchased the displayed pack amounts (500g pasta, 1kg peas, one lemon, 50g pesto), transferred purchases and marked the meal finished. Reload retained the expected 320g pasta, 840g peas, half lemon and zero pesto. This verifies the tested recipe/pack path, not every catalogue quantity.
+- Fabricated records and preferences on isolated localhost:4174 were cleared through Settings; other origins were untouched. Physical phone checks remain outstanding.
+
+- Validation: all 227 full-suite checks passed (32 core and 195 Node test-runner checks). The final reordered side-query assertion passed separately after its test wording was updated; no production code changed after the full run.
