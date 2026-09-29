@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 760d3e6 (PR #7): Pages run 36498896287 succeeded, all 18 checked public assets matched v3.9.0, and the live Choose page displayed v3.9.0. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 74aa34e (PR #8): Pages run 36500344765 succeeded, all 20 checked public assets matched v3.10.0, and the live Choose page displayed v3.10.0. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -23,9 +23,13 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 
 - Released v3.9.0 adds 44 recipe sides for fresh and stored plans, preference-aware search, ingredient/method previews and touch steppers throughout recipe/allocation dialogs. Recipe side links persist through backup and menu copy. A discovered old 1,000-entry pantry truncation is removed. Sweet protein balls are classified as snacks rather than dinner sides.
 
-- Branch feat/cooking-mode adds persisted ingredient and original-method checks, publisher method links, named pause/resume timers, opt-in screen wake and fallbacks. Changes use the existing atomic persistence path and never deduct stock until the existing finish action. Changed quantities require a confirmed checklist reset. Mobile shortcuts reach ingredients, method and timers, with the close control kept visible.
+- Released v3.10.0 adds persisted ingredient and original-method checks, publisher method links, named pause/resume timers, opt-in screen wake and fallbacks. Changes use the existing atomic persistence path and never deduct stock until the existing finish action. Changed quantities require a confirmed checklist reset. Mobile shortcuts reach ingredients, method and timers, with the close control kept visible.
+
+- Branch feat/prep-checklist adds a saved, searchable combined ingredient checklist for up to 20 meals/batches, with per-recipe amounts and cooking links. Stored meals add fresh sides only. Changes invalidate affected ready checks, and finished/removed meals leave the totals. Prep checks never change pantry, cooking progress, timers or finish status.
 
 ## Verification evidence
+- Combined prep: 178 full-suite checks passed, followed by ten targeted prep checks after search/date-order polish. Browser: two- and three-portion meals combined to 450 g pasta; its ready check survived reload. At 320 px, ingredient search and expansion showed the separate 180 g / 270 g shares. Finishing the first meal changed the total to 270 g, cleared the affected ready check and displayed an explanation. Isolated port-4174 data only.
+
 - Cooking mode: full suite 166 passed; 14 targeted follow-up checks passed, including two added regressions for delayed dialog close events and expired alert cleanup (168 checks now in the suite). Real browser: two checked items and a one-minute timer survived a reload; the elapsed timer displayed Time's up on return. The 320px checklist and timer cards were visually inspected, including the sticky Close control. Changing from two to three portions required an explicit reset and then showed 270 g pasta; a new timer counted down correctly after reset. These are isolated port-4174 test records. Physical iPhone wake-lock and timer behaviour remains unverified.
 
 - Meal sides: full suite 154 passed, with targeted follow-up passing after the dynamic day-limit improvement. Browser: radish side survived reload and scaled to 340.2 g when a fresh meal changed from two to three portions. Six bolognese portions were split two fridge/four freezer; the two fridge portions were booked with roast potatoes. Shopping contained the 500 g potato side, not the cooked beef ingredients. Recording eaten left 500 g of a 1,000 g potato stock and four freezer portions after reload. The side picker was inspected at 320 px; its initially small search field was corrected. These were isolated port-4174 test records, not production pantry data.
@@ -51,7 +55,7 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Finish remaining correction-dialog checks. The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
 - Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
-- Continue the handover's Phase 2 direction: combined prep checklists; cooking aids are implemented locally and await release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- The handover's cooking aids are released; combined prep is implemented on this branch and awaits release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate

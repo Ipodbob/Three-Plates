@@ -735,7 +735,7 @@
         "Fresh meals, batch cooking and prepared portions in one place.",
         "YOUR PLAN",
       ) +
-      `<div class="action-wrap page-actions"><a class="button" href="#choose">Add a meal</a><a class="button secondary" href="#batch">Plan a batch</a>${btn("Use stored portions", "show-prepared")}${btn("Saved menus" + (state.menus.length ? " (" + state.menus.length + ")" : ""), "menus")}</div>${batches.length ? `<h2 class="section-title section-space">Batch cooking days</h2>${batches.map(batchCard).join("")}` : ""}${
+      `<div class="action-wrap page-actions"><a class="button" href="#choose">Add a meal</a><a class="button secondary" href="#batch">Plan a batch</a>${btn("Use stored portions", "show-prepared")}${globalThis.PlatesCore.prepView ? btn("Prep checklist", "prep") : ""}${btn("Saved menus" + (state.menus.length ? " (" + state.menus.length + ")" : ""), "menus")}</div>${batches.length ? `<h2 class="section-title section-space">Batch cooking days</h2>${batches.map(batchCard).join("")}` : ""}${
         pending.length
           ? pending
               .map((p) => {
@@ -753,6 +753,92 @@
             )
       }${done.length ? `<details class="details-box"><summary>Finished meals (${done.length})</summary>${done.map(planCard).join("")}</details>` : ""}`
     );
+  }
+  function prepModal(edit = false) {
+    const options = C.prepOptions(state, R),
+      view = C.prepView(state, R);
+    if (edit || !state.prep.selected.length) {
+      modal(
+        "Choose meals to prepare",
+        `<p class="helper">Choose up to 20 meals or batches. Ingredients are combined for gathering, with each recipe's share shown separately.</p>${!options.length ? "<p>No unfinished meals or batches. Add some to Plan first.</p>" : `<form id="prep-select-form"><label for="prep-search">Find a meal or date</label><input id="prep-search" class="text-input" type="search" placeholder="Recipe name, date or meal"><p id="prep-selection-count" role="status"></p><div class="prep-options">${options.map((x) => `<label class="cook-check prep-choice" data-date="${e(x.record.date)}"><input type="checkbox" name="prep-ref" value="${e(x.ref)}" ${state.prep.selected.includes(x.ref) ? "checked" : ""}><span><strong>${e(x.recipe.name)}</strong><small>${e(day(x.record.date))} · ${x.kind === "batch" ? "Batch" : e(x.record.meal)} · ${x.record.servings} portions${x.record.kind === "stored" ? " · Fresh side only" : ""}</small></span></label>`).join("")}</div><button class="button wide section-space" id="prep-build" type="submit">Build checklist</button></form>`}`,
+      );
+      const form = document.getElementById("prep-select-form");
+      if (!form) return;
+      const selected = () =>
+        [...form.querySelectorAll('[name="prep-ref"]:checked')].map(
+          (x) => x.value,
+        );
+      const update = () => {
+        const n = selected().length;
+        document.getElementById("prep-selection-count").textContent =
+          `${n} selected · Up to 20`;
+        document.getElementById("prep-build").disabled = n === 0 || n > 20;
+      };
+      form.addEventListener("change", (ev) => {
+        ev.stopPropagation();
+        update();
+      });
+      document.getElementById("prep-search").oninput = (ev) => {
+        const q = ev.target.value.trim().toLowerCase();
+        for (const row of form.querySelectorAll(".prep-choice"))
+          row.hidden = !(row.textContent + " " + row.dataset.date)
+            .toLowerCase()
+            .includes(q);
+      };
+      form.onsubmit = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (change(() => C.selectPrep(state, selected(), R))) prepModal();
+      };
+      update();
+      return;
+    }
+    const items = [...view.items].sort((a, b) =>
+      ing(a.id).name.localeCompare(ing(b.id).name),
+    );
+    modal(
+      "Prep checklist",
+      `<div id="prep-panel"><p class="helper">Gather these ingredients, keeping each recipe's share separate. These checks do not change pantry stock or mark meals cooked.</p><div class="action-wrap">${btn("Change meals", "prep-select")}${btn("Clear ready checks", "prep-reset", "", "ghost")}</div>${view.missing.length ? `<p class="notice">${view.missing.length} selected meal(s) finished or were removed and are no longer included. Change meals to review your selection.</p>` : ""}${view.outdated ? '<p class="notice">The plan changed. Ingredients with changed amounts are unchecked; review their new quantities.</p>' : ""}<p id="prep-progress" class="cook-progress">${items.filter((i) => i.checked).length} of ${items.length} ingredients ready · ${view.chosen.length} meals / batches</p><label for="prep-ingredient-search">Find an ingredient</label><input id="prep-ingredient-search" type="search" class="text-input" placeholder="Search this checklist"><p id="prep-no-matches" class="helper" hidden>No matching ingredients. Clear the search to see the whole checklist.</p>${
+        items
+          .map(
+            (i) =>
+              `<section class="prep-item" data-prep-search="${e(ing(i.id).name.toLowerCase())}"><label class="cook-check"><input type="checkbox" data-prep-id="${e(i.id)}" ${i.checked ? "checked" : ""}><span>${e(ing(i.id).name)}<strong>${amount(i.id, i.qty)}</strong></span></label><details class="prep-breakdown"><summary>Amounts for each recipe</summary>${[
+                ...i.parts,
+              ]
+                .sort((a, b) => a.date.localeCompare(b.date))
+                .map(
+                  (p) =>
+                    `<p><strong>${amount(i.id, p.qty)}</strong> · ${e(p.name)}<small>${e(day(p.date))} · ${e(p.meal)}</small></p>`,
+                )
+                .join("")}</details></section>`,
+          )
+          .join("") || "<p>No fresh ingredients to gather for these meals.</p>"
+      }<section class="section-space"><h3>Prepare each recipe</h3><p class="helper">Open Cooking for its method and timers. Follow each recipe's preparation order; this checklist does not predict a shared finishing time.</p>${view.chosen.map((x) => `<article class="prep-recipe"><h4>${e(x.recipe.name)}</h4><p class="helper">${e(day(x.record.date))} · ${x.kind === "batch" ? "Batch" : e(x.record.meal)} · ${x.record.servings} portions</p><div class="action-wrap">${plannedRecipeButton(x.record, x.kind)}${cookingButton(x.record, x.kind)}</div></article>`).join("")}</section></div>`,
+    );
+    document.getElementById("prep-ingredient-search").oninput = (ev) => {
+      const q = ev.target.value.trim().toLowerCase();
+      const rows = [...document.querySelectorAll("#prep-panel .prep-item")];
+      rows.forEach((row) => {
+        row.hidden = !row.dataset.prepSearch.includes(q);
+      });
+      document.getElementById("prep-no-matches").hidden =
+        !q || rows.some((row) => !row.hidden);
+    };
+    document.getElementById("prep-panel").addEventListener("change", (ev) => {
+      const id = ev.target.dataset.prepId;
+      if (!id) return;
+      ev.stopPropagation();
+      const item = items.find((i) => i.id === id);
+      if (
+        !change(() =>
+          C.checkPrep(state, id, ev.target.checked, item.signature, R),
+        )
+      )
+        ev.target.checked = !ev.target.checked;
+      const current = C.prepView(state, R);
+      document.getElementById("prep-progress").textContent =
+        `${current.items.filter((i) => i.checked).length} of ${current.items.length} ingredients ready · ${current.chosen.length} meals / batches`;
+    });
   }
   function menuRows(entries, start) {
     return entries
@@ -1494,6 +1580,26 @@
       id = b.dataset.id,
       batch = route === "batch",
       key = batch ? "batch" : "choose";
+    if (act === "prep" || act === "prep-select") {
+      prepModal(act === "prep-select");
+      return;
+    }
+    if (act === "prep-reset") {
+      confirmAction(
+        "Clear ready checks",
+        "Clear this prep checklist's ready checks? Your selected meals, cooking progress and pantry stock stay in place.",
+        "Clear checks",
+        () => {
+          if (
+            change(() => {
+              state.prep.checked = [];
+            })
+          )
+            prepModal();
+        },
+      );
+      return;
+    }
     if (act === "cooking") {
       cookingModal(b.dataset.kind, id);
       return;

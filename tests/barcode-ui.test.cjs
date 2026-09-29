@@ -38,6 +38,7 @@ function app(seed = {}, setup = () => {}) {
     "phase1.js",
     "menus.js",
     "cooking.js",
+    "prep.js",
     "cooking-ui.js",
     "barcode-config.js",
     "pantry-scan.js",
