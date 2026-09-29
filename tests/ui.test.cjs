@@ -221,3 +221,12 @@ test('exact-weight pack editor ignores unused size and restores pack validation 
  b.click('#pack-exact');assert.equal(b.q('#pack-size').disabled,false);assert.equal(b.q('#pack-size').required,true);b.set('#pack-size','750');b.set('#pack-product','Test pasta');b.set('#pack-url','https://example.com/pasta');b.submit('#pack-form');
  assert.equal(b.state().packs.none.pasta.size,750);b.click('[data-act="pack-edit"][data-id="pasta"]');assert.equal(b.q('#pack-product').value,'Test pasta');assert.equal(b.q('#pack-url').value,'https://example.com/pasta');a.dom.window.close();b.dom.window.close();
 });
+
+test('save guard preserves newer data before the storage event is delivered',()=>{
+ const a=app();a.click("#f-time-any");const newer=a.state();newer.pantry=[{id:'pasta',qty:432,always:false}];const serialized=JSON.stringify(newer);a.w.localStorage.setItem('three-plates-v3',serialized);
+ a.click('[data-act="plan-add"]');assert.equal(a.w.localStorage.getItem('three-plates-v3'),serialized);assert.match(a.q('.storage-warning').textContent,/another tab/);assert.ok(a.q('[data-act="reload"]'));a.dom.window.close();
+});
+
+test('cleared storage cannot be resurrected by a stale tab, with or without its event',()=>{
+ for(const event of [true,false]){const a=app();a.click("#f-time-any");a.w.localStorage.clear();if(event)a.w.dispatchEvent(new a.w.StorageEvent('storage',{key:null,newValue:null}));a.click('[data-act="plan-add"]');assert.equal(a.w.localStorage.getItem('three-plates-v3'),null);assert.match(a.q('.storage-warning').textContent,/another tab/);a.dom.window.close();}
+});

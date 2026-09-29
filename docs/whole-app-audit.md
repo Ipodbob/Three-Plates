@@ -3,7 +3,7 @@
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
 ## Verified release baseline
-- Main 2bda48a (PR #18): Pages run 36507570414 succeeded, all 21 checked public assets matched v3.11.9, and a fresh live navigation displayed v3.11.9. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
+- Main 8367ded (PR #19): Pages run 36508219070 succeeded, all 21 checked public assets matched v3.11.10, and a fresh live navigation displayed v3.11.10. This release includes the defrost save-recovery fix. Earlier live scanner and UPC fallback checks also passed.
 - The user verified the previous scanner on iPhone. That does not establish the redesigned continuous-camera behaviour.
 
 ## Implemented on the current feature branch
@@ -92,3 +92,27 @@ Recorded dates cannot prove actual food safety. Recipe-specific freezer suitabil
 
 - Browser reproduced an exact-weight save blocked by a zero pack size. Disabled unused size validation now allows saving, and the exact-weight choice survives reload. Returning to pack mode restores required validation; a connected UI regression checks product metadata retention as well.
 - The mobile editor now puts Save before expandable optional product details. Inspected in a 320px iframe. 209 full-suite checks passed. Browser screenshot confirms Save is visible and the dialog fits at 320px. Temporary test meal, pack override and search were cleared; release verification follows merge.
+
+## Multiple-tab data preservation
+
+- Added pre-save comparison against the last read/written saved text, covering delayed storage events. Full-clear events now pause stale tabs too; a visible Reload saved data action recovers. Restore and reset update the baseline.
+- Targeted regressions preserve newer pantry records and keep cleared storage absent, both before and after event delivery. Browser: changing one tab to Vegetarian paused another tab; its Reload action loaded Vegetarian, after which the original preference was restored.
+- No production data changed. This protects stale saves; it is not a claim of atomic concurrent transactions across devices.
+
+## Requirement reconciliation (29 September)
+
+The handover is a brief, not evidence of completion. Later user choices supersede its separate Batch navigation tab with the shared Choose/Batch screen; recipe expansion and the barcode relay were subsequently requested explicitly.
+
+| Requirement | Current evidence | Outstanding scope |
+| --- | --- | --- |
+| Three choices, refresh/keep, search and shared meal/batch controls | Core/DOM regressions and recorded browser search/filter checks | Remaining alternate UI states |
+| Batch allocation, reservations, once-only deductions and fresh sides | phase1/sides tests; recorded browser split, defrost and consumption checks | Further correction-dialog inspection |
+| Optional pack estimates, trip shop, actual purchases and leftovers | phase1 tests for trip snapshots, corrections and unknown packs; shopping browser arithmetic and pack-editor checks | No live retailer catalogue is promised |
+| Migration, backup, failed saves and saved-data preservation | v1/v3 roundtrips, damaged-data rejection, large histories and storage-failure tests | Ongoing validation review; stale-tab guard in current change |
+| Menus, reminders, cooking aids and combined prep | Dedicated domain/UI suites and recorded browser workflows | Physical phone wake/timer behaviour |
+| Broad rated catalogue with dessert and baking | 993 qualifying publisher snapshots, source links, metadata preservation and discovery tests | Ambiguous imported ingredients and independent quantity review; no absolute best-rated claim |
+| Barcode addition, partial packs and used-stock correction | Barcode/relay suites, saved partial pack and stock-link browser checks | Physical iPhone continuous camera, multiple products and reload |
+| Uniform responsive UI and accessible interactions | Six routes inspected; 320–1280px previews and focus regressions | Remaining dialogs and device keyboard/camera interactions |
+| GitHub Pages and PR delivery | Exact merge/run and public asset proofs for each release | Verify each new release separately |
+
+Independent kitchen testing of every publisher recipe is not a deliverable claimed by this app; the planning-estimate label remains necessary. Physical-phone checks are not substituted by DOM tests.

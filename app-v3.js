@@ -69,18 +69,23 @@
   };
   let state = C.defaults(),
     originalBackup = "",
+    lastSaved = null,
     storageError = "",
     migrated = false,
     blocked = false;
   try {
     const saved = localStorage.getItem(KEY),
       old = localStorage.getItem(OLD);
+    lastSaved = saved;
     if (saved || old) {
       originalBackup = saved || old;
       state = C.migrate(JSON.parse(saved || old), R, I);
       migrated = !saved && !!old;
     }
-    if (migrated) localStorage.setItem(KEY, JSON.stringify(state));
+    if (migrated) {
+      lastSaved = JSON.stringify(state);
+      localStorage.setItem(KEY, lastSaved);
+    }
   } catch (err) {
     storageError =
       "Saved data could not be read. The original is untouched. Restore a backup in Settings; saving is paused.";
@@ -248,13 +253,26 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove("show"), 5500);
   }
+  function changedElsewhere(saved) {
+    originalBackup = saved || "";
+    storageError = "This app changed in another tab. Reload to use the latest saved data; saving is paused to avoid overwriting it.";
+    blocked = true;
+  }
   function persist() {
     if (blocked) {
       toast(storageError);
       return;
     }
     try {
-      localStorage.setItem(KEY, JSON.stringify(state));
+      const current = localStorage.getItem(KEY);
+      if (current !== lastSaved) {
+        changedElsewhere(current);
+        toast(storageError);
+        return false;
+      }
+      const serialized = JSON.stringify(state);
+      localStorage.setItem(KEY, serialized);
+      lastSaved = serialized;
       storageError = "";
       return true;
     } catch (err) {
@@ -370,7 +388,7 @@
     };
     main.innerHTML =
       (storageError
-        ? `<div class="notice storage-warning">${e(storageError)} <a href="#you">Settings</a></div>`
+        ? `<div class="notice storage-warning">${e(storageError)} <a href="#you">Settings</a> ${btn("Reload saved data", "reload", "", "secondary")}</div>`
         : "") + pages[route]();
     nav();
     restoreFocus(focused, true);
@@ -1639,7 +1657,9 @@
               throw Error(
                 "Data changed after you selected the backup. Select it again to review the replacement.",
               );
-            localStorage.setItem(KEY, JSON.stringify(next));
+            const serialized = JSON.stringify(next);
+            localStorage.setItem(KEY, serialized);
+            lastSaved = serialized;
             state = next;
             searchDrafts = { choose: null, batch: null };
             blocked = false;
@@ -1943,6 +1963,10 @@
       go("pantry");
       return;
     }
+    if (act === "reload") {
+      location.reload();
+      return;
+    }
     if (act === "reset") {
       if (!approved) {
         confirmAction(
@@ -1959,6 +1983,7 @@
         previous[OLD] = localStorage.getItem(OLD);
         localStorage.removeItem(KEY);
         localStorage.removeItem(OLD);
+        lastSaved = null;
         blocked = false;
         storageError = "";
         state = C.defaults();
@@ -2553,11 +2578,9 @@
     window.scrollTo(0, 0);
   });
   window.addEventListener("storage", (ev) => {
-    if (ev.key === KEY) {
-      originalBackup = ev.newValue || "";
-      storageError =
-        "This app changed in another tab. Reload to use the latest saved data; saving is paused to avoid overwriting it.";
-      blocked = true;
+    if (ev.storageArea && ev.storageArea !== localStorage) return;
+    if (ev.key === KEY || ev.key === null) {
+      changedElsewhere(ev.key === null ? null : ev.newValue);
       render();
     }
   });
