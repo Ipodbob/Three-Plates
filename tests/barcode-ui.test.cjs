@@ -92,6 +92,7 @@ test("scanner preserves existing pantry units through additions, partial use and
 });
 async function lookup(a) {
   a.click('[data-act="pantry-scan"]');
+  a.q("#barcode-number").closest("details").open = true;
   a.q("#barcode-number").value = code;
   a.q("#barcode-number-form").dispatchEvent(
     new a.w.Event("submit", { bubbles: true, cancelable: true }),
@@ -127,6 +128,7 @@ test("lookup focuses confirmation without saving and returns to entry for the ne
   a.click('[data-fraction="0.5"]');
   a.click("#scan-save");
   assert.equal(a.state().pantry[0].qty, 250);
+  assert.equal(a.q("#barcode-number").closest("details").open, true);
   assert.equal(a.w.document.activeElement, a.q("#barcode-number"));
   a.w.fetch = async () => {
     throw Error("Remembered match must not need a lookup");
@@ -148,7 +150,9 @@ test("lookup focuses confirmation without saving and returns to entry for the ne
 });
 test("barcode photo uses local decoding and revokes its temporary URL", async () => {
   let revoked, decoded;
+  let now = Date.now();
   const a = app({}, (w) => {
+    w.Date.now = () => now;
     w.URL.createObjectURL = () => "blob:local-test";
     w.URL.revokeObjectURL = (u) => (revoked = u);
     w.ZXingBrowser = {
@@ -161,6 +165,7 @@ test("barcode photo uses local decoding and revokes its temporary URL", async ()
     };
   });
   a.click('[data-act="pantry-scan"]');
+  a.click("#scan-photo-open");
   Object.defineProperty(a.q("#scan-photo"), "files", {
     value: [new a.w.File(["test"], "barcode.jpg", { type: "image/jpeg" })],
   });
@@ -169,6 +174,17 @@ test("barcode photo uses local decoding and revokes its temporary URL", async ()
   assert.equal(decoded, "blob:local-test");
   assert.equal(revoked, "blob:local-test");
   assert.match(a.q("#scan-result").textContent, /Penne pasta/);
+  const before = a.w.localStorage.getItem("three-plates-v3");
+  a.click("#scan-skip");
+  assert.equal(a.w.document.activeElement, a.q("#scan-photo-open"));
+  assert.equal(a.q("#barcode-number").closest("details").open, false);
+  assert.equal(a.w.localStorage.getItem("three-plates-v3"), before);
+  now += 5000;
+  a.q("#scan-photo").dispatchEvent(new a.w.Event("change", { bubbles: true }));
+  await tick();
+  a.click("#scan-save");
+  assert.equal(a.w.document.activeElement, a.q("#scan-photo-open"));
+  assert.equal(a.state().pantry[0].qty, 500);
   a.dom.window.close();
 });
 test("untrusted product names render as text, and incompatible units require a new amount", async () => {
@@ -334,13 +350,15 @@ test("camera starts once and continues after confirmation without another permis
   let now = Date.now();
   let callback,
     starts = 0,
-    stops = 0;
+    stops = 0,
+    failRestart = false;
   const a = app({}, (w) => {
     w.Date.now = () => now;
     Object.defineProperty(w.navigator, "mediaDevices", {
       value: {
         getUserMedia: async () => {
           starts++;
+          if (failRestart) throw Error("Camera unavailable on return");
           return { getTracks: () => [{ stop: () => stops++ }] };
         },
       },
@@ -365,11 +383,13 @@ test("camera starts once and continues after confirmation without another permis
   assert.equal(a.w.localStorage.getItem("three-plates-v3"), before);
   assert.equal(a.q("#scan-session").textContent, "");
   assert.equal(starts, 1); assert.equal(stops, 0);
+  assert.equal(a.w.document.activeElement, a.q("#scan-stop"));
   now += 5000;
   callback(null); callback({ getText: () => code }); await tick();
   a.click("#scan-save");
   assert.match(a.q("#scan-status").textContent, /^Saved/);
   assert.match(a.q("#scan-session").textContent, /1 saved/);
+  assert.equal(a.w.document.activeElement, a.q("#scan-stop"));
   assert.equal(starts, 1);
   callback({ getText: () => code });
   await tick();
@@ -378,6 +398,21 @@ test("camera starts once and continues after confirmation without another permis
   callback({ getText: () => code });
   await tick();
   assert.ok(a.q("#scan-save"));
+  failRestart = true;
+  Object.defineProperty(a.w.document, "hidden", {value:true,configurable:true});
+  a.w.document.dispatchEvent(new a.w.Event("visibilitychange"));
+  Object.defineProperty(a.w.document, "hidden", {value:false,configurable:true});
+  a.click("#scan-save");
+  await tick();
+  assert.equal(starts, 2);
+  assert.equal(a.q("#scan-stop").hidden, true);
+  assert.equal(a.w.document.activeElement, a.q("#scan-camera"));
+  assert.equal(a.q("#scan-camera").disabled, false);
+  failRestart = false;
+  a.click("#scan-camera");
+  await tick();
+  a.click("#scan-stop");
+  assert.equal(a.w.document.activeElement, a.q("#scan-camera"));
   a.click("#scan-done");
   assert.ok(stops > 0);
   a.dom.window.close();
