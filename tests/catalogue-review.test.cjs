@@ -23,7 +23,8 @@ const herbReview = require("../docs/catalogue/herb-ingredient-corrections.json")
 const bakingCorrections = require("../docs/catalogue/baking-ingredient-corrections.json").corrections;
 const finishingCorrections = require("../docs/catalogue/finishing-ingredient-corrections.json").corrections;
 const mixedReview = require("../docs/catalogue/mixed-quantity-corrections.json");
-const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections,...finishingCorrections,...mixedReview.corrections];
+const omittedReview = require("../docs/catalogue/omitted-quantity-review.json");
+const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections,...finishingCorrections,...mixedReview.corrections,...omittedReview.corrections];
 const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id),...mixedReview.ingredients.map(i=>i.id)]);
 function correctedReference(old) {
   const r = JSON.parse(JSON.stringify(old));
@@ -37,6 +38,34 @@ function correctedReference(old) {
   return r;
 }
 const correctedRecipes = before.recipes.map(correctedReference);
+
+test('required cocoa icing and slurry amounts affect shopping and consume stock once', () => {
+ const expected=[
+  ['sp-amyjacky-instant-pot-beef-broccoli','cornflour',22.5],
+  ['sp-sally-stamped-chocolate-espresso-cookies','ex-unsweetened-natural-cocoa-powder-34c6cb2e',62],
+  ['sp-sally-chocolate-pastry-pop-tarts','ex-unsweetened-natural-1668438f',31],
+  ['sp-sally-classic-chocolate-cupcakes-with-vanilla-frosting','icing-sugar',480],
+  ['sp-sally-homemade-lemon-cupcakes-with-vanilla-frosting','icing-sugar',480],
+ ];
+ for(const [recipeId,id,qty] of expected) {
+  const r=find(recipeId),s=C.defaults();
+  s.plans=[{id:'required-part',recipeId,date:C.today(),meal:r.meals[0],servings:r.base,side:'none',cooked:false}];
+  s.pantry=[{id,qty:qty/4,always:false},{id:'rice',qty:123,always:false}];
+  const restored=C.migrate(C.clone(s),R,I);
+  assert.deepEqual(restored.pantry,s.pantry);
+  assert.equal(C.requirements(restored,R)[id],qty,recipeId);
+  assert.equal(C.shopping(restored,R).find(i=>i.id===id).remaining,qty*0.75,recipeId);
+  restored.pantry.find(i=>i.id===id).qty=qty*2;
+  C.finishPlan(restored,'required-part',R);
+  assert.equal(C.stock(restored,id),qty);assert.equal(C.stock(restored,'rice'),123);
+  const finished=C.migrate(C.clone(restored),R,I);assert.deepEqual(finished.pantry,restored.pantry);
+  assert.throws(()=>C.finishPlan(finished,'required-part',R));
+  assert.match(r.ingredientGuidance,/Includes/);
+ }
+ const remaining=require('../scripts/review-omitted-quantities.cjs')();
+ assert.ok(remaining.every(r=>omittedReview.entries.some(e=>e.recipeId===r.recipeId)));
+ assert.equal(new Set(omittedReview.entries.map(e=>e.recipeId)).size,omittedReview.entries.length);
+});
 
 test('milk avoidance permits reviewed plant ingredients but still excludes real dairy and exact avoided foods', () => {
   const review=require('../docs/catalogue/plant-preference-corrections.json');

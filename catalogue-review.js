@@ -1262,6 +1262,110 @@
     "ingredientGuidance": "For two wraps: reserve 2 tbsp brine from the jalapeño jar as well as 30g peppers. The brine line is liquid from that jar, not an extra jar or extra peppers. Scale for your portions."
   }
 ]);
+  // Reviewed quantified omissions; sources and decisions are retained in docs/catalogue.
+  requiredIngredientCorrections.push(...[
+  {
+    "recipeId": "sp-amyjacky-instant-pot-beef-broccoli",
+    "source": "https://www.pressurecookrecipes.com/instant-pot-beef-broccoli/",
+    "items": [
+      {
+        "id": "cornflour",
+        "oldQty": 0,
+        "qty": 22.5
+      }
+    ],
+    "replace": [
+      [
+        "2 - 3 tablespoons cold water + 2 ½ tablespoons (22.5g) cornstarch",
+        "water for the thickener (not stocked)"
+      ]
+    ],
+    "note": "Includes the publisher's 22.5g cornflour for the sauce thickener. Its water is not pantry stock; unspecified seasoning remains adjustable.",
+    "ingredientGuidance": "Includes the publisher's 22.5g cornflour for the sauce thickener. Its water is not pantry stock; unspecified seasoning remains adjustable."
+  },
+  {
+    "recipeId": "sp-sally-stamped-chocolate-espresso-cookies",
+    "source": "https://sallysbakingaddiction.com/stamped-chocolate-espresso-cookies/",
+    "items": [
+      {
+        "id": "ex-unsweetened-natural-cocoa-powder-34c6cb2e",
+        "oldQty": 0,
+        "qty": 62,
+        "avoidIds": [
+          "cocoa"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "3/4 cup (62g) unsweetened natural or Dutch-process cocoa powder, plus more as needed",
+        "extra cocoa for stamping (amount not specified)"
+      ]
+    ],
+    "note": "Includes 62g cocoa powder for the cookie dough. Extra cocoa for stamping remains unquantified.",
+    "ingredientGuidance": "Includes 62g cocoa powder for the cookie dough. Extra cocoa for stamping remains unquantified."
+  },
+  {
+    "recipeId": "sp-sally-chocolate-pastry-pop-tarts",
+    "source": "https://sallysbakingaddiction.com/chocolate-pastry-pop-tarts/",
+    "items": [
+      {
+        "id": "ex-unsweetened-natural-1668438f",
+        "oldQty": 10,
+        "qty": 31,
+        "avoidIds": [
+          "cocoa"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "1/4 cup (21g) unsweetened natural or dutch-process cocoa powder, plus more as needed for rolling",
+        "extra cocoa for rolling (amount not specified)"
+      ]
+    ],
+    "note": "Includes 21g cocoa in the pastry plus 10g in the icing (31g total). Extra cocoa for rolling remains unquantified.",
+    "ingredientGuidance": "Includes 21g cocoa in the pastry plus 10g in the icing (31g total). Extra cocoa for rolling remains unquantified."
+  },
+  {
+    "recipeId": "sp-sally-classic-chocolate-cupcakes-with-vanilla-frosting",
+    "source": "https://sallysbakingaddiction.com/classic-chocolate-cupcakes-with-vanilla-frosting/",
+    "items": [
+      {
+        "id": "icing-sugar",
+        "oldQty": 0,
+        "qty": 480
+      }
+    ],
+    "replace": [
+      [
+        "4 cups (480g) confectioners' sugar, plus more as needed",
+        "extra icing sugar for consistency (amount not specified)"
+      ]
+    ],
+    "note": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified.",
+    "ingredientGuidance": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified."
+  },
+  {
+    "recipeId": "sp-sally-homemade-lemon-cupcakes-with-vanilla-frosting",
+    "source": "https://sallysbakingaddiction.com/homemade-lemon-cupcakes-with-vanilla-frosting/",
+    "items": [
+      {
+        "id": "icing-sugar",
+        "oldQty": 0,
+        "qty": 480
+      }
+    ],
+    "replace": [
+      [
+        "4 cups (480g) confectioners' sugar, plus more as needed",
+        "extra icing sugar for consistency (amount not specified)"
+      ]
+    ],
+    "note": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified.",
+    "ingredientGuidance": "Includes the 480g icing sugar required for the buttercream. Further sugar to adjust its consistency is optional and unquantified."
+  }
+]);
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,
