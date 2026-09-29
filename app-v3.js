@@ -1169,17 +1169,15 @@
     },
   };
   function preferenceSection(key, title) {
-    const seafood =
-      key === "exclusions" &&
-      groups["group-fish"].ids.every((id) => state.prefs[key].includes(id));
-    const selected = seafood
-      ? [
-          "group-fish",
-          ...state.prefs[key].filter(
-            (id) => !groups["group-fish"].ids.includes(id),
-          ),
-        ]
-      : state.prefs[key];
+    const selected = [...state.prefs[key]];
+    if (key === "exclusions") {
+      for (const [groupId, group] of Object.entries(groups)) {
+        if (!group.ids.every((id) => selected.includes(id))) continue;
+        const first = Math.min(...group.ids.map((id) => selected.indexOf(id)));
+        for (const id of group.ids) selected.splice(selected.indexOf(id), 1);
+        selected.splice(first, 0, groupId);
+      }
+    }
     const options = [
       ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
       ...Object.values(I).sort((a, b) => a.name.localeCompare(b.name)),

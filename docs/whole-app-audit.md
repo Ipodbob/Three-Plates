@@ -76,8 +76,14 @@ Goal: a comprehensive, simple, uniform and functional Three Plates across Choose
 - Continue remaining correction-dialog checks (partial discard/capacity restoration now verified at 320px). The ordinary fresh-meal browser check passed: 100 g pasta + 500 g purchased - 180 g cooked = 420 g after reload. Multi-batch allocation, fridge/freezer booking, partial defrost, eating, side deduction and discard now have browser evidence above.
 - Physical iPhone test of continuous scanning, several products, opened packs and stock updates.
 - Review large-catalogue performance, component/side classification, ingredient equivalence and exclusions across imported ingredients. The v3.8.1 review corrects 54 identified role/category/method errors, including Radishes and Microwave macaroni. Full independent kitchen/ingredient validation remains incomplete.
-- The handover's cooking aids and combined prep are released. Large-history preservation is released; history navigation and focus changes are released; no-bake filter corrections are released; search-draft preservation is released; publisher-rating discovery policy is released; preference/pack validation is released; diet classification and skip-link fixes are released; seafood preference coverage awaits release verification. Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
+- The handover's cooking aids and combined prep are released. Large-history preservation is released; history navigation and focus changes are released; no-bake filter corrections are released; search-draft preservation is released; publisher-rating discovery policy is released; preference/pack validation is released; diet classification and skip-link fixes are released; seafood preference coverage is verified live as v3.11.8 (PR #17, Pages run 36507041960, 21 matching assets). Use-soon reminders and their responsive layout are verified in-browser; physical-device checks remain distinct.
 - Release via PR and verify the exact Pages run and live assets after merge. Do not equate committed code with deployment.
 
 ## Limits to communicate
 Recorded dates cannot prove actual food safety. Recipe-specific freezer suitability and independent kitchen validation remain unknown. Lookup can miss products or be rate-limited. Custom products need explicit recipe linkage. None of these limitations justifies weakening data preservation or silently inventing verified facts.
+
+## v3.11.9 meat preference review
+
+- Added explicit preference-only mappings for 69 chicken, 42 beef and 38 pork ingredient variants; broad groups render as one removable chip. No stock, quantity or saved-ID migration.
+- Full suite: 208 checks passed; three targeted regressions also passed after final generic-steak review: catalogue preservation, ingredient coverage/false-positive checks and group reload/removal. Browser verified all three chips survive reload and can be removed. Temporary preferences were cleared.
+- Unspecified sausages and mixed cured meats still require review; this is not a claim of complete ingredient validation. Release verification pending.
