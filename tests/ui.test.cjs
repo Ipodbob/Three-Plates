@@ -1,6 +1,25 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
 
+test('stored booking errors are visible inside the dialog and a corrected draft can save', (t) => {
+ const setup=app(),C=setup.w.PlatesCore,R=setup.w.PLATES_DATA.recipes,s=C.defaults(),now=Date.now();
+ s.batches=[{id:'dialog-error',recipeId:'prep-chilli',servings:2,date:C.today(),cooked:false}];
+ C.finishBatch(s,'dialog-error',{eat:0,fridge:2,freezer:0,cookedAt:new Date(now-60000).toISOString(),freezerConfirmed:true},R,now);setup.dom.window.close();
+ const a=app({'three-plates-v3':JSON.stringify(s)});t.after(()=>a.dom.window.close());a.route('pantry');a.click('[data-act="pantry-tab"][data-id="prepared"]');a.q('[data-act="lot-plan"]').focus();a.click('[data-act="lot-plan"]');
+ const before=a.w.localStorage.getItem('three-plates-v3');a.set('#lot-date',C.addDays(C.today(),3));a.submit('#lot-plan-form');
+ assert.equal(a.q('#sheet').open,true);const feedback=a.q('#sheet-feedback');assert.ok(feedback);assert.equal(feedback.hidden,false);assert.equal(feedback.getAttribute('role'),'alert');assert.match(feedback.textContent,/storage|limit|use.by|deadline/i);assert.equal(a.w.document.activeElement,feedback);
+ assert.equal(a.w.localStorage.getItem('three-plates-v3'),before);assert.equal(a.q('#lot-date').value,C.addDays(C.today(),3));
+ a.set('#lot-date',C.today());a.set('#lot-time','23:59');a.submit('#lot-plan-form');assert.equal(a.q('#sheet').open,false);assert.equal(a.state().plans.length,1);assert.equal(a.state().lots[0].portions,2);
+ a.click('[data-act="lot-correct"]');assert.equal(a.q('#sheet-feedback').hidden,true);assert.equal(a.q('#sheet-feedback').textContent,'');
+});
+
+test('dialog save failures remain visible and preserve editable draft and original stock', (t) => {
+ const a=app({'three-plates-v3':JSON.stringify({version:3,pantry:[{id:'pasta',qty:250}]})});t.after(()=>a.dom.window.close());a.route('pantry');a.q('[data-act="pantry-edit"]').focus();a.click('[data-act="pantry-edit"]');
+ const before=a.w.localStorage.getItem('three-plates-v3');a.set('#pantry-qty','400');a.w.Storage.prototype.setItem=()=>{throw Error('quota');};a.submit('#pantry-form');
+ assert.equal(a.q('#sheet').open,true);assert.equal(a.q('#pantry-qty').value,'400');assert.equal(a.q('#sheet-feedback').hidden,false);assert.match(a.q('#sheet-feedback').textContent,/cannot save/);assert.equal(a.w.document.activeElement,a.q('#sheet-feedback'));assert.equal(a.w.localStorage.getItem('three-plates-v3'),before);
+ a.click('#sheet [data-act="close"]');assert.equal(a.state().pantry[0].qty,250);assert.equal(a.w.document.activeElement,a.q('[data-act="pantry-edit"]'));
+});
+
 test('milk preference keeps plant curry searchable and plan stock stable across reload', (t) => {
  const a=app();t.after(()=>a.dom.window.close());a.route('you');a.set('#pref-exclusions','Milk (ml)');a.submit('.pref-form[data-key="exclusions"]');
  assert.ok(a.state().prefs.exclusions.includes('milk'));a.route('choose');a.click('#f-time-any');a.q('#recipe-search').value='microwave garam masala';a.submit('#search-form');

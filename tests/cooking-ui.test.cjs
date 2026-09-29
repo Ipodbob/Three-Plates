@@ -98,10 +98,21 @@ test("a failed timer save preserves focus and the original control", (t) => {
   );
   const control = a.q('[data-cook="pause"]');
   control.focus();
+  const saved = a.w.localStorage.getItem("three-plates-v3");
+  const setItem = a.w.Storage.prototype.setItem;
   a.w.Storage.prototype.setItem = () => { throw Error("quota"); };
   control.click();
   assert.equal(a.w.document.activeElement, control);
   assert.equal(a.q('[data-cook="resume"]'), null);
+  assert.equal(a.q("#sheet-feedback").hidden, false);
+  assert.equal(a.q("#sheet-feedback").getAttribute("role"), "alert");
+  assert.match(a.q("#sheet-feedback").textContent, /cannot save/i);
+  assert.equal(a.w.localStorage.getItem("three-plates-v3"), saved);
+  a.w.Storage.prototype.setItem = setItem;
+  control.click();
+  assert.equal(a.w.document.activeElement.dataset.cook, "resume");
+  assert.equal(a.q("#sheet-feedback").hidden, true);
+  assert.equal(a.q("#sheet-feedback").textContent, "");
 });
 test("expired timer alerts clear on removal and shortcuts focus their headings", () => {
   let a = app();
