@@ -163,6 +163,32 @@ test('cancelled dialog drafts preserve saved data and return focus across planni
  a.route('pantry');cancel('[data-act="lot-plan"]',()=>{a.set('#lot-meal','Dinner');a.set('#lot-time','19:00');a.set('#lot-servings','1');});
 });
 
+test('menu save and copy drafts cancel without changing meals stock or saved menus', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());
+ a.q('#recipe-search').value='Pesto & pea pasta';a.submit('#search-form');a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');a.route('plan');
+ const openMenus=()=>{a.q('[data-act="menus"]').focus();a.click('[data-act="menus"]');};
+ openMenus();const before=a.w.localStorage.getItem('three-plates-v3');a.click('[data-act="menu-save"]');a.set('#menu-name','Cancelled week');a.set('#menu-meal','Dinner');
+ a.click('#sheet [data-act="close"]');assert.equal(a.w.localStorage.getItem('three-plates-v3'),before);assert.equal(a.w.document.activeElement,a.q('[data-act="menus"]'));
+ openMenus();a.click('[data-act="menu-save"]');a.set('#menu-name','Saved week');a.submit('#menu-save-form');a.click('#sheet [data-act="close"]');
+ for(const conflict of [false,true]){
+   openMenus();const saved=a.w.localStorage.getItem('three-plates-v3');a.click('[data-act="menu-use"]');a.q('#menu-adjust').click();a.set('#menu-people','3');
+   if(conflict){a.set('#menu-new-start',a.state().filters.date);assert.equal(a.q('#menu-apply').disabled,true);}
+   else assert.equal(a.q('#menu-apply').disabled,false);
+   a.click('#sheet [data-act="close"]');assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved);assert.equal(a.w.document.activeElement,a.q('[data-act="menus"]'));
+ }
+});
+
+test('backup replacement preview can be cancelled without replacing any saved data', async (t) => {
+ const a=app();t.after(()=>a.dom.window.close());a.route('shop');a.set('#shop-select','Tesco');a.route('you');await new Promise(r=>setImmediate(r));
+ const before=a.w.localStorage.getItem('three-plates-v3'),backup=JSON.stringify({...a.state(),shop:'Aldi'});
+ a.q('[data-act="import"]').focus();Object.defineProperty(a.q('#backup-file'),'files',{value:[{size:backup.length,text:async()=>backup}]});
+ a.q('#backup-file').dispatchEvent(new a.w.Event('change',{bubbles:true}));await new Promise(r=>setImmediate(r));
+ assert.ok(a.q('#confirm-action'));assert.equal(a.w.localStorage.getItem('three-plates-v3'),before);
+ a.q('#sheet .action-wrap [data-act="close"]').click();assert.equal(a.q('#sheet').open,false);assert.equal(a.w.localStorage.getItem('three-plates-v3'),before);
+ assert.equal(a.w.document.activeElement,a.q('[data-act="import"]'));
+ const b=app({'three-plates-v3':before});t.after(()=>b.dom.window.close());assert.equal(b.state().shop,'Tesco');
+});
+
 function app(seed={},failStorage=false){
  const dom=new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'),{url:'http://localhost/Three-Plates/',runScripts:'outside-only'}),w=dom.window;
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
