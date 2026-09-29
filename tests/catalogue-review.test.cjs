@@ -25,7 +25,7 @@ const finishingCorrections = require("../docs/catalogue/finishing-ingredient-cor
 const mixedReview = require("../docs/catalogue/mixed-quantity-corrections.json");
 const omittedReview = require("../docs/catalogue/omitted-quantity-review.json");
 const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections,...finishingCorrections,...mixedReview.corrections,...omittedReview.corrections];
-const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id),...mixedReview.ingredients.map(i=>i.id)]);
+const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id),...mixedReview.ingredients.map(i=>i.id),...omittedReview.ingredients.map(i=>i.id)]);
 function correctedReference(old) {
   const r = JSON.parse(JSON.stringify(old));
   const correction = requiredCorrections.find(c => c.recipeId === old.id);
@@ -178,7 +178,7 @@ test("review preserves identities and ratings with only documented ingredient co
   assert.equal(R.length, before.recipes.length);
   assert.deepEqual(Object.fromEntries(Object.entries(I).filter(([id]) => !definitionAdditions.has(id))), before.ingredients);
   for (const c of corrections) assert.deepEqual(I[c.ingredient.id],c.ingredient);
-  for(const i of [...herbReview.ingredients,...mixedReview.ingredients]) assert.deepEqual(I[i.id],i);
+  for(const i of [...herbReview.ingredients,...mixedReview.ingredients,...omittedReview.ingredients]) assert.deepEqual(I[i.id],i);
   for (const old of before.recipes) {
     const r = find(old.id);
     assert.ok(r);
@@ -642,4 +642,36 @@ test('measured topping estimates include every component and preserve gram stock
   assert.match(r.planningNotes,/estimated as/);assert.match(r.planningNotes,/King Arthur/);assert.throws(()=>C.finishPlan(restored,'topping',R));
  }
  const review=require('../docs/catalogue/finishing-ingredient-corrections.json');assert.deepEqual(review.pending,[]);for(const row of review.conversionEvidence.entries)assert.equal(Math.round(row.gramsPerCup/16*2),row.twoTablespoonsGrams);
+});
+
+
+test('potato bread and berry toppings scale without consuming incompatible pantry stock', () => {
+ const cases=[
+  ['sp-kingarthur-sour-cream-chive-potato-bread-or-rolls-recipe',{'prepared-mashed-potato':135,'ex-green-spring-onions-93581d5c':24}],
+  ['sp-sally-healthy-berry-streusel-bars',{'flaked-almonds':64,'ex-old-fashioned-whole-rolled-oats-39f8b507':218}],
+ ];
+ for(const [recipeId,amounts] of cases){
+  const r=find(recipeId),s=C.defaults();
+  s.plans=[{id:'bake',recipeId,date:C.today(),meal:r.meals[0],servings:r.base/2,side:'none',cooked:false}];
+  s.pantry=[{id:'potato',qty:1000,always:false},{id:'ground-almonds',qty:250,always:false}];
+  const saved=C.migrate(C.clone(s),R,I);
+  assert.deepEqual(saved.pantry,s.pantry);
+  for(const [id,qty]of Object.entries(amounts)){
+   assert.equal(C.requirements(saved,R)[id],qty/2);
+   assert.equal(C.shopping(saved,R).find(i=>i.id===id).remaining,qty/2);
+   assert.equal(C.foodAllowed(r,{...saved.prefs,exclusions:[id]}),false);
+   saved.pantry.push({id,qty,always:false});
+  }
+  C.finishPlan(saved,'bake',R);
+  for(const [id,qty]of Object.entries(amounts))assert.equal(C.stock(saved,id),qty/2);
+  assert.equal(C.stock(saved,'potato'),1000);assert.equal(C.stock(saved,'ground-almonds'),250);
+  const done=C.migrate(C.clone(saved),R,I);assert.deepEqual(done.pantry,saved.pantry);
+  assert.throws(()=>C.finishPlan(done,'bake',R));
+ }
+ const berry=find('sp-sally-healthy-berry-streusel-bars');
+ assert.equal(C.foodAllowed(berry,{...C.defaults().prefs,exclusions:['milk']}),true);
+ assert.equal(C.foodAllowed(berry,{...C.defaults().prefs,exclusions:['ex-almond-butter-b2e86a6d']}),false);
+ assert.match(berry.ingredientGuidance,/estimated 5g/);
+ assert.equal(Math.round(213/(2.5*16)),5);
+ assert.equal(C.foodAllowed(find(cases[0][0]),{...C.defaults().prefs,exclusions:['potato']}),false);
 });
