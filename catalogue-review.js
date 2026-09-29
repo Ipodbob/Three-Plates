@@ -669,15 +669,24 @@
         "id": "flour",
         "oldQty": 0,
         "qty": 291
+      },
+      {
+        "id": "ex-white-chocolate-morsels-9c7d30dc",
+        "oldQty": 180,
+        "qty": 191
       }
     ],
     "replace": [
       [
         "2 and 1/3 cups (291g) all-purpose flour (spooned & leveled), plus more as needed",
         "extra flour as needed (amount not specified)"
+      ],
+      [
+        "Additional dusting/greasing/serving amounts are not included: 180g white chocolate morsels, plus 1 tbsp for topping",
+        "The measured white-chocolate topping is included as a planning estimate."
       ]
     ],
-    "note": "Includes 291g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+    "note": "Includes 291g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method. Includes 180g white chocolate in the dough plus an estimated 11g for its 1 tbsp topping (191g total). The estimate uses the publisher's 180g per cup divided by 16 tablespoons and rounded to whole grams. Morsel size and packing vary: use the publisher's tablespoon measure when cooking."
   },
   {
     "recipeId": "sp-sally-whole-wheat-bread",
@@ -897,6 +906,24 @@
     "note": "Includes 200g caster sugar in the cake plus 2 tbsp in the syrup, estimated as 24g (224g total), and 75g yogurt in the cake plus 2 tbsp in the icing, estimated as 28g (103g total). Estimates use King Arthur Baking's caster-sugar and yogurt references of 190g and 227g per cup, divided by 16 tablespoons and rounded to whole grams. Product density varies: use the publisher's spoon measures when cooking."
   }
 ]);
+  requiredIngredientCorrections.push({
+  "recipeId": "gf2-baileys-cheesecake",
+  "source": "https://www.bbcgoodfood.com/recipes/baileys-cheesecake",
+  "items": [
+    {
+      "id": "ex-powdered-gelatine-a81e7eb5",
+      "oldQty": 1,
+      "qty": 2
+    }
+  ],
+  "replace": [
+    [
+      "Additional dusting/greasing/serving amounts are not included: 11g pack powdered gelatine plus 1 tsp",
+      "The additional measured gelatine is included."
+    ]
+  ],
+  "note": "Includes 11g gelatine plus 1 tsp for the cheesecake, and a further heaped tsp for the coffee jelly. Shopping keeps 11g and an approximate 2 tsp as separate measured amounts; the heaped spoon is counted nominally. Follow the publisher spoon measures when cooking. Gram and teaspoon pantry stock are not automatically interchangeable."
+});
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,

@@ -4,6 +4,12 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Required gelatine and chocolate topping
+
+- Publisher verification identified a missing 1 tsp gelatine in Good Food Baileys cheesecake, in addition to its separate 11g quantity and heaped tsp for the jelly. The spoon identity now totals a nominal 2 tsp, with the heaped approximation explicit. Gram and spoon stock remain separate; no inferred density conversion is added.
+- Sally snickerdoodle blondies now include their required white-chocolate topping: 180g dough plus an estimated 11g topping, 191g total. The estimate uses the publisher's 180g-per-cup reference divided by 16 tablespoons and rounded to whole grams; morsel packing varies and the original tablespoon measure is retained in the note.
+- Updated the existing source-correction registers and runtime corrections, preserving recipe/ingredient identities and rating snapshots. All 27 catalogue checks passed, including shopping/scaling, unchanged saved stock, once-only deductions, and separate gelatine units. Browser confirmed 11g plus 2 tsp in the cheesecake recipe and shopping after reload. Isolated test data was cleared through Settings. Other imported recipe quantities remain under review.
+
 ## Menu and backup cancellation
 
 - Added UI regressions for cancelling an edited menu-save draft, valid/occupied-date menu-copy drafts and a validated backup replacement preview. Exact persisted text and opener focus remain unchanged; the backup cancellation retains the original shop on reload.

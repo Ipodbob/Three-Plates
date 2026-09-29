@@ -329,15 +329,24 @@
           "id": "flour",
           "oldQty": 0,
           "qty": 291
+        },
+        {
+          "id": "ex-white-chocolate-morsels-9c7d30dc",
+          "oldQty": 180,
+          "qty": 191
         }
       ],
       "replace": [
         [
           "2 and 1/3 cups (291g) all-purpose flour (spooned & leveled), plus more as needed",
           "extra flour as needed (amount not specified)"
+        ],
+        [
+          "Additional dusting/greasing/serving amounts are not included: 180g white chocolate morsels, plus 1 tbsp for topping",
+          "The measured white-chocolate topping is included as a planning estimate."
         ]
       ],
-      "note": "Includes 291g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+      "note": "Includes 291g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method. Includes 180g white chocolate in the dough plus an estimated 11g for its 1 tbsp topping (191g total). The estimate uses the publisher's 180g per cup divided by 16 tablespoons and rounded to whole grams. Morsel size and packing vary: use the publisher's tablespoon measure when cooking."
     },
     {
       "recipeId": "sp-sally-whole-wheat-bread",
