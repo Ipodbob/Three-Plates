@@ -147,3 +147,11 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Rendered audit found 42px mode/pantry tabs and smaller pantry row buttons. Shared CSS now gives these, scanner fraction presets and summary headings a 44px minimum height; pantry row buttons/presets also have a 44px minimum width.
 - Browser measured mode tabs, pantry tabs and Settings summary headings at 44px; pantry Edit/Remove measured 44 by 44px. A 320px pantry screenshot was inspected with stock present. Temporary 500g Pasta test stock was removed and reload completed.
 - CSS-only change plus release version. `git diff --check` passed; no new calculation logic or test suite rerun was needed. Prior functional baseline remains 216 passing checks. Physical phone ergonomics remain unverified.
+
+## Pepper preference aliases
+
+- Reviewed 15 explicit black/white/green peppercorn and peppermint identities that incorrectly inherited the vegetable Peppers exclusion. A separate preference alias map corrects filtering without rewriting original ingredients, quantities or saved stock. Explicit black-pepper identities now respect the Black pepper exclusion too.
+- 64 recipes use these mistaken links; 51 no longer disappear solely because Peppers is excluded. Other recipes with actual pepper ingredients remain excluded. Ambiguous seasonings and compound foods were not inferred from names.
+- Regression covers every affected recipe, exact ingredient exclusions, remaining vegetable exclusions and unchanged saved recipe/stock records. Browser verified Grasshopper Cupcakes is available with Peppers excluded; all test settings restored.
+
+- Full release validation: all 217 checks passed (31 core checks and 186 Node test-runner checks).

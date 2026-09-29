@@ -311,3 +311,28 @@ test('all reviewed seafood ingredients stay out of vegetarian and vegan discover
  for(const r of recipes){assert.ok(['fish','meat'].includes(r.kind),r.id);for(const diet of ['vegetarian','vegan'])assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet}),false,r.id);}
  for(const id of ['gf2-greek-style-roast-fish','sp-gfmore-peppered-mackerel-pink-pickled-onion-salad'])assert.equal(C.foodAllowed(find(id),{...C.defaults().prefs,diet:'pescatarian'}),true,id);
 });
+
+test('vegetable pepper preferences do not exclude reviewed peppercorns or peppermint',()=>{
+ const aliases=PLATES_DATA.ingredientPreferenceAliases;
+ const prefs={...C.defaults().prefs,exclusions:['pepper']};
+ for(const [id,mapped] of Object.entries(aliases)){
+  assert.ok(I[id],id);
+  const ingredient={id,qty:1,avoidIds:['pepper']};
+  const r={kind:'vegan',ingredients:[ingredient]};
+  assert.equal(C.foodAllowed(r,prefs),true,id);
+  assert.equal(C.foodAllowed(r,{...prefs,exclusions:[id]}),false,id+' exact exclusion');
+  for(const alias of mapped)assert.equal(C.foodAllowed(r,{...prefs,exclusions:[alias]}),false,id+' reviewed alias');
+  assert.deepEqual(ingredient.avoidIds,['pepper']);
+ }
+ for(const id of ['pepper','ex-roasted-red-peppers-3b0088dc'])assert.equal(C.foodAllowed({kind:'vegan',ingredients:[{id,qty:1,avoidIds:['pepper']}]},prefs),false,id);
+ const affected=R.filter(r=>r.ingredients.some(i=>aliases[i.id] && (i.avoidIds||[]).includes('pepper')));
+ assert.ok(affected.length>20);
+ let restored=0;
+ for(const r of affected){
+  const containsVegetable=r.ingredients.some(i=>i.id==='pepper'||(!Object.hasOwn(aliases,i.id)&&(i.avoidIds||[]).includes('pepper')));
+  assert.equal(C.foodAllowed(r,prefs),!containsVegetable,r.id);
+  if(!containsVegetable)restored++;
+ }
+ assert.ok(restored>20);
+ const s=C.defaults();s.pantry=[{id:'pepper',qty:2,always:false}];assert.equal(C.stock(s,'black-pepper'),0);
+});

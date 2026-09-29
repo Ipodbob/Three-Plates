@@ -732,7 +732,11 @@
       !r.ingredients.some(
         (i) =>
           excluded.has(i.id) ||
-          (i.avoidIds || []).some((id) => excluded.has(id)),
+          (
+            root.PLATES_DATA?.ingredientPreferenceAliases?.[i.id] ??
+            i.avoidIds ??
+            []
+          ).some((id) => excluded.has(id)),
       ) &&
       !(p.diet === "vegetarian" && r.vegetarianSuitable === false) &&
       !(p.diet === "vegetarian" && !["vegan", "vegetarian"].includes(r.kind)) &&
