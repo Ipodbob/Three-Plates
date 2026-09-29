@@ -1,0 +1,583 @@
+{
+  "reviewedOn": "2026-09-29",
+  "basis": "Existing ingredient identities and explicit fish/seafood names; oyster mushrooms excluded. Preference matching only, not stock equivalence or an allergy guarantee.",
+  "members": [
+    {
+      "id": "salmon",
+      "name": "Salmon fillets",
+      "group": "Meat & fish",
+      "unit": "g"
+    },
+    {
+      "id": "tuna",
+      "name": "Tinned tuna (drained)",
+      "group": "Meat & fish",
+      "unit": "g"
+    },
+    {
+      "id": "prawns",
+      "name": "Cooked prawns",
+      "group": "Meat & fish",
+      "unit": "g"
+    },
+    {
+      "id": "raw-prawns",
+      "name": "Raw prawns",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "anchovy",
+      "name": "Anchovy fillets",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "oyster-sauce",
+      "name": "Oyster sauce",
+      "unit": "g",
+      "group": "Staples"
+    },
+    {
+      "id": "fish-sauce",
+      "name": "Fish sauce",
+      "unit": "ml",
+      "group": "Staples"
+    },
+    {
+      "id": "ex-skinless-cod-loins-7b7654e9",
+      "name": "Skinless cod loins",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-frozen-small-atlantic-cooked-prawns-defrosted-837cfb9a",
+      "name": "Frozen small atlantic cooked prawns defrosted",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-prawns-571121fc",
+      "name": "Prawns (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-dressed-crab-48094b28",
+      "name": "Dressed crab (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-fish-stock-fa752599",
+      "name": "Fish stock",
+      "unit": "ml",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-white-crabmeat-eee983fc",
+      "name": "White crabmeat",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-brown-crabmeat-37b070eb",
+      "name": "Brown crabmeat",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-raw-prawns-2867dc61",
+      "name": "Raw prawns (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-ready-cooked-mussels-1f2011f4",
+      "name": "Ready-cooked mussels",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-peeled-prawns-aecfd7cd",
+      "name": "Peeled prawns",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-raw-king-prawns-shelled-and-a0767334",
+      "name": "Raw king prawns shelled and",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-frozen-lobster-8a4e9f2f",
+      "name": "Frozen lobster (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-brown-crab-meat-3f87a103",
+      "name": "Brown crab meat",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-mussels-cleaned-and-beards-removed-1906a346",
+      "name": "Mussels cleaned and beards removed",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-raw-tiger-prawns-in-their-shells-3eb47d4f",
+      "name": "Raw tiger prawns in their shells (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-mussels-38f8b4fd",
+      "name": "Mussels",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-squid-1be2787d",
+      "name": "Squid (count)",
+      "unit": "each",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-prawns-heads-and-shells-on-0d1747bf",
+      "name": "Prawns heads and shells on (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-mussels-34ebd4b6",
+      "name": "Mussels (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-squids-with-tentacles-311544e8",
+      "name": "Squids with tentacles (count)",
+      "unit": "each",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-shrimp-paste-0c1864f3",
+      "name": "Shrimp paste",
+      "unit": "tsp",
+      "group": "Staples"
+    },
+    {
+      "id": "ex-smoked-salmon-3bdb2bdf",
+      "name": "Smoked salmon",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cooked-salmon-fillets-a6eed50b",
+      "name": "Cooked salmon fillets (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-prawn-72c00655",
+      "name": "Prawn",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cooked-shelled-mussels-4d3cda6d",
+      "name": "Cooked shelled mussels",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cod-fillets-364cbdf6",
+      "name": "Cod fillets",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-clams-98ce79c8",
+      "name": "Clams (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-prawns-shells-and-heads-on-4f22cd21",
+      "name": "Prawns shells and heads on (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-smoked-trout-2b9b6aa1",
+      "name": "Smoked trout",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-sardines-in-sunflower-oil-d169028f",
+      "name": "Sardines in sunflower oil",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-trout-fillets-9cabe4fd",
+      "name": "Trout fillets (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-whole-raw-king-prawns-e27acc41",
+      "name": "Whole raw king prawns",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-oyster-sauce-333242a0",
+      "name": "Oyster sauce",
+      "unit": "ml",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-cooked-prawns-b45ce0ad",
+      "name": "Cooked prawns (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-white-fish-loin-aed8cc2a",
+      "name": "White fish loin",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-side-of-salmon-skinned-and-pin-boned-35774d83",
+      "name": "Side of salmon skinned and pin-boned",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-skinless-salmon-fillets-abcc72d4",
+      "name": "Skinless salmon fillets (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cod-fillets-1c41a693",
+      "name": "Cod fillets (count)",
+      "unit": "each",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-white-fish-fillets-85fb0724",
+      "name": "White fish fillets",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-hot-fish-stock-80771bbf",
+      "name": "Hot fish stock",
+      "unit": "ml",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-raw-prawn-defrosted-if-frozen-e6a9ca22",
+      "name": "Raw prawn defrosted if frozen",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-smoked-haddock-fillets-baf81a39",
+      "name": "Smoked haddock fillets",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-peppered-smoked-mackerel-torn-into-pieces-ce0093bc",
+      "name": "Peppered smoked mackerel torn into pieces",
+      "unit": "g",
+      "group": "Fruit & veg"
+    },
+    {
+      "id": "ex-salmon-fillet-294c43c8",
+      "name": "Salmon fillet (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cooked-king-prawns-39693914",
+      "name": "Cooked king prawns",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-prawns-thawed-if-frozen-1bb14e3b",
+      "name": "Prawns thawed if frozen",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cooked-king-prawns-defrosted-if-frozen-d66400b9",
+      "name": "Cooked king prawns defrosted if frozen",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-slices-smoked-salmon-92d15411",
+      "name": "Slices smoked salmon (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-aldi-specially-selected-lightly-smoked-scotti-f2086003",
+      "name": "Aldi specially selected lightly smoked scottish salmon fillets (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-skinless-poached-salmon-fillets-flaked-a769e9f5",
+      "name": "Skinless poached salmon fillets flaked (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-fresh-mussels-191dfb2c",
+      "name": "Fresh mussels",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-hot-fish-stock-heated-to-a-simmer-4c6896e1",
+      "name": "Hot fish stock heated to a simmer",
+      "unit": "ml",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-raw-shelled-king-prawns-c7dfdebc",
+      "name": "Raw shelled king prawns",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-fish-stock-made-a7a3796b",
+      "name": "Fish stock made",
+      "unit": "ml",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-fish-pie-mix-0b47458e",
+      "name": "Fish pie mix",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cooked-mixed-shellfish-2ed81f6c",
+      "name": "Cooked mixed shellfish",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-cooked-prawns-salmon-cd4c34d0",
+      "name": "Cooked prawns salmon",
+      "unit": "g",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-un-dyed-smoked-haddock-fillet-a76cff1f",
+      "name": "Un-dyed smoked haddock fillet",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-sardines-in-chilli-olive-oil-541aa455",
+      "name": "Sardines in chilli olive oil",
+      "unit": "g",
+      "group": "Fruit & veg"
+    },
+    {
+      "id": "ex-raw-large-shrimp-c5471e1c",
+      "name": "Raw large shrimp",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-wild-salmon-fillets-7b7406f6",
+      "name": "Wild salmon fillets (count)",
+      "unit": "each",
+      "group": "Meat & fish"
+    },
+    {
+      "id": "ex-sea-scallops-36ef9847",
+      "name": "Sea scallops",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-raw-shrimp-a2bb72e4",
+      "name": "Raw shrimp",
+      "unit": "g",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-jumbo-shrimp-936733cf",
+      "name": "Jumbo shrimp (count)",
+      "unit": "each",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-fresh-skinless-pollock-fillets-285cf6e4",
+      "name": "Fresh skinless pollock fillets (count)",
+      "unit": "each",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-skinless-hake-fillets-73b8dbfe",
+      "name": "Skinless hake fillets (count)",
+      "unit": "each",
+      "group": "Cupboard"
+    },
+    {
+      "id": "ex-skinless-pollock-fillets-551c7e04",
+      "name": "Skinless pollock fillets (count)",
+      "unit": "each",
+      "group": "Cupboard"
+    }
+  ],
+  "families": [
+    {
+      "anchors": [
+        "salmon",
+        "tuna",
+        "prawns"
+      ],
+      "members": [
+        "salmon",
+        "tuna",
+        "prawns",
+        "raw-prawns",
+        "anchovy",
+        "oyster-sauce",
+        "fish-sauce",
+        "ex-skinless-cod-loins-7b7654e9",
+        "ex-frozen-small-atlantic-cooked-prawns-defrosted-837cfb9a",
+        "ex-prawns-571121fc",
+        "ex-dressed-crab-48094b28",
+        "ex-fish-stock-fa752599",
+        "ex-white-crabmeat-eee983fc",
+        "ex-brown-crabmeat-37b070eb",
+        "ex-raw-prawns-2867dc61",
+        "ex-ready-cooked-mussels-1f2011f4",
+        "ex-peeled-prawns-aecfd7cd",
+        "ex-raw-king-prawns-shelled-and-a0767334",
+        "ex-frozen-lobster-8a4e9f2f",
+        "ex-brown-crab-meat-3f87a103",
+        "ex-mussels-cleaned-and-beards-removed-1906a346",
+        "ex-raw-tiger-prawns-in-their-shells-3eb47d4f",
+        "ex-mussels-38f8b4fd",
+        "ex-squid-1be2787d",
+        "ex-prawns-heads-and-shells-on-0d1747bf",
+        "ex-mussels-34ebd4b6",
+        "ex-squids-with-tentacles-311544e8",
+        "ex-shrimp-paste-0c1864f3",
+        "ex-smoked-salmon-3bdb2bdf",
+        "ex-cooked-salmon-fillets-a6eed50b",
+        "ex-prawn-72c00655",
+        "ex-cooked-shelled-mussels-4d3cda6d",
+        "ex-cod-fillets-364cbdf6",
+        "ex-clams-98ce79c8",
+        "ex-prawns-shells-and-heads-on-4f22cd21",
+        "ex-smoked-trout-2b9b6aa1",
+        "ex-sardines-in-sunflower-oil-d169028f",
+        "ex-trout-fillets-9cabe4fd",
+        "ex-whole-raw-king-prawns-e27acc41",
+        "ex-oyster-sauce-333242a0",
+        "ex-cooked-prawns-b45ce0ad",
+        "ex-white-fish-loin-aed8cc2a",
+        "ex-side-of-salmon-skinned-and-pin-boned-35774d83",
+        "ex-skinless-salmon-fillets-abcc72d4",
+        "ex-cod-fillets-1c41a693",
+        "ex-white-fish-fillets-85fb0724",
+        "ex-hot-fish-stock-80771bbf",
+        "ex-raw-prawn-defrosted-if-frozen-e6a9ca22",
+        "ex-smoked-haddock-fillets-baf81a39",
+        "ex-peppered-smoked-mackerel-torn-into-pieces-ce0093bc",
+        "ex-salmon-fillet-294c43c8",
+        "ex-cooked-king-prawns-39693914",
+        "ex-prawns-thawed-if-frozen-1bb14e3b",
+        "ex-cooked-king-prawns-defrosted-if-frozen-d66400b9",
+        "ex-slices-smoked-salmon-92d15411",
+        "ex-aldi-specially-selected-lightly-smoked-scotti-f2086003",
+        "ex-skinless-poached-salmon-fillets-flaked-a769e9f5",
+        "ex-fresh-mussels-191dfb2c",
+        "ex-hot-fish-stock-heated-to-a-simmer-4c6896e1",
+        "ex-raw-shelled-king-prawns-c7dfdebc",
+        "ex-fish-stock-made-a7a3796b",
+        "ex-fish-pie-mix-0b47458e",
+        "ex-cooked-mixed-shellfish-2ed81f6c",
+        "ex-cooked-prawns-salmon-cd4c34d0",
+        "ex-un-dyed-smoked-haddock-fillet-a76cff1f",
+        "ex-sardines-in-chilli-olive-oil-541aa455",
+        "ex-raw-large-shrimp-c5471e1c",
+        "ex-wild-salmon-fillets-7b7406f6",
+        "ex-sea-scallops-36ef9847",
+        "ex-raw-shrimp-a2bb72e4",
+        "ex-jumbo-shrimp-936733cf",
+        "ex-fresh-skinless-pollock-fillets-285cf6e4",
+        "ex-skinless-hake-fillets-73b8dbfe",
+        "ex-skinless-pollock-fillets-551c7e04"
+      ]
+    },
+    {
+      "anchors": [
+        "prawns"
+      ],
+      "members": [
+        "prawns",
+        "raw-prawns",
+        "ex-frozen-small-atlantic-cooked-prawns-defrosted-837cfb9a",
+        "ex-prawns-571121fc",
+        "ex-raw-prawns-2867dc61",
+        "ex-peeled-prawns-aecfd7cd",
+        "ex-raw-king-prawns-shelled-and-a0767334",
+        "ex-raw-tiger-prawns-in-their-shells-3eb47d4f",
+        "ex-prawns-heads-and-shells-on-0d1747bf",
+        "ex-shrimp-paste-0c1864f3",
+        "ex-prawn-72c00655",
+        "ex-prawns-shells-and-heads-on-4f22cd21",
+        "ex-whole-raw-king-prawns-e27acc41",
+        "ex-cooked-prawns-b45ce0ad",
+        "ex-raw-prawn-defrosted-if-frozen-e6a9ca22",
+        "ex-cooked-king-prawns-39693914",
+        "ex-prawns-thawed-if-frozen-1bb14e3b",
+        "ex-cooked-king-prawns-defrosted-if-frozen-d66400b9",
+        "ex-raw-shelled-king-prawns-c7dfdebc",
+        "ex-cooked-prawns-salmon-cd4c34d0",
+        "ex-raw-large-shrimp-c5471e1c",
+        "ex-raw-shrimp-a2bb72e4",
+        "ex-jumbo-shrimp-936733cf"
+      ]
+    },
+    {
+      "anchors": [
+        "salmon"
+      ],
+      "members": [
+        "salmon",
+        "ex-smoked-salmon-3bdb2bdf",
+        "ex-cooked-salmon-fillets-a6eed50b",
+        "ex-side-of-salmon-skinned-and-pin-boned-35774d83",
+        "ex-skinless-salmon-fillets-abcc72d4",
+        "ex-salmon-fillet-294c43c8",
+        "ex-slices-smoked-salmon-92d15411",
+        "ex-aldi-specially-selected-lightly-smoked-scotti-f2086003",
+        "ex-skinless-poached-salmon-fillets-flaked-a769e9f5",
+        "ex-cooked-prawns-salmon-cd4c34d0",
+        "ex-wild-salmon-fillets-7b7406f6"
+      ]
+    }
+  ]
+}

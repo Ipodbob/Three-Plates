@@ -196,3 +196,8 @@ test('low-count publisher recipes leave discovery while saved plans remain reada
 test('skip to content focuses the current page without changing route or saved data',()=>{
  const a=app();for(const name of ['choose','batch','plan','shop','pantry','you']){a.route(name);const heading=a.q('h1').textContent,saved=a.w.localStorage.getItem('three-plates-v3');const event=new a.w.MouseEvent('click',{bubbles:true,cancelable:true});a.q('.skip-link').dispatchEvent(event);assert.equal(event.defaultPrevented,true);assert.equal(a.w.location.hash,'#'+name);assert.equal(a.q('h1').textContent,heading);assert.equal(a.w.document.activeElement,a.q('main'));assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved);}a.dom.window.close();
 });
+
+test('fish and seafood group stays compact across reload and can be removed without other exclusions',()=>{
+ const a=app();a.route('you');a.set('#pref-exclusions','Fish & seafood');a.submit('.pref-form[data-key="exclusions"]');assert.equal(a.w.document.querySelectorAll('[data-act="pref-remove"][data-key="exclusions"]').length,1);assert.match(a.q('[data-act="pref-remove"][data-key="exclusions"]').textContent,/Fish & seafood/);
+ a.set('#pref-exclusions','Garlic cloves');a.submit('.pref-form[data-key="exclusions"]');const b=app({'three-plates-v3':JSON.stringify(a.state())});b.route('you');assert.equal(b.w.document.querySelectorAll('[data-act="pref-remove"][data-key="exclusions"]').length,2);b.click('[data-act="pref-remove"][data-id="group-fish"]');assert.deepEqual(b.state().prefs.exclusions,['garlic']);a.dom.window.close();b.dom.window.close();
+});

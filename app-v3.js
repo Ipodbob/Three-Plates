@@ -1169,11 +1169,22 @@
     },
   };
   function preferenceSection(key, title) {
+    const seafood =
+      key === "exclusions" &&
+      groups["group-fish"].ids.every((id) => state.prefs[key].includes(id));
+    const selected = seafood
+      ? [
+          "group-fish",
+          ...state.prefs[key].filter(
+            (id) => !groups["group-fish"].ids.includes(id),
+          ),
+        ]
+      : state.prefs[key];
     const options = [
       ...Object.entries(groups).map(([id, g]) => ({ id, name: g.name })),
       ...Object.values(I).sort((a, b) => a.name.localeCompare(b.name)),
     ];
-    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label><input id="pref-${key}" type="search" list="pref-options-${key}" placeholder="Search ingredients" autocomplete="off" required><datalist id="pref-options-${key}">${options.map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${state.prefs[key].map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(ing(id)?.name)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
+    return `<section class="panel"><h2 class="section-title">${title}</h2><form class="pref-form" data-key="${key}"><label class="sr-only" for="pref-${key}">${title}</label><input id="pref-${key}" type="search" list="pref-options-${key}" placeholder="Search ingredients" autocomplete="off" required><datalist id="pref-options-${key}">${options.map((i) => `<option value="${e(i.name)} [${e(i.id)}]"></option>`).join("")}</datalist><button class="button" type="submit">Add</button></form><div class="chip-wrap">${selected.map((id) => `<button class="chip ${key === "exclusions" ? "excluded" : ""}" data-act="pref-remove" data-key="${key}" data-id="${e(id)}">${e(groups[id]?.name || ing(id)?.name)} ${icon("close")}<span class="sr-only">Remove</span></button>`).join("") || '<span class="small-count">None added.</span>'}</div></section>`;
   }
   function cuisineSection() {
     const choices = [...new Set(R.map((r) => r.cuisine))].sort();
@@ -2045,7 +2056,7 @@
             break;
           case "pref-remove":
             state.prefs[b.dataset.key] = state.prefs[b.dataset.key].filter(
-              (x) => x !== id,
+              (x) => !(groups[id]?.ids || [id]).includes(x),
             );
             break;
           case "clear-search":
