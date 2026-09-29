@@ -1,6 +1,6 @@
 # Dialog verification matrix
 
-Reviewed against v3.11.40, main `a77db4e0c14a8053d6c0c0ec4d254108d073044a`, plus the cancellation regression introduced with this document. Evidence is deliberately separated: jsdom assertions do not prove mobile layout or a physical keyboard experience.
+Reviewed through v3.11.48, main `1791eda943f50216289167f1afb3b873d40ee781`, with the defrost completion follow-up below. Evidence is deliberately separated: jsdom assertions do not prove mobile layout or a physical keyboard experience.
 
 ## Shared cancellation check
 
@@ -19,7 +19,7 @@ Reviewed against v3.11.40, main `a77db4e0c14a8053d6c0c0ec4d254108d073044a`, plus
 | Batch creation | Reviewed ingredient-note and portion-stepper UI checks | Shared cancellation test covers portions draft | 320px zero-portion rejection, visible Save and Close focus checked; subsequent valid four-portion batch saved |
 | Cooked-batch allocation | UI whole allocation and Phase 1 once-only deduction/freezer confirmation | Shared cancellation test covers eat-now/freezer draft | 320px stacked allocation controls previously checked |
 | Stored booking | UI meal/time defaults, custom time, blank validity, booking/reload; Phase 1 overbooking guards; rejected date remains editable and corrected draft saves | Shared cancellation test covers meal/time/portion draft | 320px beyond-fridge-deadline error now visible inside dialog, focused with draft retained; correcting date saves |
-| Defrost / correction / discard | Core and Phase 1 deadlines, reservations, corrections; history UI restores mistaken discard | Valid/invalid correction, partial discard and defrost drafts cancel with exact saved-text/focus checks; whole-lot discard confirmation also cancels; reload retains original portions | 320px reserved-count rejection and partial-discard native limit readable; cancelled defrost returns focus and remains thawing on reload. Invalid defrost field could not be driven with the browser tool; no new claim for that error layout |
+| Defrost / correction / discard | Core and Phase 1 deadlines, reservations, corrections; history UI restores mistaken discard; UI rejects earlier-than-start completion, retains draft, then accepts corrected time and survives reload | Valid/invalid correction, partial discard and defrost drafts cancel with exact saved-text/focus checks; whole-lot discard confirmation also cancels; reload retains original portions | 320px reserved-count rejection and partial-discard native limit readable. Defrost early-time inline alert and future-time native message both checked at 320px; Close returns focus, reload remains thawing. Valid completion and next-day deadline survive reload |
 | Save/copy menu | UI saved-week copy, hidden-input validation; menus suite rejects conflicts/preferences atomically | UI test cancels save draft, valid copy draft and occupied-date copy; exact persisted text and Plan opener focus checked | 320px occupied-date warning, disabled Copy action and Close fit; cancellation returns focus to Saved menus and original meal survives reload |
 | Backup restore | UI round-trip, malformed JSON, stale-tab refusal; history UI large backup/damaged preferences | UI replacement-preview Cancel preserves exact saved text, returns focus to Restore backup and retains original shop on reload | Native file picker and physical-phone restore not established |
 | Scanner | Barcode UI product confirmation, partial packs, reload, camera denial and save failure | Skip preserves exact state; dismissal rejects late lookups and releases camera tracks | 320px and real barcode-entry checks recorded; continuous physical camera/keyboard remains unverified |
@@ -33,3 +33,9 @@ Two additional UI regressions cover menu save/copy cancellation and backup repla
 ## Exit rule
 
 Remaining cells require the stated evidence; they are not waived by a green suite. Reuse an existing test or recorded browser journey only when it covers the same interaction and state. Physical iPhone/Android results must be recorded separately from mocked camera and narrow desktop screenshots. This matrix does not establish accuracy of all imported recipe quantities.
+
+## Defrost completion follow-up
+
+A synthetic one-portion batch on isolated localhost:4174 was frozen, booked and moved into thawing. A future completion time triggered native validation without saving; an earlier-than-start time showed the inline dialog alert with the draft intact. Both messages were inspected at 320px. Close returned focus to Fully defrosted; reload still showed the thawing reservation. Reopening and confirming a valid time displayed Defrosted · fridge and a deadline 24 hours later, unchanged after reload. The single synthetic portion and its reservation were removed using its discard action; archived cooking/empty-portion history remains. No user origin or backup was reset.
+
+The new connected UI regression complements the browser check with exact persisted-text equality after rejection, unchanged raw stock and portion count, corrected completion timestamp and reload equality. This closes the earlier unsupported datetime-input check: the browser accepted minute-precision ISO input. No physical-phone or food-handling claim follows from these synthetic records.

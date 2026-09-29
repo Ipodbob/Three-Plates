@@ -1,6 +1,6 @@
 # Current completion audit
 
-Reviewed 29 September 2026 against main `3e3714d8d859ec605b3d49119e55e0f516ac161b` (v3.11.45), with the v3.11.46 dialog-feedback follow-up. This is a scope-and-evidence register, not a declaration that the whole product is complete. Earlier observations are retained in [whole-app-audit.md](whole-app-audit.md).
+Reviewed 29 September 2026 against main `1791eda943f50216289167f1afb3b873d40ee781` (v3.11.48), with the defrost verification follow-up. This is a scope-and-evidence register, not a declaration that the whole product is complete. Earlier observations are retained in [whole-app-audit.md](whole-app-audit.md).
 
 ## Authority and scope
 
@@ -10,8 +10,8 @@ The goal remains comprehensive, simple, consistent and functional across Choose,
 
 ## Current delivery evidence
 
-- PR #56 merged v3.11.44 at the commit above. GitHub Pages run [36533888265](https://github.com/Ipodbob/Three-Plates/actions/runs/36533888265) succeeded for that exact commit; all 21 checked public assets matched the local release, normalizing line endings. Fresh live navigation displayed v3.11.44. Static hosting and the case-sensitive `/Three-Plates/` path remain unchanged.
-- Latest full regression baseline: **272 passed** with v3.11.46 dialog feedback (32 core plus 240 Node checks), zero failures, cancellations or skips; Node stage 163 seconds. A final adjustment clears old feedback after a successful retry; the three affected failure/correction tests passed again afterward. Release deployment evidence remains separate from local checks.
+- PR #60 merged v3.11.48 at the commit above. GitHub Pages run [36537734715](https://github.com/Ipodbob/Three-Plates/actions/runs/36537734715) succeeded for that exact commit; all 21 checked public assets matched the local release, normalizing line endings. Fresh release-query navigation displayed v3.11.48. Static hosting and the case-sensitive `/Three-Plates/` path remain unchanged. An older cached unversioned document observed during v3.11.47 verification is recorded separately in the historical audit.
+- Latest full regression baseline: **274 passed** on v3.11.48 plus the new defrost-completion regression (32 core plus 242 Node checks), zero failures, cancellations or skips; Node stage 148 seconds. This includes the scanner unit and repeat-focus fixes. The defrost follow-up changes tests and evidence only, not runtime code. Release deployment evidence remains separate from local checks.
 - Browser test records use isolated localhost:4174. Current cleanup removes only test-created plans and portions through their individual UI actions; synthetic archived history remains. User origins and production data are not reset.
 
 ## Requirement-by-requirement evidence

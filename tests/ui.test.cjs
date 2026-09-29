@@ -1,6 +1,35 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
 
+test('invalid defrost time retains its draft and corrected completion survives reload without changing stock', (t) => {
+ const setup=app(), C=setup.w.PlatesCore, R=setup.w.PLATES_DATA.recipes, s=C.defaults(), now=Date.now();
+ s.batches=[{id:'defrost-audit',recipeId:'prep-chilli',servings:2,date:C.today(),cooked:false}];
+ C.finishBatch(s,'defrost-audit',{eat:0,fridge:0,freezer:2,cookedAt:new Date(now-120000).toISOString(),freezerConfirmed:true},R,now-60000);
+ C.changeStorage(s,s.lots[0].id,'thaw',R,now-30000);
+ s.pantry=[{id:'pasta',qty:125,always:false}];
+ setup.dom.window.close();
+ const a=app({'three-plates-v3':JSON.stringify(s)});t.after(()=>a.dom.window.close());
+ a.route('pantry');a.click('[data-act="pantry-tab"][data-id="prepared"]');a.click('[data-act="defrosted"]');
+ const saved=a.w.localStorage.getItem('three-plates-v3'), valid=a.q('#thawed-at').value;
+ const earlier=new Date(now-3600000);
+ const local=new Date(earlier.getTime()-earlier.getTimezoneOffset()*60000).toISOString().slice(0,19);
+ a.set('#thawed-at',local);const draft=a.q('#thawed-at').value;a.submit('#defrost-form');
+ assert.equal(a.q('#sheet').open,true);
+ assert.equal(a.q('#thawed-at').value,draft);
+ assert.equal(a.q('#sheet-feedback').hidden,false);
+ assert.match(a.q('#sheet-feedback').textContent,/after thawing started/);
+ assert.equal(a.w.document.activeElement,a.q('#sheet-feedback'));
+ assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved);
+ a.set('#thawed-at',valid);a.submit('#defrost-form');
+ assert.equal(a.q('#sheet').open,false);
+ const state=a.state(), lot=state.lots[0];
+ assert.equal(lot.location,'thawed');assert.equal(lot.portions,2);
+ assert.equal(new Date(lot.thawedAt).getTime(),new Date(valid).getTime());
+ assert.deepEqual(state.pantry,[{id:'pasta',qty:125,always:false}]);
+ const b=app({'three-plates-v3':JSON.stringify(state)});t.after(()=>b.dom.window.close());
+ assert.deepEqual(b.state().lots,state.lots);assert.deepEqual(b.state().pantry,state.pantry);
+});
+
 test('stored booking errors are visible inside the dialog and a corrected draft can save', (t) => {
  const setup=app(),C=setup.w.PlatesCore,R=setup.w.PLATES_DATA.recipes,s=C.defaults(),now=Date.now();
  s.batches=[{id:'dialog-error',recipeId:'prep-chilli',servings:2,date:C.today(),cooked:false}];
