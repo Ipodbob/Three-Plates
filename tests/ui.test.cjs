@@ -595,3 +595,20 @@ test('reviewed potato bread and berry bars show complete shopping amounts after 
   assert.deepEqual(b.state().pantry,[]);assert.equal(b.state().plans[0].recipeId,id);
  }
 });
+
+
+test('new baking flavouring and watercress shopping rows survive app reload', (t)=>{
+ for(const [id,ingredient,qty,label]of [
+  ['sp-kingarthur-panettone-muffins-recipe','fiori-di-sicilia',.25,'0.25 tsp'],
+  ['sp-skinnytaste-vietnamese-shaking-beef-bo-luc-lac','ex-watercress-6c01a4a4',136,'136 g'],
+ ]){
+  const setup=app(),C=setup.w.PlatesCore,r=setup.w.PLATES_DATA.recipes.find(r=>r.id===id),state=C.defaults();
+  state.plans=[{id:'existing-meal',recipeId:id,date:C.today(),meal:r.meals[0],servings:r.base,side:'none',cooked:false}];setup.dom.window.close();
+  const a=app({'three-plates-v3':JSON.stringify(state)});t.after(()=>a.dom.window.close());a.route('shop');
+  const row=a.q('[data-act="bought"][data-id="'+ingredient+'"]').closest('.shopping-row');assert.ok(row.textContent.includes(label),row.textContent);
+  a.click('[data-act="bought"][data-id="'+ingredient+'"]');assert.equal(a.state().bought[ingredient],qty);
+  const b=app({'three-plates-v3':JSON.stringify(a.state())});t.after(()=>b.dom.window.close());b.route('shop');
+  assert.equal(b.state().bought[ingredient],qty);assert.deepEqual(b.state().pantry,[]);
+  assert.ok(b.q('[data-act="bought"][data-id="'+ingredient+'"]').closest('.shopping-row').textContent.includes(label));
+ }
+});
