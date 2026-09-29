@@ -17,13 +17,17 @@ const C = require("../menus.js"),
   R = PLATES_DATA.recipes,
   I = PLATES_DATA.ingredients;
 const find = (id) => R.find((r) => r.id === id);
-test("review preserves all saved recipe identities, ratings, ingredients and existing plan quantities", () => {
+const corrections = require("../docs/catalogue/fish-ingredient-corrections.json").corrections;
+const additions = new Set(corrections.map(c => c.ingredient.id));
+test("review preserves saved identities, ratings and original quantities with only reviewed missing ingredients added", () => {
   assert.equal(R.length, before.recipes.length);
-  assert.deepEqual(I, before.ingredients);
+  assert.deepEqual(Object.fromEntries(Object.entries(I).filter(([id]) => !additions.has(id))), before.ingredients);
+  for (const c of corrections) assert.deepEqual(I[c.ingredient.id],c.ingredient);
   for (const old of before.recipes) {
     const r = find(old.id);
     assert.ok(r);
-    assert.deepEqual(r.ingredients, old.ingredients, old.id);
+    assert.deepEqual(r.ingredients.filter(i => !additions.has(i.id)), old.ingredients, old.id);
+    assert.deepEqual(r.ingredients.filter(i => additions.has(i.id)), corrections.filter(c => c.recipeId === old.id).map(c => ({id:c.ingredient.id,qty:c.qty,avoidIds:c.avoidIds})),old.id);
     assert.deepEqual(r.source, old.source, old.id);
     assert.deepEqual(r.batch, old.batch, old.id);
     const s = C.defaults();
@@ -42,7 +46,7 @@ test("review preserves all saved recipe identities, ratings, ingredients and exi
     assert.equal(migrated.plans.length, 1, old.id);
     assert.equal(migrated.plans[0].servings, s.plans[0].servings, old.id);
     assert.deepEqual(
-      C.requirements(migrated, R),
+      Object.fromEntries(Object.entries(C.requirements(migrated, R)).filter(([id]) => !additions.has(id))),
       C.requirements(s, before.recipes),
       old.id,
     );
@@ -358,4 +362,35 @@ test('vegetarian quesadillas are not classified by fish-slice equipment',()=>{
  assert.equal(r.kind,'vegetarian');assert.equal(r.emoji,'🫓');
  assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet:'vegetarian'}),true);
  assert.equal(C.foodAllowed(r,{...C.defaults().prefs,diet:'vegan'}),false);
+});
+
+test('missing fish corrections scale package counts without altering existing stock or completed meals',()=>{
+ const expected=[['sp-gfmore-lentil-tuna-salad','tuna-water-160g-can',2],['sp-skinnytaste-sardine-salad','sardines-water-4-4oz-tin',1],['sp-skinnytaste-tuna-and-white-bean-salad','tuna-water-3oz-packet',2]];
+ for(const [recipeId,id,qty] of expected){
+  const r=find(recipeId);assert.equal(I[id].unit,'each');assert.equal(r.ingredients.find(i=>i.id===id).qty,qty);
+  const s=C.defaults();s.pantry=[{id:'tuna',qty:200,always:false},{id,qty:qty*2,always:false}];
+  s.plans=[{id:'old-plan',recipeId,date:C.today(),meal:'Lunch',servings:r.base,side:'none',cooked:false}];
+  const migrated=C.migrate(JSON.parse(JSON.stringify(s)),R,I);
+  assert.deepEqual(migrated.pantry,s.pantry);assert.equal(migrated.plans[0].servings,r.base);
+  assert.equal(C.requirements(migrated,R)[id],qty);assert.equal(C.scaled(r,r.base*2).find(i=>i.id===id).qty,qty*2);
+  C.finishPlan(migrated,'old-plan',R);assert.equal(C.stock(migrated,id),qty);assert.equal(C.stock(migrated,'tuna'),200);
+  const completed=C.migrate(JSON.parse(JSON.stringify(migrated)),R,I);
+  assert.deepEqual(C.requirements(completed,R),{});assert.deepEqual(completed.pantry,migrated.pantry);
+  assert.throws(()=>C.finishPlan(completed,'old-plan',R));assert.equal(C.stock(completed,id),qty);
+  const noStock=C.defaults();noStock.plans=s.plans;const row=C.shopping(noStock,R).find(i=>i.id===id);assert.equal(row.remaining,qty);
+  assert.equal(C.purchase(noStock,id,qty,I).qty,qty);
+  assert.equal(C.foodAllowed(r,{...s.prefs,exclusions:['salmon','tuna','prawns']}),false);
+  if(id.startsWith('tuna'))assert.equal(C.foodAllowed(r,{...s.prefs,exclusions:['tuna']}),false);
+  assert.ok(!r.planningNotes.includes(corrections.find(c=>c.recipeId===recipeId).omittedText));
+ }
+});
+
+test('fish cakes and uncertain dashi respect broad fish exclusions without inventing stock matches',()=>{
+ const p={...C.defaults().prefs,exclusions:['salmon','tuna','prawns']};
+ for(const id of ['gf2-miso-soup','gf2-tteokbokki-spicy-rice-cakes']){
+  assert.equal(C.foodAllowed(find(id),p),false,id);assert.equal(C.foodAllowed(find(id),C.defaults().prefs),true,id);
+ }
+ assert.equal(C.preferenceIds(p.exclusions).has('ex-dashi-a03a1e85'),false);
+ assert.match(find('gf2-miso-soup').methodNote,/can contain fish/);
+ const s=C.defaults();s.pantry=[{id:'tuna',qty:300,always:false}];assert.equal(C.stock(s,'ex-eomuk-a86f582c'),0);
 });

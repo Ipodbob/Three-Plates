@@ -1,0 +1,61 @@
+{
+  "reviewedOn": "2026-09-29",
+  "basis": "Publisher package counts, not assumed drained mass. Existing uncompleted plans acquire the missing shopping requirement; pantry and completed records are not rewritten.",
+  "corrections": [
+    {
+      "recipeId": "sp-gfmore-lentil-tuna-salad",
+      "ingredient": {
+        "id": "tuna-water-160g-can",
+        "name": "Tuna in water (160g can, drain before use)",
+        "unit": "each",
+        "group": "Cupboard"
+      },
+      "qty": 2,
+      "avoidIds": [
+        "tuna"
+      ],
+      "source": "https://www.bbcgoodfood.com/recipes/lentil-tuna-salad",
+      "omittedText": "2 x 160g cans tuna steaks in spring water, drained and flaked"
+    },
+    {
+      "recipeId": "sp-skinnytaste-sardine-salad",
+      "ingredient": {
+        "id": "sardines-water-4-4oz-tin",
+        "name": "Sardines in water (4.4oz / 125g tin, drain before use)",
+        "unit": "each",
+        "group": "Cupboard"
+      },
+      "qty": 1,
+      "avoidIds": [],
+      "source": "https://www.skinnytaste.com/sardine-salad/",
+      "omittedText": "1 4.4-ounce tin  no-salt-added sardines in water (drained (such as Wild Planet) )"
+    },
+    {
+      "recipeId": "sp-skinnytaste-tuna-and-white-bean-salad",
+      "ingredient": {
+        "id": "tuna-water-3oz-packet",
+        "name": "Tuna in water (3oz / 85g packet, drain before use)",
+        "unit": "each",
+        "group": "Cupboard"
+      },
+      "qty": 2,
+      "avoidIds": [
+        "tuna"
+      ],
+      "source": "https://www.skinnytaste.com/tuna-and-white-bean-salad/",
+      "omittedText": "2 3-ounce  packets tuna in water (drained)"
+    }
+  ],
+  "preferenceReview": [
+    {
+      "id": "ex-eomuk-a86f582c",
+      "source": "https://www.bbcgoodfood.com/recipes/tteokbokki-spicy-rice-cakes",
+      "decision": "Publisher explicitly identifies Korean fish cakes; included in the broad fish family."
+    },
+    {
+      "id": "ex-dashi-a03a1e85",
+      "source": "https://www.bbcgoodfood.com/recipes/miso-soup",
+      "decision": "Publisher describes plant and fish versions. Broad fish exclusions omit this unspecified stock; not expanded for favourite ranking. Existing conservative Fish label retained with a note."
+    }
+  ]
+}

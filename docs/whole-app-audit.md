@@ -166,3 +166,13 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Newly found outstanding ingredient completeness gaps: Lentil & tuna salad, Sardine Salad and Tuna White Bean Salad have no fish ingredient records. Review publisher quantities and saved-plan effects before changing requirements. Miso soup (dashi) and Tteokbokki (eomuk) also need their imported ingredient identities reviewed for broad fish exclusions. These are now explicit outstanding audit items.
 
 - Validation: full run passed 218 checks before the final quesadilla metadata correction; all 16 catalogue checks passed afterward. Browser confirmed vegetarian quesadilla discovery and restored the diet preference. Replaced its misleading fish illustration with flatbread.
+
+## Missing fish ingredients and saved plans
+
+- Restored the three omitted core fish ingredients using publisher package counts: two 160g tuna cans for four servings of Lentil & tuna salad; one 4.4oz sardine tin per Sardine Salad; two 3oz tuna packets for two servings of Tuna White Bean Salad. No drained-weight conversion is assumed. Sizes appear in ingredient names and corrected planning notes.
+- Original recipe IDs, quantities and stock identities remain intact. Existing uncooked plans now correctly require the missing fish. Completed records and pantry balances do not change on migration/reload, and a completed meal cannot deduct again. Regression checks cover scaling, shopping, exclusions, exact stock separation and once-only deduction for all three.
+- Eomuk is explicitly fish cakes in the publisher recipe and now belongs to broad fish exclusions. Dashi has fish and plant variants; broad fish exclusions omit the unspecified entry without inventing a favourite match. Miso soup explains the uncertainty.
+- A scan of omitted-item notes for cans/tins/packets found these three core fish omissions; remaining matches were equipment, optional nuts, serving condiments or greasing. This screening is not proof that all 530 omission notes are correct.
+- Browser verified the lentil salad shows one 160g can for two portions and the same one-can requirement on Shopping. Temporary meal removed after verification.
+
+- Full release validation: all 221 checks passed (31 core and 190 Node test-runner checks).
