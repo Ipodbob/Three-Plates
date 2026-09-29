@@ -1101,3 +1101,22 @@
 .three-v3 .sheet:has(#prep-panel) .sheet-top, .three-v3 .sheet:has(#prep-select-form) .sheet-top { position: sticky; top: 0; z-index: 2; }
 #prep-search, #prep-ingredient-search { width: 100%; min-height: 46px; font-size: 16px; }
 .prep-item[hidden] { display: none; }
+
+/* Use the same minimum touch target across the remaining compact controls. */
+.three-v3 .pantry-item .button,
+.three-v3 .pantry-tabs button,
+.three-v3 .mode-bar .chip-button,
+.three-v3 .scan-presets button,
+.three-v3 summary {
+  min-height: 44px;
+}
+.three-v3 summary {
+  box-sizing: border-box;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.three-v3 .pantry-item .button,
+.three-v3 .scan-presets button {
+  min-width: 44px;
+}
