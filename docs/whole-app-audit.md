@@ -244,3 +244,12 @@ Independent kitchen testing of every publisher recipe is not a deliverable claim
 - Domain/connected tests cover copy, search, exclusions, no-shopping, stored/fresh-side separation, unchanged stock, completion removal, stale affected checks and all displayed workflow stages. Browser verified Shopping, Cooking and Prep display the nutmeg reminder with the source method available. This mechanism currently covers reviewed metadata, not automatic interpretation of every remaining catalogue note.
 
 - Validation: full suite passed 236 checks (32 core and 204 Node checks). After the final favourite-ranking and side-search inclusion adjustment, four unmeasured-domain checks and the connected UI flow passed again. Browser test plan/prep state was cleared through Settings on isolated localhost.
+
+
+## Explicit always-stocked choice for unknown amounts
+
+- Follow-up review found the new No shopping gate ignored the existing Always stocked — assume enough choice. The gate now accepts an unmeasured ingredient only when that exact pantry identity is explicitly always stocked; an ordinary recorded quantity or a different nutmeg variant does not imply coverage. Measured ingredients must still be sufficient after reservations.
+- Recipe coverage, Shopping/Cooking/Prep reminders and copied lists show the same assumption. Reminders still retain the publisher's preparation guidance and never invent a deduction. Unticking Always stocked restores the amount-check requirement.
+- All 24 focused checks passed: 22 quantity/phase/unmeasured domain checks and two connected UI workflows. They cover full coverage/no-shopping, reload, changing the flag, different identities, copied labels and unchanged stock. Browser verified an always-stocked nutmeg entry survives reload and contributes 1 of 6 covered ingredients. No full-suite rerun was needed for this localized policy adjustment; prior full baseline was 236 passing checks.
+
+- Browser confirmed Shopping says Always stocked — assumed enough while retaining the method reminder. All fabricated localhost stock, plan and settings were cleared through the UI afterward.

@@ -949,7 +949,7 @@
     )
       return false;
     if (f.mode === "only") {
-      if (r.unmeasuredIngredients?.length) return false;
+      if ((r.unmeasuredIngredients || []).some(i => stock(s, i.id) !== Infinity)) return false;
       const req = requirements(s, recipes);
       if (
         scaled(r, r.baking ? r.base : f.servings || 1).some(
