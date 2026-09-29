@@ -39,3 +39,9 @@ Remaining cells require the stated evidence; they are not waived by a green suit
 A synthetic one-portion batch on isolated localhost:4174 was frozen, booked and moved into thawing. A future completion time triggered native validation without saving; an earlier-than-start time showed the inline dialog alert with the draft intact. Both messages were inspected at 320px. Close returned focus to Fully defrosted; reload still showed the thawing reservation. Reopening and confirming a valid time displayed Defrosted · fridge and a deadline 24 hours later, unchanged after reload. The single synthetic portion and its reservation were removed using its discard action; archived cooking/empty-portion history remains. No user origin or backup was reset.
 
 The new connected UI regression complements the browser check with exact persisted-text equality after rejection, unchanged raw stock and portion count, corrected completion timestamp and reload equality. This closes the earlier unsupported datetime-input check: the browser accepted minute-precision ISO input. No physical-phone or food-handling claim follows from these synthetic records.
+
+## iPhone feedback and scanner fallback — v3.11.54
+
+On 29 September 2026 the user reported "Phone scanning works" and "It did save" on their iPhone 17 Pro Max. Record scanning and saving as user-confirmed; do not infer confirmation of precise partial amounts, reload, uninterrupted multi-item scanning, keyboard ergonomics or timers.
+
+A separate desktop browser check at 320px on isolated localhost:4174 confirmed that camera denial leaves photo and barcode-number entry usable. Submitting 123 showed readable validation; the input, submit action and Done fitted without horizontal overflow. Done returned focus to Scan barcode. Reload retained an empty pantry; no test stock or mapping was saved.

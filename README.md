@@ -292,8 +292,10 @@ The earlier whole-app layout was checked in the browser at 320, 390, 430 and 128
 all six destinations fit without horizontal overflow or fields leaving the viewport.
 The local `/Three-Plates/` page loaded real assets and browser persistence; batch
 allocation, reload, prepared-meal booking and side-only shopping were exercised.
-WebKit and physical iPhone/Safari testing have not been performed. Screenshots show
-local testing, not deployment.
+On 29 September 2026 the user confirmed scanning and saving on their iPhone 17 Pro Max.
+That report does not establish every Safari interaction: continuous scanning, exact
+partial amounts after reload, keyboard obstruction and background timers still need
+device evidence. Android remains unverified. Screenshots show local testing, not deployment.
 
 Publishing the feature branch or opening a PR does not deploy it. Merge to `main`
 and verify the Pages run and live assets for that exact commit before calling this
