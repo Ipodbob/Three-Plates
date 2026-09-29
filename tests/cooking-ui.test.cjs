@@ -29,6 +29,7 @@ function app(saved, setup = () => {}) {
     "phase1.js",
     "menus.js",
     "cooking.js",
+    "prep.js",
     "cooking-ui.js",
   ])
     w.eval(fs.readFileSync(path.join(root, f), "utf8"));

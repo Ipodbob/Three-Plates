@@ -26,8 +26,8 @@ the deployed UPC relay allows the default 4173 origin, not arbitrary preview por
 The server serves the local vendor decoder while keeping repository metadata,
 scripts and dependencies unavailable through HTTP.
 
-`npm test` runs 168 checks: 31 core regressions, 33 added domain checks,
-23 catalogue checks, 51 DOM checks, 28 barcode/relay checks and two server checks.
+`npm test` runs 178 checks: 31 core regressions, 39 added domain checks,
+23 catalogue checks, 55 DOM checks, 28 barcode/relay checks and two server checks.
 jsdom is test-only; it does not validate rendering or replace real browser checks.
 The pinned ZXing browser bundle is served locally and loaded only for camera/photo scanning.
 
@@ -46,8 +46,8 @@ Camera/photo decoding stays local; only new barcode numbers are looked up online
 
 Open Food Facts works directly. **The free UPCitemdb relay is deployed and verified
 from the local pantry UI.** This branch configures the live relay; GitHub Pages
-frontend v3.9.0 was verified live after PR #7 (merge 760d3e6, successful
-Pages run 36498896287 and all 18 checked public assets matched). The fallback shares 100 requests per
+frontend v3.10.0 was verified live after PR #8 (merge 74aa34e, successful
+Pages run 36500344765 and all 18 checked public assets matched). The fallback shares 100 requests per
 day across users, with a cooldown between requests. See [setup and testing details](docs/barcode-scanning.md).
 Physical iPhone/Safari and Android camera support still needs device testing.
 
@@ -125,7 +125,7 @@ Purchase history snapshots the actual pack and retailer; changing shops never
 rewrites purchases. Moving purchases to pantry adds the whole purchased amount.
 No retailer sizes, prices, availability or integrations are claimed as verified.
 
-## Cooking mode (current feature branch)
+## Cooking mode (released in v3.10.0)
 
 Plan > Start cooking opens large ingredient and method check-offs for that meal
 or batch. Check-offs persist across reloads and backups without changing pantry
@@ -145,6 +145,25 @@ batch confirmation and stock transaction. The feature has 14 domain/connected UI
 checks, plus the existing regression suite. Implementation references:
 [Screen Wake Lock specification](https://www.w3.org/TR/screen-wake-lock/) and
 [MDN timer throttling](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout#reasons_for_delays_longer_than_specified).
+
+## Combined prep checklist (current feature branch)
+
+Plan > Prep checklist combines the ingredients for up to 20 selected meals and
+batches. Select by recipe, meal or date, then gather from one searchable list.
+Each ingredient expands to show the amounts for its individual recipes. Finished
+meals are excluded and stored meals contribute only their fresh side.
+
+Ready checks persist through reloads and backups. Only checks whose recipe
+allocations and quantities still match are retained; changed amounts are shown
+unchecked with a notice. Gathering checks are separate from cooking progress and
+never change stock, purchases, timers or meal status. Recipe cards lead to the
+existing recipe and cooking views. The list is not a combined cooking schedule
+and does not predict a common finish time.
+
+Ten domain/connected UI checks cover totals, stored portions, changes, failed
+saves, restoration and independence from pantry/cooking state. The browser
+verified 450 g pasta split into 180 g and 270 g, saved checks after reload, the
+320px ingredient search/breakdown, and removal of finished meal quantities.
 
 ## Saved data
 
@@ -207,12 +226,12 @@ of cooking. Plan stored portions after cooking; advance allocation is a backlog 
 
 ## Verification and release status
 
-The latest baseline inspected was `dd700a9`, which already supplied most Phase 1
-screens. This feature branch completes missing controls and strengthens preservation,
-provenance and correction rules. Earlier testing claims in `UPGRADE-v3.md` describe
-that baseline, not this branch.
+The latest verified release is v3.10.0 at `74aa34e` (PR #8): Pages run
+36500344765 succeeded, all 20 checked public assets matched, and the live app
+displayed v3.10.0. The current prep-checklist changes await their own release
+verification. Earlier claims in `UPGRADE-v3.md` describe the original baseline.
 
-This branch was checked in the Codex in-app browser at 320, 390, 430 and 1280 px:
+The earlier whole-app layout was checked in the browser at 320, 390, 430 and 1280 px:
 all six destinations fit without horizontal overflow or fields leaving the viewport.
 The local `/Three-Plates/` page loaded real assets and browser persistence; batch
 allocation, reload, prepared-meal booking and side-only shopping were exercised.
@@ -227,6 +246,6 @@ version live. The existing live baseline was inspected; Pages configuration is u
 
 - Recipe-specific freezing/storage provenance and independently tested quantity mappings.
 - Continue deduplicated sourcing and improve ingredient equivalence and method classification. Verify licensing before hosting full publisher methods or photographs.
-- Phase 2 remaining: combined preparation checklist and further whole-app checks.
+- Finish whole-app dialog/correction checks and release verification for new changes.
 - Verified retailer catalogue, advance allocation of uncooked planned batches,
   and physical-device/WebKit testing.

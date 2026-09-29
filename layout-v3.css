@@ -1090,3 +1090,14 @@
 .three-v3 .sheet:has(#cooking-panel) .sheet-top { position: sticky; top: 0; z-index: 2; padding: 16px 20px; }
 .three-v3 .sheet:has(#cooking-panel) .sheet-top h2 { font-size: 24px; }
 #cooking-panel h3, #cooking-panel h4 { scroll-margin-top: 130px; }
+.prep-choice[hidden] { display: none; }
+.prep-choice small, .prep-breakdown small { display: block; color: #62695e; }
+.prep-item { padding: 8px 0; border-bottom: 1px solid #deded4; }
+.prep-breakdown { margin: 0 8px 8px 44px; font-size: .9rem; }
+.prep-breakdown summary { cursor: pointer; min-height: 44px; padding: 10px 0; }
+.prep-breakdown p { margin: 8px 0; }
+.prep-recipe { margin: 16px 0; padding: 14px; border: 1px solid #deded4; border-radius: 14px; }
+.prep-recipe h4 { margin: 0; }
+.three-v3 .sheet:has(#prep-panel) .sheet-top, .three-v3 .sheet:has(#prep-select-form) .sheet-top { position: sticky; top: 0; z-index: 2; }
+#prep-search, #prep-ingredient-search { width: 100%; min-height: 46px; font-size: 16px; }
+.prep-item[hidden] { display: none; }

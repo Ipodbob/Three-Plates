@@ -38,7 +38,7 @@ function app(seed={},failStorage=false){
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
  for(const [key,value] of Object.entries(seed))w.localStorage.setItem(key,value);
  if(failStorage)w.Storage.prototype.setItem=()=>{throw Error('quota');};
- for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','recipes-specialists.js','catalogue-review.js','core-v3.js','phase1.js','menus.js','cooking.js','cooking-ui.js','barcode-config.js','pantry-scan.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
+ for(const file of ['recipes.js','batch-v3.js','recipes-rated.js','recipes-diverse.js','recipes-expanded.js','recipes-specialists.js','catalogue-review.js','core-v3.js','phase1.js','menus.js','cooking.js','prep.js','cooking-ui.js','barcode-config.js','pantry-scan.js','app-v3.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8'));
  const q=selector=>w.document.querySelector(selector),click=selector=>{assert.ok(q(selector),selector);q(selector).click();if(q("#confirm-action"))q("#confirm-action").click();},set=(selector,value)=>{assert.ok(q(selector),selector);q(selector).value=value;q(selector).dispatchEvent(new w.Event('change',{bubbles:true}));};
  const route=name=>{w.location.hash=name;w.dispatchEvent(new w.HashChangeEvent('hashchange'));};
  const submit=id=>q(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
