@@ -687,6 +687,11 @@
           old = getState().pantry.find((x) => x.id === id);
         if (mode === "use" && (!old || old.always)) selected = null;
         expected = old?.qty || 0;
+        // Separate new products use base units; an existing pantry match must
+        // retain its own unit, including kg, litres and tablespoons.
+        q("#scan-unit").innerHTML = [...new Set(["g", "ml", "each", ...(i ? [i.unit] : [])])]
+          .map((unit) => `<option value="${esc(unit)}">${unit === "each" ? "items" : esc(unit)}</option>`)
+          .join("");
         q("#scan-unit").disabled = !!i;
         q("#scan-unit").value = i?.unit || p.amount?.unit || "each";
         q("#scan-ingredient").value = i ? C.ingredientLabel(i) : "";
