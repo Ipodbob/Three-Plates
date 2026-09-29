@@ -4,6 +4,13 @@ For current requirements, release evidence and remaining exit checks, use [curre
 
 Goal: a comprehensive, simple, uniform and functional Three Plates across Choose, Plan, Shopping, Pantry and Settings. This register records evidence; it is not a claim that the whole goal is complete. User decisions override the original handover: shared Choose/Batch screen, simple meal and headcount controls, broad rated catalogue, scanning and used-stock adjustments.
 
+## Compact recipe view and accessible primary actions
+
+- Recipe method and planning actions now appear beside the portion controls, before the ingredient list. On narrow screens they fill the available width; source methods still open at the publisher. Existing-plan views expose the method without offering a duplicate planning action.
+- Long source, import and conversion details are collapsed under Source & quantity notes. The rating, timing note, method notes, measured quantities and unmeasured required-ingredient reminders remain available outside that disclosure. A short visible explanation identifies planning estimates and where to inspect their notes.
+- Nine distinct focused UI checks passed across fresh/source/batch/stored/contextual recipes, portion steppers, ratings, required seasonings and the new action/provenance flow. The new test verifies a single planning action, correct external link, full expandable correction text and seven-portion planning without duplicate actions in context. Prior complete-suite baseline is 256 checks; no full rerun claimed for this presentation change.
+- Browser inspected both full-width actions at 320px, expanded the source notes, adjusted eight scones to seven and saved the correct plan. Isolated localhost test data was cleared through Settings afterward. No source quantities or saved formats changed.
+
 ## Measured egg wash, brushing and pan amounts
 
 - Three source-verified corrections restore a separate glazing egg in Good Food egg-and-bacon pie (five total), 15ml brushing buttermilk in Sally ham-and-cheese scones (175ml total), and up to 56g pan butter in Sally crepes (99g total including batter). The pan value uses the upper end of the publisher range and is labelled a planning allowance. Source decisions are in docs/catalogue/finishing-ingredient-corrections.json.

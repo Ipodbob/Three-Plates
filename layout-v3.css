@@ -1136,3 +1136,7 @@
     margin: 0;
   }
 }
+
+.three-v3 #recipe-actions .button {
+  flex: 1 1 220px;
+}

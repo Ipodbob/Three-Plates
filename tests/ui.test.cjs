@@ -369,3 +369,14 @@ test('turning off menu portion adjustment excludes its hidden invalid input from
  const before=a.state();a.q('#menu-apply').click();const saved=a.state();assert.equal(saved.plans.length,2);assert.equal(saved.plans[1].servings,before.plans[0].servings);assert.deepEqual(saved.pantry,before.pantry);a.dom.window.close();
  const b=app({'three-plates-v3':JSON.stringify(saved)});assert.equal(b.state().plans.length,2);assert.equal(b.state().plans[1].servings,2);b.dom.window.close();
 });
+
+test('publisher recipe actions precede ingredients while detailed provenance stays expandable',()=>{
+ const a=app();a.click('#f-time-any');while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');a.q('#recipe-search').value='ham cheese scones';a.submit('#search-form');a.click('[data-act="recipe"][data-id="sp-sally-ham-cheese-scones"]');
+ const actions=a.q('#recipe-actions'),ingredients=a.q('#recipe-amounts'),notes=a.q('#recipe-source-notes');
+ assert.ok(actions.compareDocumentPosition(ingredients)&a.w.Node.DOCUMENT_POSITION_FOLLOWING);assert.equal(notes.open,false);
+ assert.equal(a.w.document.querySelectorAll('#sheet [data-act="plan-add"]').length,1);assert.match(notes.textContent,/175ml total/);assert.match(notes.textContent,/Source checked/);
+ assert.match(actions.querySelector('a').href,/sallysbakingaddiction.com\/ham-cheese-scones/);
+ notes.open=true;assert.match(notes.textContent,/Measured brushing buttermilk is included/);
+ a.click('#recipe-portions-minus');assert.match(ingredients.textContent,/153.125 ml/);a.click('#recipe-actions [data-act="plan-add"]');assert.equal(a.state().plans[0].servings,7);
+ a.route('plan');a.click('[data-act="recipe"][data-context="plan"]');assert.equal(a.q('#recipe-actions [data-act="plan-add"]'),null);assert.ok(a.q('#recipe-actions a'));assert.match(a.q('#recipe-amounts').textContent,/153.125 ml/);a.dom.window.close();
+});
