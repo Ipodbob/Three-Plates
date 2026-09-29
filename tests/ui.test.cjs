@@ -1,6 +1,22 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
 
+test('corrected blondies plan a full bake with flour while unbaked pastry stays a searchable component', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());a.click('#f-time-any');
+ a.q('#recipe-search').value='snickerdoodle blondies';a.submit('#search-form');assert.equal(a.q('.meal-card'),null);
+ while(a.q('.meal-stepper span').textContent!=='Baking')a.click('#f-meal-next');
+ assert.match(a.q('.meal-card').textContent,/Full bake/);
+ a.click('[data-act="plan-add"][data-id="sp-sally-white-chocolate-snickerdoodle-blondies"]');
+ assert.equal(a.state().plans[0].servings,16);a.route('shop');
+ const row=a.q('[data-act="bought"][data-id="flour"]').closest('.shopping-row');assert.match(row.textContent,/291 g/);
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});t.after(()=>b.dom.window.close());
+ assert.equal(b.state().plans[0].servings,16);b.route('shop');assert.match(b.q('[data-id="flour"]').closest('.shopping-row').textContent,/291 g/);
+ a.route('choose');a.q('#recipe-search').value='rough puff pastry';a.submit('#search-form');
+ const pastry=a.q('[data-act="recipe"][data-id="sp-sally-rough-puff-pastry"]').closest('.meal-card');
+ assert.match(pastry.textContent,/Recipe component/);assert.match(pastry.textContent,/Unbaked pastry dough/);
+ a.click('[data-act="recipe"][data-id="sp-sally-rough-puff-pastry"]');assert.match(a.q('#sheet').textContent,/Plain flour/);
+});
+
 test('batch creation and editing show the same reviewed ingredient guidance as the recipe', (t) => {
  const a=app(); t.after(()=>a.dom.window.close()); a.route('batch');
  a.q('#recipe-search').value='courgette potato cheddar soup'; a.submit('#search-form');

@@ -340,6 +340,455 @@
       },
     ],
   );
+  // Evidence: docs/catalogue/baking-ingredient-corrections.json.
+  requiredIngredientCorrections.push(...[
+  {
+    "recipeId": "sp-sally-apple-cinnamon-rolls",
+    "source": "https://sallysbakingaddiction.com/apple-cinnamon-rolls/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 563
+      }
+    ],
+    "replace": [
+      [
+        "4 and 1/2 cups (563g) all-purpose flour or bread flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 563g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-asiago-bread",
+    "source": "https://sallysbakingaddiction.com/asiago-bread/",
+    "items": [
+      {
+        "id": "ex-bread-flour-7cab183f",
+        "oldQty": 0,
+        "qty": 423,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "3 and 1/4 cups (423g) bread flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 423g bread flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-berry-galette",
+    "source": "https://sallysbakingaddiction.com/berry-galette/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 156
+      },
+      {
+        "id": "ex-cold-buttermilk-e5557548",
+        "oldQty": 0,
+        "qty": 60,
+        "avoidIds": [
+          "milk"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "1 and 1/4 cups (156g) all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ],
+      [
+        "1/4 cup (60ml) cold buttermilk, plus more as needed",
+        "extra buttermilk as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 156g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method. Includes 60ml cold buttermilk for the crust, separate from the milk in the egg wash."
+  },
+  {
+    "recipeId": "sp-sally-blueberry-galette",
+    "source": "https://sallysbakingaddiction.com/blueberry-galette/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 156
+      },
+      {
+        "id": "ex-cold-buttermilk-e5557548",
+        "oldQty": 0,
+        "qty": 60,
+        "avoidIds": [
+          "milk"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "1 and 1/4 cups (156g) all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ],
+      [
+        "1/4 cup (60ml) cold buttermilk, plus more as needed",
+        "extra buttermilk as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 156g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method. Includes 60ml cold buttermilk for the crust, separate from the milk in the egg wash."
+  },
+  {
+    "recipeId": "sp-sally-ciabatta-bread-recipe",
+    "source": "https://sallysbakingaddiction.com/ciabatta-bread-recipe/",
+    "items": [
+      {
+        "id": "ex-bread-flour-7cab183f",
+        "oldQty": 130,
+        "qty": 455,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "2 and 1/2 cups (325g) bread flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 455g bread flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-gingerbread-cinnamon-rolls",
+    "source": "https://sallysbakingaddiction.com/gingerbread-cinnamon-rolls/",
+    "items": [
+      {
+        "id": "ex-bread-flour-7cab183f",
+        "oldQty": 0,
+        "qty": 520,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "4 cups (520g) bread flour&nbsp;(spooned & leveled), plus more as needed for hands/work surface",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 520g bread flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-homemade-apple-fritters",
+    "source": "https://sallysbakingaddiction.com/homemade-apple-fritters/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 594
+      }
+    ],
+    "replace": [
+      [
+        "4 and 1/2 cups (563g) all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ],
+      [
+        "1/4 cup (31g) all-purpose flour, plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 594g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-homemade-berry-fritters",
+    "source": "https://sallysbakingaddiction.com/homemade-berry-fritters/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 500
+      }
+    ],
+    "replace": [
+      [
+        "4 cups (500g) all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 500g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-homemade-brioche",
+    "source": "https://sallysbakingaddiction.com/homemade-brioche/",
+    "items": [
+      {
+        "id": "ex-bread-flour-7cab183f",
+        "oldQty": 0,
+        "qty": 423,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "3 and 1/4 cups (423g) bread flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 423g bread flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-lemon-blueberry-babka",
+    "source": "https://sallysbakingaddiction.com/lemon-blueberry-babka/",
+    "items": [
+      {
+        "id": "ex-bread-flour-7cab183f",
+        "oldQty": 24,
+        "qty": 382,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "2 and 3/4 (358g) bread flour or all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 382g bread flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-no-knead-cranberry-nut-bread",
+    "source": "https://sallysbakingaddiction.com/no-knead-cranberry-nut-bread/",
+    "items": [
+      {
+        "id": "ex-bread-flour-7cab183f",
+        "oldQty": 0,
+        "qty": 390,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "3 cups + 2 Tablespoons (390g) bread flour or all-purpose flour&nbsp;(spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 390g bread flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-overnight-cinnamon-rolls",
+    "source": "https://sallysbakingaddiction.com/overnight-cinnamon-rolls/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 563
+      }
+    ],
+    "replace": [
+      [
+        "4 and 1/2 cups (563g) all-purpose flour or bread flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 563g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-pumpkin-sugar-cookies",
+    "source": "https://sallysbakingaddiction.com/pumpkin-sugar-cookies/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 281
+      }
+    ],
+    "replace": [
+      [
+        "2 and 1/4 cups (281g) all-purpose flour&nbsp;(spooned & leveled), plus more as needed for rolling and work surface",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 281g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-rough-puff-pastry",
+    "source": "https://sallysbakingaddiction.com/rough-puff-pastry/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 167
+      }
+    ],
+    "replace": [
+      [
+        "1 and 1/3 cups (167g) all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 167g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-sweet-potato-dinner-rolls",
+    "source": "https://sallysbakingaddiction.com/sweet-potato-dinner-rolls/",
+    "items": [
+      {
+        "id": "ex-bread-flour-7cab183f",
+        "oldQty": 0,
+        "qty": 715,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "5 and 1/2 cups (715g) bread flour* (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 715g bread flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-white-chocolate-snickerdoodle-blondies",
+    "source": "https://sallysbakingaddiction.com/white-chocolate-snickerdoodle-blondies/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 291
+      }
+    ],
+    "replace": [
+      [
+        "2 and 1/3 cups (291g) all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 291g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-whole-wheat-bread",
+    "source": "https://sallysbakingaddiction.com/whole-wheat-bread/",
+    "items": [
+      {
+        "id": "ex-whole-wheat-flour-21c11971",
+        "oldQty": 260,
+        "qty": 433,
+        "avoidIds": [
+          "flour"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "1 and 1/3 cups (173g) whole wheat flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ]
+    ],
+    "note": "Includes 433g whole wheat flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method."
+  },
+  {
+    "recipeId": "sp-sally-zucchini-biscuits",
+    "source": "https://sallysbakingaddiction.com/zucchini-biscuits/",
+    "items": [
+      {
+        "id": "flour",
+        "oldQty": 0,
+        "qty": 313
+      },
+      {
+        "id": "buttermilk",
+        "oldQty": 240,
+        "qty": 270,
+        "avoidIds": [
+          "milk"
+        ]
+      }
+    ],
+    "replace": [
+      [
+        "2 and 1/2 cups (313g) all-purpose flour (spooned & leveled), plus more as needed",
+        "extra flour as needed (amount not specified)"
+      ],
+      [
+        "Additional dusting/greasing/serving amounts are not included: 240ml buttermilk, cold, plus 2 tbsp for brushing on top",
+        "The measured buttermilk for brushing is included."
+      ]
+    ],
+    "note": "Includes 313g plain flour for the full recipe, including any measured flour used in separate components. Unspecified extra flour for handling or dough adjustment is not quantified; follow the publisher method. Buttermilk totals 270ml: 240ml in the dough and two 15ml tablespoons for brushing."
+  },
+  {
+    "recipeId": "gf2-brioche",
+    "source": "https://www.bbcgoodfood.com/recipes/brioche",
+    "items": [
+      {
+        "id": "eggs",
+        "oldQty": 4,
+        "qty": 5
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 4 eggs at room temperature, beaten, plus 1 for egg wash",
+        "Measured finishing amounts are included."
+      ]
+    ],
+    "note": "Includes four eggs for the dough and one for the egg wash: five eggs for the full loaf."
+  },
+  {
+    "recipeId": "gf2-best-ever-macaroni-cheese-recipe",
+    "source": "https://www.bbcgoodfood.com/recipes/best-ever-macaroni-cheese-recipe",
+    "items": [
+      {
+        "id": "butter",
+        "oldQty": 28.2,
+        "qty": 42.3
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 2 tbsp butter plus 1 tbsp melted",
+        "Measured finishing amounts are included."
+      ],
+      [
+        "Planning conversion: 2 tbsp butter plus 1 tbsp melted → 28.2g Butter",
+        "Planning conversion: 3 tbsp butter in total → approximately 42.3g Butter"
+      ]
+    ],
+    "note": "Includes three tablespoons of butter: two for the sauce and one melted for the bread topping. Uses the existing approximate planning conversion of 14.1g per tablespoon (42.3g total)."
+  },
+  {
+    "recipeId": "gf2-classic-cheese-scones",
+    "source": "https://www.bbcgoodfood.com/recipes/classic-cheese-scones",
+    "items": [
+      {
+        "id": "milk",
+        "oldQty": 100,
+        "qty": 115
+      }
+    ],
+    "replace": [
+      [
+        "Additional dusting/greasing/serving amounts are not included: 90-100ml milk plus 1 tbsp for glazing",
+        "Measured finishing amounts are included."
+      ]
+    ],
+    "note": "Includes up to 100ml milk for the dough plus 15ml for glazing (115ml total). Add dough milk gradually as the publisher instructs."
+  }
+]);
   for (const correction of requiredIngredientCorrections) {
     const r = root.PLATES_DATA.recipes.find(
       (r) => r.id === correction.recipeId,
@@ -721,6 +1170,15 @@
     "ex-pepperoni-slices-d83045ab",
   ];
   const patches = {
+    "sp-sally-berry-galette": { baking: true, meals: ["Dessert", "Baking"] },
+    "sp-sally-blueberry-galette": { baking: true, meals: ["Dessert", "Baking"] },
+    "sp-sally-lemon-blueberry-babka": { baking: true, meals: ["Dessert", "Baking", "Breakfast"] },
+    "sp-sally-white-chocolate-snickerdoodle-blondies": { baking: true, meals: ["Dessert", "Baking"], method: "oven" },
+    "sp-sally-sweet-potato-dinner-rolls": { baking: true, meals: ["Baking"], dishRole: "side" },
+    "sp-sally-rough-puff-pastry": {
+      meals: ["Baking"], dishRole: "component", method: "no-cook",
+      methodNote: "Unbaked pastry dough only. This preparation includes chilling and folding; bake it as directed by the recipe that uses the dough.",
+    },
     "gf2-miso-soup": {
       methodNote:
         "Dashi can contain fish. This listing keeps a fish classification unless a verified plant-based stock is used.",

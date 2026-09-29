@@ -20,7 +20,8 @@ const find = (id) => R.find((r) => r.id === id);
 const corrections = require("../docs/catalogue/fish-ingredient-corrections.json").corrections;
 const additions = new Set(corrections.map(c => c.ingredient.id));
 const herbReview = require("../docs/catalogue/herb-ingredient-corrections.json");
-const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections];
+const bakingCorrections = require("../docs/catalogue/baking-ingredient-corrections.json").corrections;
+const requiredCorrections = [...require("../docs/catalogue/required-ingredient-corrections.json").corrections,...herbReview.corrections,...bakingCorrections];
 const definitionAdditions = new Set([...additions,...herbReview.ingredients.map(i=>i.id)]);
 function correctedReference(old) {
   const r = JSON.parse(JSON.stringify(old));
@@ -34,6 +35,35 @@ function correctedReference(old) {
   return r;
 }
 const correctedRecipes = before.recipes.map(correctedReference);
+
+test('required baking ingredients reach shopping, exclusions and once-only deductions for every corrected recipe',()=>{
+ assert.equal(bakingCorrections.length,21);
+ for(const correction of bakingCorrections){
+  const r=find(correction.recipeId),s=C.defaults();
+  s.plans=[{id:'existing-bake',recipeId:r.id,date:C.today(),meal:r.meals[0],servings:r.base,side:'none',cooked:false}];
+  const saved=C.migrate(C.clone(s),R,I);
+  for(const item of correction.items){
+   assert.equal(r.ingredients.filter(i=>i.id===item.id).length,1);
+   assert.equal(C.requirements(saved,R)[item.id],item.qty);
+   assert.equal(C.shopping(saved,R).find(i=>i.id===item.id).remaining,item.qty);
+   assert.equal(C.foodAllowed(r,{...saved.prefs,exclusions:[item.id]}),false);
+   for(const alias of item.avoidIds||[])assert.equal(C.foodAllowed(r,{...saved.prefs,exclusions:[alias]}),false);
+   saved.pantry.push({id:item.id,qty:item.qty*2,always:false});
+  }
+  const beforeCook=C.migrate(C.clone(saved),R,I);assert.deepEqual(beforeCook.pantry,saved.pantry);
+  C.finishPlan(beforeCook,'existing-bake',R);
+  for(const item of correction.items)assert.equal(C.stock(beforeCook,item.id),item.qty);
+  const done=C.migrate(C.clone(beforeCook),R,I);assert.deepEqual(done.pantry,beforeCook.pantry);
+  assert.throws(()=>C.finishPlan(done,'existing-bake',R));
+ }
+ assert.equal(find('sp-sally-ciabatta-bread-recipe').ingredients.find(i=>i.id==='ex-bread-flour-7cab183f').qty,455);
+ assert.equal(find('sp-sally-lemon-blueberry-babka').ingredients.find(i=>i.id==='ex-bread-flour-7cab183f').qty,382);
+ assert.equal(find('sp-sally-whole-wheat-bread').ingredients.find(i=>i.id==='ex-whole-wheat-flour-21c11971').qty,433);
+ for(const r of R.filter(r=>r.id.startsWith('sp-sally'))){
+  const omitted=(r.planningNotes||'').split('Not included in shopping (serving extras, optional items or equipment): ')[1]||'';
+  assert.doesNotMatch(omitted,/\(\d+g\) (?:all-purpose|bread|whole wheat) flour[^;]*plus more as needed/,r.id);
+ }
+});
 
 test("batch guidance includes reviewed planning notes instead of stale omission claims", () => {
   const affected = R.filter(r => r.batch && r.planningNotes !== before.recipes.find(x => x.id === r.id).planningNotes);
