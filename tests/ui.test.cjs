@@ -100,6 +100,27 @@ test('quantity steppers respect limits, keep focus and update batch portions',()
  a.q('#bf-days-plus').focus();a.click('#bf-days-plus');assert.equal(a.w.document.activeElement.id,'bf-days-plus');assert.equal(a.state().batchFilters.days,2);assert.match(a.q('.portion-summary').textContent,/4 portions/);
  a.set('#bf-days','7');a.click('#bf-days-plus');assert.equal(a.state().batchFilters.days,7);a.set('#bf-people','6');a.click('#bf-people-plus');assert.equal(a.state().batchFilters.people,6);a.set('#bf-people','1');a.click('#bf-people-minus');assert.equal(a.state().batchFilters.people,1);a.dom.window.close();
 });
+test('stored meal time follows meal selection until explicitly edited and survives booking', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());
+ a.route('batch');a.click('#bf-time-any');a.click('[data-act="batch-add"]');
+ a.set('#batch-portions','4');a.submit('#batch-form');a.route('plan');a.click('[data-act="batch-finish"]');
+ a.q('#freezer-confirm').checked=true;a.q('#storage-confirm').checked=true;a.submit('#finish-batch-form');
+ a.route('pantry');a.click('[data-act="lot-plan"]');
+ const before=JSON.stringify(a.state());
+ a.set('#lot-meal','Breakfast');assert.equal(a.q('#lot-time').value,'08:00');
+ a.set('#lot-meal','Dinner');assert.equal(a.q('#lot-time').value,'18:00');
+ assert.equal(JSON.stringify(a.state()),before);
+ a.set('#lot-time','19:15');a.set('#lot-meal','Lunch');assert.equal(a.q('#lot-time').value,'19:15');
+ a.set('#lot-time','');a.set('#lot-meal','Dinner');assert.equal(a.q('#lot-time').value,'');
+ assert.equal(a.q('#lot-plan-form').checkValidity(),false);
+ a.set('#lot-time','19:15');a.set('#lot-date',a.w.PlatesCore.addDays(a.w.PlatesCore.today(),1));
+ a.submit('#lot-plan-form');assert.equal(a.state().plans.length,1);
+ assert.equal(a.state().plans[0].serveTime,'19:15');assert.equal(a.state().plans[0].meal,'Dinner');
+ assert.equal(JSON.stringify(a.state().pantry),JSON.stringify(JSON.parse(before).pantry));
+ const b=app({'three-plates-v3':JSON.stringify(a.state())});t.after(()=>b.dom.window.close());
+ assert.equal(b.state().plans[0].serveTime,'19:15');
+});
+
 function app(seed={},failStorage=false){
  const dom=new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'),{url:'http://localhost/Three-Plates/',runScripts:'outside-only'}),w=dom.window;
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};

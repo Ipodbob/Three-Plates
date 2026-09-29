@@ -1438,6 +1438,18 @@
     );
     const portions = document.getElementById("lot-servings"),
       days = document.getElementById("lot-days");
+    const meal = document.getElementById("lot-meal"),
+      time = document.getElementById("lot-time");
+    let timeEdited = false;
+    time.addEventListener("input", () => {
+      timeEdited = true;
+    });
+    time.addEventListener("change", () => {
+      timeEdited = true;
+    });
+    meal.addEventListener("change", () => {
+      if (!timeEdited) time.value = C.mealTimes[meal.value];
+    });
     portions.addEventListener("change", () => {
       if (!C.integer(+portions.value, 1, Math.min(12, free))) return;
       days.max = Math.min(7, Math.floor(free / +portions.value));
