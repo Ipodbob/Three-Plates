@@ -25,3 +25,14 @@ test('ordinary cooking signatures retain their existing shape and changed season
  const s=state();s.plans[0].recipeId='pesto-pea-pasta';const v=C.cookingView(s,'plan','soup',R);assert.ok(v.groups.every(g=>!Object.hasOwn(g,'unmeasured')));
  s.plans[0].recipeId=soup.id;const oldRecipes=R.map(r=>r.id===soup.id?{...r,unmeasuredIngredients:undefined}:r),old=C.cookingView(s,'plan','soup',oldRecipes);C.restartCooking(s,old);assert.equal(C.cookingView(s,'plan','soup',R).stale,true);
 });
+
+test('only an explicit always-stocked choice covers a required unknown amount',()=>{
+ const s=C.defaults(),f={...s.filters,meal:'Dinner',time:'any',mode:'only',servings:2};
+ s.pantry=C.scaled(soup,2).map(i=>({...i,always:false}));
+ assert.equal(C.matching(soup,f,s,R,I),false);
+ s.pantry.push({id,qty:1000,always:false});assert.equal(C.matching(soup,f,s,R,I),false);
+ s.pantry.find(i=>i.id===id).always=true;assert.equal(C.matching(soup,f,s,R,I),true);
+ const restored=C.migrate(JSON.parse(JSON.stringify(s)),R,I);assert.equal(C.matching(soup,f,restored,R,I),true);
+ restored.pantry.find(i=>i.id===id).always=false;assert.equal(C.matching(soup,f,restored,R,I),false);
+ restored.pantry.push({id:'nutmeg',qty:0,always:true});assert.equal(C.matching(soup,f,restored,R,I),false);
+});

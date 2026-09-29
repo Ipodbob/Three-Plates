@@ -431,6 +431,9 @@
       if (have + 0.0005 >= i.qty) yes++;
       ratio += Math.min(1, have / i.qty);
     }
+    for (const i of r.unmeasuredIngredients || []) {
+      if (C.stock(state, i.id) === Infinity) { yes++; ratio++; }
+    }
     const total = items.length + (r.unmeasuredIngredients?.length || 0);
     return { yes, total, ratio: total ? ratio / total : 0 };
   }
@@ -1019,7 +1022,7 @@
   }
   function unmeasuredNotice(items) {
     if (!items?.length) return "";
-    return `<section class="notice unmeasured-ingredients"><h3>Check amounts</h3><p class="helper">These required ingredients have no measured quantity. Check what you have before shopping or cooking. They are not included in quantity totals or automatic stock deductions.</p>${items.map(i => `<div class="section-space"><strong>${e(ing(i.id)?.name || i.id)} · Check amount</strong>${i.recipeName ? `<p class="helper">${e(i.recipeName)}</p>` : ""}<p>${e(i.note)}</p>${i.source ? `<a href="${e(i.source.url)}" target="_blank" rel="noopener noreferrer">Check publisher method ↗</a>` : ""}</div>`).join("")}</section>`;
+    return `<section class="notice unmeasured-ingredients"><h3>Check amounts</h3><p class="helper">These required ingredients have no measured quantity. Check what you have before shopping or cooking. They are not included in quantity totals or automatic stock deductions.</p>${items.map(i => `<div class="section-space"><strong>${e(ing(i.id)?.name || i.id)} · ${C.stock(state, i.id) === Infinity ? "Always stocked — assumed enough" : "Check amount"}</strong>${i.recipeName ? `<p class="helper">${e(i.recipeName)}</p>` : ""}<p>${e(i.note)}</p>${i.source ? `<a href="${e(i.source.url)}" target="_blank" rel="noopener noreferrer">Check publisher method ↗</a>` : ""}</div>`).join("")}</section>`;
   }
   function shoppingRow(i) {
     const p = C.purchase(state, i.id, i.remaining, ingredients());
@@ -1625,7 +1628,7 @@
         return `☐ ${ing(i.id).name}: ${amount(i.id, p.qty)}${p.pack ? " (" + p.count + " × " + amount(i.id, p.pack.size) + "; " + p.pack.basis + ")" : ""}`;
       });
     for (const i of C.unmeasuredRequirements(state, R))
-      lines.push(`☐ CHECK AMOUNT: ${ing(i.id).name} — ${i.recipeName}. ${i.note}`);
+      lines.push(`☐ ${C.stock(state, i.id) === Infinity ? "ASSUMED STOCKED — CHECK RECIPE AMOUNT" : "CHECK AMOUNT"}: ${ing(i.id).name} — ${i.recipeName}. ${i.note}`);
     const text =
       "THREE PLATES — " +
       (C.activeShop(state) === "none" ? "SHOPPING" : C.activeShop(state)) +

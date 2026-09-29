@@ -274,3 +274,11 @@ test('required unmeasured seasoning appears in recipe, shopping, copy, cooking a
  a.click('[data-act="prep"]');a.q('[name="prep-ref"]').checked=true;a.submit('#prep-select-form');assert.match(a.q('#prep-panel .unmeasured-ingredients').textContent,/nutmeg/i);
  a.dom.window.close();
 });
+
+test('always-stocked unknown amounts agree across coverage, no-shopping and copied reminders',async()=>{
+ const a=app();const C=a.w.PlatesCore,R=a.w.PLATES_DATA.recipes,r=R.find(r=>r.id==='sp-gfmore-courgette-potato-cheddar-soup');
+ const seed=C.defaults();seed.filters={...seed.filters,query:'courgette soup',time:'any',mode:'only'};seed.pantry=C.scaled(r,2).map(i=>({...i,always:false}));seed.pantry.push({id:'ex-fresh-nutmeg-8f09666c',qty:0,always:true});
+ const b=app({'three-plates-v3':JSON.stringify(seed)});assert.ok(b.q('[data-act="plan-add"][data-id="'+r.id+'"]'));assert.match(b.q('.meal-card').textContent,/6 \/ 6/);b.click('[data-act="plan-add"][data-id="'+r.id+'"]');b.route('shop');assert.match(b.q('.unmeasured-ingredients').textContent,/Always stocked — assumed enough/);
+ let text='';Object.defineProperty(b.w.navigator,'clipboard',{value:{writeText:async t=>{text=t;}}});b.click('[data-act="copy-list"]');await new Promise(r=>setImmediate(r));assert.match(text,/ASSUMED STOCKED — CHECK RECIPE AMOUNT: Fresh nutmeg/);
+ assert.equal(b.state().pantry.find(i=>i.id==='ex-fresh-nutmeg-8f09666c').always,true);a.dom.window.close();b.dom.window.close();
+});
