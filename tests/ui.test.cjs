@@ -139,6 +139,30 @@ test('always-stocked pantry form ignores inactive amounts and reminders but rest
  assert.equal(b.state().pantry[0].always,false);assert.equal(b.state().pantry[0].qty,250);
 });
 
+test('cancelled dialog drafts preserve saved data and return focus across planning shopping and pantry', (t) => {
+ const a=app();t.after(()=>a.dom.window.close());
+ const cancel=(opener,edit)=>{
+   const saved=a.w.localStorage.getItem('three-plates-v3');a.q(opener).focus();a.click(opener);
+   assert.equal(a.q('#sheet').open,true,opener);edit();a.click('#sheet [data-act="close"]');
+   assert.equal(a.q('#sheet').open,false,opener);
+   assert.equal(a.w.localStorage.getItem('three-plates-v3'),saved,opener);
+   assert.equal(a.w.document.activeElement,a.q(opener),opener);
+ };
+ a.route('pantry');cancel('[data-act="pantry-add"]',()=>{a.set('#pantry-name','Pasta');a.set('#pantry-qty','500');});
+ a.route('choose');a.q('#recipe-search').value='Pesto & pea pasta';a.submit('#search-form');
+ cancel('[data-act="recipe"]',()=>a.set('#recipe-portions','3'));
+ a.click('[data-act="plan-add"][data-id="pesto-pea-pasta"]');a.route('plan');
+ cancel('[data-act="plan-edit"]',()=>a.set('#plan-portions','5'));
+ cancel('[data-act="plan-side"]',()=>{a.q('#side-search').value='radishes';a.q('#side-search').dispatchEvent(new a.w.Event('input',{bubbles:true}));});
+ a.route('shop');cancel('[data-act="pack-edit"][data-id="pasta"]',()=>a.set('#pack-size','750'));
+ a.click('[data-act="bought"][data-id="pasta"]');cancel('[data-act="purchase-edit"][data-id="pasta"]',()=>a.set('#purchase-qty','350'));
+ a.route('batch');a.click('#bf-time-any');cancel('[data-act="batch-add"]',()=>a.set('#batch-portions','8'));
+ a.click('[data-act="batch-add"]');a.set('#batch-portions','4');a.submit('#batch-form');a.route('plan');
+ cancel('[data-act="batch-finish"]',()=>{a.set('#eat-now','1');a.set('#freezer-qty','3');});
+ a.click('[data-act="batch-finish"]');a.q('#freezer-confirm').checked=true;a.q('#storage-confirm').checked=true;a.submit('#finish-batch-form');
+ a.route('pantry');cancel('[data-act="lot-plan"]',()=>{a.set('#lot-meal','Dinner');a.set('#lot-time','19:00');a.set('#lot-servings','1');});
+});
+
 function app(seed={},failStorage=false){
  const dom=new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'),{url:'http://localhost/Three-Plates/',runScripts:'outside-only'}),w=dom.window;
  w.confirm=()=>true;w.scrollTo=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
